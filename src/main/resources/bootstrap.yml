@@ -1,0 +1,3 @@
+spring:
+  application:
+    name: COM.NDC.CHANNEL.SERVICE

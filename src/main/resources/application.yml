@@ -1,0 +1,86 @@
+server:
+  port: 8001
+  tomcat:
+    uri-encoding: UTF-8
+spring:
+  cache:
+    ehcache:
+      config: classpath:/ehcache/ehcache.xml
+    type: ehcache
+  redis:
+    host: db-replication.redis.svc.flybycs.com
+    password: feibaredis
+    port: 6379
+    timeout: 5000ms
+    database: 2
+    lettuce:
+      pool:
+        max-active: 10
+        max-wait: -1
+        max-idle: 10
+        min-idle: 1
+ibeplus:
+  #ota：生产环境，目前阶段不要提交  develop：测试环境
+  baseurl: http://espeed.srv.prod.flybytrip.com/develop/
+  ota:
+    username: hzxs
+    password: 95Zy95Zqn4Rg  #测试环境密码
+    #password: Gx58aT2p03iP   #生成环境密码
+    iatanumber: 08315860
+  searchone:
+    useCache: Y
+    serviceUrl: ${ibeplus.baseurl}/xml/AirFareSearchOne/I
+  farerule:
+    serviceUrl: ${ibeplus.baseurl}/xml/AirFareRules/I
+  rtpnr:
+    serviceUrl: ${ibeplus.baseurl}/xml/AirResRetComplete
+  xepnr:
+    serviceUrl: ${ibeplus.baseurl}/xml/AirBookModify
+  bookpnr:
+    serviceUrl: ${ibeplus.baseurl}/xml/AirBook
+    airresretUrl: ${ibeplus.baseurl}/xml/AirResRet
+    airdetailsUrl: ${ibeplus.baseurl}/xml/AirDetails
+  ifarerule:
+    pnrServiceUrl: ${ibeplus.baseurl}/xml/AirFarePriceByPNR4WS/I
+    flightInfoServiceUrl: ${ibeplus.baseurl}/xml/AirFarePrice/I
+  airrefund:
+    serviceUrl: ${ibeplus.baseurl}/xml/AirTicketRefund
+  searchflight:
+    serviceUrl: ${ibeplus.baseurl}/xml/AirFlightShop/D
+    useCache: Y
+  airbrief:
+    serviceUrl: ${ibeplus.baseurl}/xml/AirBrief
+  flightissue:
+    serviceUrl: ${ibeplus.baseurl}/xml/AirDemandTicket
+  inflightissue:
+    serviceUrl: ${ibeplus.baseurl}/xml/AirFareAutoTicketPlus/I
+  flightRule:
+    serviceUrl: ${ibeplus.baseurl}/xml/AirRuleDisplayPlus/D
+  fd:
+    serviceUrl: ${ibeplus.baseurl}/xml/AirFareDisplay/D
+  reshop:
+    serviceUrl: ${ibeplus.baseurl}/xml/AirTicketReShop
+  pata:
+    serviceUrl: ${ibeplus.baseurl}/xml/AirPrice/D
+  pataBySeg:
+    serviceUrl: ${ibeplus.baseurl}/xml/AirPriceBySeg/D
+  reissueprice:
+    serviceUrl: ${ibeplus.baseurl}/xml/AirReIssuePrice
+  reissue:
+    serviceUrl: ${ibeplus.baseurl}/xml/AirReIssueAutoTicket
+  av:
+    serviceUrl: ${ibeplus.baseurl}/xml/AirAvail/RealTime
+
+sys:
+  basedata:
+    root: E:\workspacefiancenewgit\ticket_ibe_plus\src\main\resources\data
+
+xxl:
+  job:
+    admin:
+      addresses: http://flyby-task-admin.develop.svc.flybycs.com/
+    accessToken:
+    executor:
+      appname: flight-cache-run
+      logretentiondays: 30
+      logpath: ./logs
