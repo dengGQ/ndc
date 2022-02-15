@@ -1,9 +1,10 @@
-package com.ndc.channel.flight.dto;
+package com.ndc.channel.flight.dto.flightSearch;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Data
 public class CorpApiTicketData {
@@ -79,4 +80,15 @@ public class CorpApiTicketData {
 
 	@ApiModelProperty(value = "价格类型, 0: 未知, 1: fdPrice, 2: nfdPrice", required = false)
 	private Byte priceType;
+
+	private List<String> offerItemIdList;
+	private String pricingSystemCodeText;
+
+	private String priceClassID;
+	private String priceClassCode;
+	private String priceClassName;
+	private String priceClassDesc;
+
+
+	private String fareTypeCode;
 }

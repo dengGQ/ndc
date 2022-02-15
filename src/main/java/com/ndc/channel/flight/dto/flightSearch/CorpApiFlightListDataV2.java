@@ -1,4 +1,4 @@
-package com.ndc.channel.flight.dto;
+package com.ndc.channel.flight.dto.flightSearch;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -113,6 +113,11 @@ public class CorpApiFlightListDataV2 {
 	@ApiModelProperty(value = "机票信息", required = true)
 	private List<CorpApiTicketData> tickets;
 
+	private String originDestID;
+	private List<String> paxJourneyRefID;
+	private String paxJourneyID;
+	private List<String> paxSegmentRefID;
+	private String paxSegmentID;
 
 	public String getFlightId() {
 		return flightId;
@@ -392,5 +397,45 @@ public class CorpApiFlightListDataV2 {
 
 	public void setTickets(List<CorpApiTicketData> tickets) {
 		this.tickets = tickets;
+	}
+
+	public String getOriginDestID() {
+		return originDestID;
+	}
+
+	public void setOriginDestID(String originDestID) {
+		this.originDestID = originDestID;
+	}
+
+	public List<String> getPaxJourneyRefID() {
+		return paxJourneyRefID;
+	}
+
+	public void setPaxJourneyRefID(List<String> paxJourneyRefID) {
+		this.paxJourneyRefID = paxJourneyRefID;
+	}
+
+	public String getPaxJourneyID() {
+		return paxJourneyID;
+	}
+
+	public void setPaxJourneyID(String paxJourneyID) {
+		this.paxJourneyID = paxJourneyID;
+	}
+
+	public List<String> getPaxSegmentRefID() {
+		return paxSegmentRefID;
+	}
+
+	public void setPaxSegmentRefID(List<String> paxSegmentRefID) {
+		this.paxSegmentRefID = paxSegmentRefID;
+	}
+
+	public String getPaxSegmentID() {
+		return paxSegmentID;
+	}
+
+	public void setPaxSegmentID(String paxSegmentID) {
+		this.paxSegmentID = paxSegmentID;
 	}
 }

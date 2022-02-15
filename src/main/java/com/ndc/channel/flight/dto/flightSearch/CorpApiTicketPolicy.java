@@ -1,4 +1,4 @@
-package com.ndc.channel.flight.dto;
+package com.ndc.channel.flight.dto.flightSearch;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;

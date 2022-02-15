@@ -1,0 +1,203 @@
+<!DOCTYPE IATA_OfferPriceRQ [
+        <!ELEMENT IATA_OfferPriceRQ (MessageDoc|Party|PayloadAttributes|Request)*>
+        <!ATTLIST IATA_OfferPriceRQ
+                xmlns CDATA #REQUIRED>
+        <!ELEMENT MessageDoc (Name|RefVersionNumber)*>
+        <!ELEMENT Name (#PCDATA)>
+        <!ELEMENT RefVersionNumber (#PCDATA)>
+        <!ELEMENT Party (Recipient|Sender)*>
+        <!ELEMENT Recipient (MarketingCarrier)*>
+        <!ELEMENT MarketingCarrier (AirlineDesigCode|DuplicateDesigInd)*>
+        <!ELEMENT AirlineDesigCode (#PCDATA)>
+        <!ELEMENT DuplicateDesigInd (#PCDATA)>
+        <!ELEMENT Sender (TravelAgency)*>
+        <!ELEMENT TravelAgency (AgencyID|IATANumber|Name|PseudoCityID|TypeCode)*>
+        <!ELEMENT AgencyID (#PCDATA)>
+        <!ELEMENT IATANumber (#PCDATA)>
+        <!ELEMENT PseudoCityID (#PCDATA)>
+        <!ELEMENT TypeCode (#PCDATA)>
+        <!ELEMENT PayloadAttributes (AltLangID|CorrelationID|EchoTokenText|PrimaryLangID|RetransmissionInd|SeqNumber|Timestamp|TrxID|TrxStatusCode|VersionNumber)*>
+        <!ELEMENT AltLangID (#PCDATA)>
+        <!ELEMENT CorrelationID (#PCDATA)>
+        <!ELEMENT EchoTokenText (#PCDATA)>
+        <!ELEMENT PrimaryLangID (#PCDATA)>
+        <!ELEMENT RetransmissionInd (#PCDATA)>
+        <!ELEMENT SeqNumber (#PCDATA)>
+        <!ELEMENT Timestamp (#PCDATA)>
+        <!ELEMENT TrxID (#PCDATA)>
+        <!ELEMENT TrxStatusCode (#PCDATA)>
+        <!ELEMENT VersionNumber (#PCDATA)>
+        <!ELEMENT Request (DataLists|PricedOffer)*>
+        <!ELEMENT DataLists (OriginDestList|PaxJourneyList|PaxSegmentList|PriceClassList)*>
+        <!ELEMENT OriginDestList (OriginDest)*>
+        <!ELEMENT OriginDest (DestCode|OriginCode|OriginDestID|PaxJourneyRefID)*>
+        <!ELEMENT DestCode (#PCDATA)>
+        <!ELEMENT OriginCode (#PCDATA)>
+        <!ELEMENT OriginDestID (#PCDATA)>
+        <!ELEMENT PaxJourneyRefID (#PCDATA)>
+        <!ELEMENT PaxJourneyList (PaxJourney)*>
+        <!ELEMENT PaxJourney (PaxJourneyID|PaxSegmentRefID)*>
+        <!ELEMENT PaxJourneyID (#PCDATA)>
+        <!ELEMENT PaxSegmentRefID (#PCDATA)>
+        <!ELEMENT PaxSegmentList (PaxSegment)*>
+        <!ELEMENT PaxSegment (Arrival|DatedOperatingLeg|Dep|MarketingCarrierInfo|OperatingCarrierInfo|PaxSegmentID|SecureFlightInd)*>
+        <!ELEMENT Arrival (AircraftScheduledDateTime|IATALocationCode|StationName|TerminalName)*>
+        <!ELEMENT AircraftScheduledDateTime (#PCDATA)>
+        <!ELEMENT IATALocationCode (#PCDATA)>
+        <!ELEMENT StationName (#PCDATA)>
+        <!ELEMENT TerminalName (#PCDATA)>
+        <!ELEMENT DatedOperatingLeg (Arrival|CarrierAircraftType|DatedOperatingLegID|Dep)*>
+        <!ELEMENT CarrierAircraftType (CarrierAircraftTypeCode|CarrierAircraftTypeName)*>
+        <!ELEMENT CarrierAircraftTypeCode (#PCDATA)>
+        <!ELEMENT CarrierAircraftTypeName (#PCDATA)>
+        <!ELEMENT DatedOperatingLegID (#PCDATA)>
+        <!ELEMENT Dep (IATALocationCode|AircraftScheduledDateTime|StationName|TerminalName)*>
+        <!ELEMENT MarketingCarrierInfo (CarrierDesigCode|MarketingCarrierFlightNumberText|OperationalSuffixText)*>
+        <!ELEMENT CarrierDesigCode (#PCDATA)>
+        <!ELEMENT MarketingCarrierFlightNumberText (#PCDATA)>
+        <!ELEMENT OperationalSuffixText (#PCDATA)>
+        <!ELEMENT OperatingCarrierInfo (CarrierDesigCode|OperatingCarrierFlightNumberText|RBDCode)*>
+        <!ELEMENT OperatingCarrierFlightNumberText (#PCDATA)>
+        <!ELEMENT RBDCode (#PCDATA)>
+        <!ELEMENT PaxSegmentID (#PCDATA)>
+        <!ELEMENT SecureFlightInd (#PCDATA)>
+        <!ELEMENT PriceClassList (PriceClass)*>
+        <!ELEMENT PriceClass (Code|Desc|Name|PriceClassID)*>
+        <!ELEMENT Code (#PCDATA)>
+        <!ELEMENT Desc (DescText)*>
+        <!ELEMENT DescText (#PCDATA)>
+        <!ELEMENT PriceClassID (#PCDATA)>
+        <!ELEMENT PricedOffer (CreateOrderItem)*>
+        <!ELEMENT CreateOrderItem (OfferItemID|OfferItemType)*>
+        <!ELEMENT OfferItemID (#PCDATA)>
+        <!ELEMENT OfferItemType (FlightItem)*>
+        <!ELEMENT FlightItem (FareDetail|OriginDestRefID)*>
+        <!ELEMENT FareDetail (FareComponent|PricingSystemCodeText)*>
+        <!ELEMENT FareComponent (FareTypeCode|PaxSegmentRefID|PriceClassRefID)*>
+        <!ELEMENT FareTypeCode (#PCDATA)>
+        <!ELEMENT PriceClassRefID (#PCDATA)>
+        <!ELEMENT PricingSystemCodeText (#PCDATA)>
+        <!ELEMENT OriginDestRefID (#PCDATA)>
+        ]>
+<IATA_OfferPriceRQ xmlns="http://www.iata.org/IATA/2015/00/2018.2/IATA_OfferPriceRQ">
+    <MessageDoc>
+        <Name>NDC_FLIGHT_OFFER_PRICE</Name>
+        <RefVersionNumber>18.2</RefVersionNumber>
+    </MessageDoc>
+    <Party>
+        <Recipient>
+            <MarketingCarrier>
+                <AirlineDesigCode>MU</AirlineDesigCode>
+                <DuplicateDesigInd>false</DuplicateDesigInd>
+            </MarketingCarrier>
+        </Recipient>
+        <Sender>
+            <TravelAgency>
+                <AgencyID>7301</AgencyID>
+                <IATANumber>8332730</IATANumber>
+                <Name>测试</Name>
+                <PseudoCityID>HGH121</PseudoCityID>
+                <TypeCode>OnlineTravelAgency</TypeCode>
+            </TravelAgency>
+        </Sender>
+    </Party>
+    <PayloadAttributes>
+        <AltLangID>CN</AltLangID>
+        <CorrelationID>18f0cc67-b8f5-4c57-af2b-c19b503edf01</CorrelationID>
+        <EchoTokenText>0e3597e3-cdde-41c6-a209-f77db62511b3</EchoTokenText>
+        <PrimaryLangID>CN</PrimaryLangID>
+        <RetransmissionInd>false</RetransmissionInd>
+        <SeqNumber>1</SeqNumber>
+        <Timestamp>2021-11-08T14:39:42.241+08:00</Timestamp>
+        <TrxID>ddad69ad66b24e4b92ee88f52051a480</TrxID>
+        <TrxStatusCode>0</TrxStatusCode>
+        <VersionNumber>18.2</VersionNumber>
+    </PayloadAttributes>
+    <Request>
+        <DataLists>
+            <OriginDestList>
+                <OriginDest>
+                    <DestCode>XIY</DestCode>
+                    <OriginCode>PVG</OriginCode>
+                    <OriginDestID>1</OriginDestID>
+                    <PaxJourneyRefID>10013</PaxJourneyRefID>
+                </OriginDest>
+            </OriginDestList>
+            <PaxJourneyList>
+                <PaxJourney>
+                    <PaxJourneyID>10013</PaxJourneyID>
+                    <PaxSegmentRefID>10005_1</PaxSegmentRefID>
+                </PaxJourney>
+            </PaxJourneyList>
+            <PaxSegmentList>
+                <PaxSegment>
+                    <Arrival>
+                        <AircraftScheduledDateTime>2022-01-10T19:55:00.000+08:00</AircraftScheduledDateTime>
+                        <IATALocationCode>XIY</IATALocationCode>
+                        <StationName>咸阳机场</StationName>
+                        <TerminalName>T3</TerminalName>
+                    </Arrival>
+                    <DatedOperatingLeg>
+                        <Arrival>
+                            <IATALocationCode>XIY</IATALocationCode>
+                        </Arrival>
+                        <CarrierAircraftType>
+                            <CarrierAircraftTypeCode>325</CarrierAircraftTypeCode>
+                            <CarrierAircraftTypeName>空客321</CarrierAircraftTypeName>
+                        </CarrierAircraftType>
+                        <DatedOperatingLegID>10006</DatedOperatingLegID>
+                        <Dep>
+                            <IATALocationCode>PVG</IATALocationCode>
+                        </Dep>
+                    </DatedOperatingLeg>
+                    <Dep>
+                        <AircraftScheduledDateTime>2022-01-10T16:55:00.000+08:00</AircraftScheduledDateTime>
+                        <IATALocationCode>PVG</IATALocationCode>
+                        <StationName>浦东国际机场</StationName>
+                        <TerminalName>T1</TerminalName>
+                    </Dep>
+                    <MarketingCarrierInfo>
+                        <CarrierDesigCode>MU</CarrierDesigCode>
+                        <MarketingCarrierFlightNumberText>2162</MarketingCarrierFlightNumberText>
+                        <OperationalSuffixText>F</OperationalSuffixText>
+                    </MarketingCarrierInfo>
+                    <OperatingCarrierInfo>
+                        <CarrierDesigCode>MU</CarrierDesigCode>
+                        <OperatingCarrierFlightNumberText>2162</OperatingCarrierFlightNumberText>
+                        <RBDCode>E</RBDCode>
+                    </OperatingCarrierInfo>
+                    <PaxSegmentID>10005_1</PaxSegmentID>
+                    <SecureFlightInd>false</SecureFlightInd>
+                </PaxSegment>
+            </PaxSegmentList>
+            <PriceClassList>
+                <PriceClass>
+                    <Code>COMMON_Y</Code>
+                    <Desc>
+                        <DescText>{"productDefinition":{"productCode":"COMMON_Y","productCornerSign":"","productDesc":"","productDescII":"","productName":"经济舱","productNotice":"","productResource":[],"promotionCode":"","specialCode":"","uRL":""},"rightDefinitionList":[]}</DescText>
+                    </Desc>
+                    <Name>经济舱</Name>
+                    <PriceClassID>10028</PriceClassID>
+                </PriceClass>
+            </PriceClassList>
+        </DataLists>
+        <PricedOffer>
+            <CreateOrderItem>
+                <OfferItemID>10037</OfferItemID>
+                <OfferItemType>
+                    <FlightItem>
+                        <FareDetail>
+                            <FareComponent>
+                                <FareTypeCode>Y</FareTypeCode>
+                                <PaxSegmentRefID>10005_1</PaxSegmentRefID>
+                                <PriceClassRefID>10028</PriceClassRefID>
+                            </FareComponent>
+                            <PricingSystemCodeText>STANDARD</PricingSystemCodeText>
+                        </FareDetail>
+                        <OriginDestRefID>1</OriginDestRefID>
+                    </FlightItem>
+                </OfferItemType>
+            </CreateOrderItem>
+        </PricedOffer>
+    </Request>
+</IATA_OfferPriceRQ>

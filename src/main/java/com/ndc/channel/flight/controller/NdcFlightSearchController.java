@@ -1,6 +1,6 @@
 package com.ndc.channel.flight.controller;
 
-import com.ndc.channel.flight.dto.CorpApiFlightListDataV2;
+import com.ndc.channel.flight.dto.flightSearch.CorpApiFlightListDataV2;
 import com.ndc.channel.flight.handler.NdcFlightSearchHandler;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;

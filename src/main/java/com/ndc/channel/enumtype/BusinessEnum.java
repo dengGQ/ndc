@@ -5,6 +5,29 @@ import com.ndc.channel.exception.BusinessException;
 import java.util.*;
 
 public class BusinessEnum {
+
+	public enum NdcApiInfo{
+
+		FLIGHT_SEARCH("A0534", "/ndc-shopping-common/shopping/basicShopping"),
+		OFFER_PRICE("A0535", "/ndc-flight-offer-price/price/flightOfferPrice");
+
+		private String code;
+		private String path;
+
+		public String getCode() {
+			return code;
+		}
+
+		public String getPath() {
+			return path;
+		}
+
+		NdcApiInfo(String code, String path) {
+			this.code = code;
+			this.path = path;
+		}
+	}
+
 	/**
 	 * 产品id
 	 * 0:标准产品 1：官网产品 2：特惠产品 3：大客户协议产品 4：政采产品 5:未知产品类型

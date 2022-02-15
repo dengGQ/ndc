@@ -1,5 +1,5 @@
 
-package com.ndc.channel.flight.xmlBean.flightSearch.common;
+package com.ndc.channel.flight.xmlBean.verifyPrice.common;
 
 import javax.xml.bind.annotation.*;
 import java.time.LocalDateTime;
@@ -48,28 +48,28 @@ import java.util.UUID;
     "trxStatusCode",
     "versionNumber"
 })
-@XmlRootElement(name = "PayloadAttributes", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_AirShoppingRQ")
+@XmlRootElement(name = "PayloadAttributes", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_OfferPriceRQ")
 public class PayloadAttributes {
 
-    @XmlElement(name = "AltLangID", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_AirShoppingRQ", required = true)
+    @XmlElement(name = "AltLangID", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_OfferPriceRQ", required = true)
     protected String altLangID;
-    @XmlElement(name = "CorrelationID", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_AirShoppingRQ", required = true)
+    @XmlElement(name = "CorrelationID", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_OfferPriceRQ", required = true)
     protected String correlationID;
-    @XmlElement(name = "EchoTokenText", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_AirShoppingRQ", required = true)
+    @XmlElement(name = "EchoTokenText", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_OfferPriceRQ", required = true)
     protected String echoTokenText;
-    @XmlElement(name = "PrimaryLangID", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_AirShoppingRQ", required = true)
+    @XmlElement(name = "PrimaryLangID", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_OfferPriceRQ", required = true)
     protected String primaryLangID;
-    @XmlElement(name = "RetransmissionInd", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_AirShoppingRQ", required = true)
+    @XmlElement(name = "RetransmissionInd", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_OfferPriceRQ", required = true)
     protected String retransmissionInd;
-    @XmlElement(name = "SeqNumber", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_AirShoppingRQ", required = true)
+    @XmlElement(name = "SeqNumber", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_OfferPriceRQ", required = true)
     protected String seqNumber;
-    @XmlElement(name = "Timestamp", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_AirShoppingRQ", required = true)
+    @XmlElement(name = "Timestamp", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_OfferPriceRQ", required = true)
     protected String timestamp;
-    @XmlElement(name = "TrxID", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_AirShoppingRQ", required = true)
+    @XmlElement(name = "TrxID", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_OfferPriceRQ", required = true)
     protected String trxID;
-    @XmlElement(name = "TrxStatusCode", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_AirShoppingRQ", required = true)
+    @XmlElement(name = "TrxStatusCode", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_OfferPriceRQ", required = true)
     protected String trxStatusCode;
-    @XmlElement(name = "VersionNumber", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_AirShoppingRQ", required = true)
+    @XmlElement(name = "VersionNumber", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_OfferPriceRQ", required = true)
     protected String versionNumber;
 
     public PayloadAttributes() {
