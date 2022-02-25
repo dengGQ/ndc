@@ -291,14 +291,6 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link BaggageAllowanceList }
-     * 
-     */
-    public BaggageAllowanceList createBaggageAllowanceList() {
-        return new BaggageAllowanceList();
-    }
-
-    /**
      * Create an instance of {@link BaggageAllowance }
      * 
      */
@@ -355,35 +347,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link OriginDestList }
-     * 
-     */
-    public OriginDestList createOriginDestList() {
-        return new OriginDestList();
-    }
-
-    /**
      * Create an instance of {@link OriginDest }
      * 
      */
     public OriginDest createOriginDest() {
         return new OriginDest();
-    }
-
-    /**
-     * Create an instance of {@link PaxJourneyList }
-     * 
-     */
-    public PaxJourneyList createPaxJourneyList() {
-        return new PaxJourneyList();
-    }
-
-    /**
-     * Create an instance of {@link PaxSegmentList }
-     * 
-     */
-    public PaxSegmentList createPaxSegmentList() {
-        return new PaxSegmentList();
     }
 
     /**
@@ -435,14 +403,6 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link PriceClassList }
-     * 
-     */
-    public PriceClassList createPriceClassList() {
-        return new PriceClassList();
-    }
-
-    /**
      * Create an instance of {@link PriceClass }
      * 
      */
@@ -456,14 +416,6 @@ public class ObjectFactory {
      */
     public Desc createDesc() {
         return new Desc();
-    }
-
-    /**
-     * Create an instance of {@link ServiceDefinitionList }
-     * 
-     */
-    public ServiceDefinitionList createServiceDefinitionList() {
-        return new ServiceDefinitionList();
     }
 
     /**

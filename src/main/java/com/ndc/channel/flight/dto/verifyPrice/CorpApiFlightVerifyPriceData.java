@@ -1,8 +1,11 @@
 package com.ndc.channel.flight.dto.verifyPrice;
 
+import com.ndc.channel.flight.dto.flightSearch.CorpApiTicketPolicy;
+import com.ndc.channel.flight.dto.flightSearch.TicketServiceDefinition;
 import io.swagger.annotations.ApiModel;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * @author dingyajun
@@ -28,6 +31,10 @@ public class CorpApiFlightVerifyPriceData {
 	private BigDecimal oilFee;
 
 	private String seatCount;
+
+	private CorpApiTicketPolicy policy;
+
+	private List<TicketServiceDefinition> serviceDefinitionList;
 
 	public String getFlightNumber() {
 		return flightNumber;
@@ -99,5 +106,21 @@ public class CorpApiFlightVerifyPriceData {
 
 	public void setSeatCount(String seatCount) {
 		this.seatCount = seatCount;
+	}
+
+	public CorpApiTicketPolicy getPolicy() {
+		return policy;
+	}
+
+	public void setPolicy(CorpApiTicketPolicy policy) {
+		this.policy = policy;
+	}
+
+	public List<TicketServiceDefinition> getServiceDefinitionList() {
+		return serviceDefinitionList;
+	}
+
+	public void setServiceDefinitionList(List<TicketServiceDefinition> serviceDefinitionList) {
+		this.serviceDefinitionList = serviceDefinitionList;
 	}
 }

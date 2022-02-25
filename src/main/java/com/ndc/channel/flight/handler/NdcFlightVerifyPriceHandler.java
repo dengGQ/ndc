@@ -1,13 +1,18 @@
 package com.ndc.channel.flight.handler;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.ndc.channel.exception.BusinessException;
 import com.ndc.channel.exception.BusinessExceptionCode;
 import com.ndc.channel.flight.dto.flightSearch.CorpApiFlightListDataV2;
 import com.ndc.channel.flight.dto.flightSearch.CorpApiTicketData;
+import com.ndc.channel.flight.dto.flightSearch.CorpApiTicketPolicy;
+import com.ndc.channel.flight.dto.flightSearch.TicketServiceDefinition;
 import com.ndc.channel.flight.dto.verifyPrice.CorpApiFlightVerifyPriceData;
 import com.ndc.channel.flight.dto.verifyPrice.FeiBaApiVerifyPriceReq;
 import com.ndc.channel.flight.dto.verifyPrice.FeibaApiVerificationParams;
 import com.ndc.channel.flight.tools.NdcApiTools;
+import com.ndc.channel.flight.xmlBean.flightSearch.common.Error;
 import com.ndc.channel.flight.xmlBean.verifyPrice.request.bean.*;
 import com.ndc.channel.flight.xmlBean.verifyPrice.request.bean.Arrival;
 import com.ndc.channel.flight.xmlBean.verifyPrice.request.bean.DataLists;
@@ -39,6 +44,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -67,7 +73,8 @@ public class NdcFlightVerifyPriceHandler {
         final String flightId = params.getFlightId();
         final String ticketId = params.getTicketId();
 
-        CorpApiFlightListDataV2 flightData = redisUtils.get(RedisKeyConstants.getRedisFlightDataCacheKey(flightId), CorpApiFlightListDataV2.class);
+        final String redisFlightDataCacheKey = RedisKeyConstants.getRedisFlightDataCacheKey(flightId);
+        CorpApiFlightListDataV2 flightData = redisUtils.get(redisFlightDataCacheKey, CorpApiFlightListDataV2.class);
         CorpApiTicketData ticketData = redisUtils.hGet(RedisKeyConstants.getRedisTicketDataCacheKey(flightId), ticketId, CorpApiTicketData.class);
 
         IATAOfferPriceRQ priceRQ = new IATAOfferPriceRQ();
@@ -79,44 +86,61 @@ public class NdcFlightVerifyPriceHandler {
         final CorpApiFlightVerifyPriceData verifyRespData = new CorpApiFlightVerifyPriceData();
         verifyRespData.setSuccess(false);
 
-        for (String offerItemId : ticketData.getOfferItemIdList()) {
-            request.setPricedOffer(getPriceOffer(flightData, ticketData, offerItemId));
+        request.setPricedOffer(getPriceOffer(flightData, ticketData, ticketData.getOfferItemId()));
 
-            priceRQ.setRequest(request);
-            final IATAOfferPriceRS iataOfferPriceRS = ndcApiTools.flightOfferPrice(priceRQ);
+        priceRQ.setRequest(request);
+        final IATAOfferPriceRS iataOfferPriceRS = ndcApiTools.flightOfferPrice(priceRQ);
 
-            if (iataOfferPriceRS.getError() != null){
-                continue;
-            }
-
-            final Response response = iataOfferPriceRS.getResponse();
-            final ShoppingResponse shoppingResponse = response.getShoppingResponse();
-            final Offer adtOffer = response.getOtherOffers().getOffer().stream()
-                    .filter(offer -> offer.getPTCOfferParameters().getPTCPricedCode().equals("ADT")).findFirst()
-                    .orElseGet(() -> {
-                        throw new BusinessException(BusinessExceptionCode.REQUEST_PARAM_ERROR, "未找到成人报价信息！");
-                    });
-
-            final TotalPrice totalPrice = adtOffer.getTotalPrice();
-            final String ticketPrice = totalPrice.getBaseAmount().getValue();
-
-            final List<Tax> tax = totalPrice.getTaxSummary().getTax();
-
-            final Map<String, Tax> taxMap = tax.stream().collect(Collectors.toMap(Tax::getTaxCode, Function.identity()));
-            final Tax buildFee = Optional.ofNullable(taxMap.get("CN")).orElse(EMPTY_TAX);
-            final Tax oilFee = Optional.ofNullable(taxMap.get("YQ")).orElse(EMPTY_TAX);
-
-            verifyRespData.setTicketPrice(new BigDecimal(ticketPrice));
-            verifyRespData.setPurchasePrice(new BigDecimal(ticketPrice));
-            verifyRespData.setBuildFee(new BigDecimal(buildFee.getAmount().getValue()));
-            verifyRespData.setOilFee(new BigDecimal(oilFee.getAmount().getValue()));
-
-            verifyRespData.setFlightNumber(flightData.getFlightNumber());
-            verifyRespData.setSeatClassCode(ticketData.getSeatClassCode());
-            verifyRespData.setSuccess(true);
-
-            break;
+        final Error error = iataOfferPriceRS.getError();
+        if (error != null){
+            throw new BusinessException(BusinessExceptionCode.REQUEST_PARAM_ERROR, error.getDescText());
         }
+
+
+        final Response response = iataOfferPriceRS.getResponse();
+
+        List<ServiceDefinition> serviceDefinitionList = response.getDataLists().getServiceDefinitionList();
+
+        final ShoppingResponse shoppingResponse = response.getShoppingResponse();
+        flightData.setShoppingResponseID(shoppingResponse.getShoppingResponseID());
+
+        final Offer adtOffer = response.getOtherOffers().getOffer().stream()
+                .filter(offer -> offer.getPTCOfferParameters().getPTCPricedCode().equals("ADT")).findFirst()
+                .orElseGet(() -> {
+                    throw new BusinessException(BusinessExceptionCode.REQUEST_PARAM_ERROR, "未找到成人报价信息！");
+                });
+
+        final OfferItem offerItem = adtOffer.getOfferItem();
+        final TotalPrice totalPrice = adtOffer.getTotalPrice();
+
+        final String offerItemID = offerItem.getOfferItemID();
+        final com.ndc.channel.flight.xmlBean.verifyPrice.response.bean.FareDetail fareDetail = offerItem.getFareDetail();
+        final String remarkText = fareDetail.getFareComponent().getFareRule().get(0).getRemark().getRemarkText();
+
+        final String ticketPrice = totalPrice.getBaseAmount().getValue();
+        final List<Tax> tax = totalPrice.getTaxSummary().getTax();
+
+        final Map<String, Tax> taxMap = tax.stream().collect(Collectors.toMap(Tax::getTaxCode, Function.identity()));
+        final Tax buildFee = Optional.ofNullable(taxMap.get("CN")).orElse(EMPTY_TAX);
+        final Tax oilFee = Optional.ofNullable(taxMap.get("YQ")).orElse(EMPTY_TAX);
+
+        verifyRespData.setTicketPrice(new BigDecimal(ticketPrice));
+        verifyRespData.setPurchasePrice(new BigDecimal(ticketPrice));
+        verifyRespData.setBuildFee(new BigDecimal(buildFee.getAmount().getValue()));
+        verifyRespData.setOilFee(new BigDecimal(oilFee.getAmount().getValue()));
+
+        verifyRespData.setFlightNumber(flightData.getFlightNumber());
+        verifyRespData.setSeatClassCode(ticketData.getSeatClassCode());
+        verifyRespData.setSuccess(true);
+        verifyRespData.setServiceDefinitionList(getServiceDefinitionList(serviceDefinitionList));
+
+        final CorpApiTicketPolicy policy = new CorpApiTicketPolicy();
+        final JSONObject policyJson = JSONObject.parseObject(remarkText, JSONObject.class);
+        policy.setChangePolicy(policyJson.getString("comment"));
+        policy.setRefundPolicy(policyJson.getString("comment"));
+        verifyRespData.setPolicy(policy);
+
+        redisUtils.setStrExpire(redisFlightDataCacheKey, JSON.toJSONString(flightData), 1, TimeUnit.DAYS);
 
         return verifyRespData;
     }
@@ -248,5 +272,18 @@ public class NdcFlightVerifyPriceHandler {
         paxSegmentList.setPaxSegment(paxSegment);
 
         return paxSegmentList;
+    }
+
+    public List<TicketServiceDefinition> getServiceDefinitionList(List<ServiceDefinition> serviceDefinitionList) {
+        final List<TicketServiceDefinition> ticketServiceDefinitionList = Optional.ofNullable(serviceDefinitionList).orElseGet(Arrays::asList).stream().map(serviceDefinition -> {
+            final TicketServiceDefinition definition = new TicketServiceDefinition();
+
+            definition.setServiceDefinitionID(serviceDefinition.getServiceDefinitionID());
+            definition.setServiceCode(serviceDefinition.getServiceCode());
+            definition.setName(serviceDefinition.getName());
+            return definition;
+        }).collect(Collectors.toList());
+
+        return ticketServiceDefinitionList;
     }
 }

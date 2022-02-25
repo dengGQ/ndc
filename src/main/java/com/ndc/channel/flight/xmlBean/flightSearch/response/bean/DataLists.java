@@ -1,11 +1,8 @@
 
 package com.ndc.channel.flight.xmlBean.flightSearch.response.bean;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.*;
+import java.util.List;
 
 
 /**
@@ -34,199 +31,90 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = {
-    "baggageAllowanceList",
-    "originDestList",
-    "paxJourneyList",
-    "paxList",
-    "paxSegmentList",
-    "priceClassList",
-    "serviceDefinitionList"
-})
 @XmlRootElement(name = "DataLists", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_AirShoppingRS")
 public class DataLists {
 
-    @XmlElement(name = "BaggageAllowanceList", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_AirShoppingRS", required = true)
-    protected BaggageAllowanceList baggageAllowanceList;
-    @XmlElement(name = "OriginDestList", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_AirShoppingRS", required = true)
-    protected OriginDestList originDestList;
-    @XmlElement(name = "PaxJourneyList", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_AirShoppingRS", required = true)
-    protected PaxJourneyList paxJourneyList;
-    @XmlElement(name = "PaxList", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_AirShoppingRS", required = true)
-    protected PaxList paxList;
-    @XmlElement(name = "PaxSegmentList", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_AirShoppingRS", required = true)
-    protected PaxSegmentList paxSegmentList;
-    @XmlElement(name = "PriceClassList", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_AirShoppingRS", required = true)
-    protected PriceClassList priceClassList;
-    @XmlElement(name = "ServiceDefinitionList", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_AirShoppingRS", required = true)
-    protected ServiceDefinitionList serviceDefinitionList;
+    @XmlElementWrapper(name = "BaggageAllowanceList", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_AirShoppingRS")
+    @XmlElement(name = "BaggageAllowance", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_AirShoppingRS")
+    protected List<BaggageAllowance> baggageAllowanceList;
 
-    /**
-     * 获取baggageAllowanceList属性的值。
-     * 
-     * @return
-     *     possible object is
-     *     {@link BaggageAllowanceList }
-     *     
-     */
-    public BaggageAllowanceList getBaggageAllowanceList() {
+    @XmlElementWrapper(name = "OriginDestList", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_AirShoppingRS")
+    @XmlElement(name = "OriginDest", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_AirShoppingRS", required = true)
+    protected List<OriginDest> originDestList;
+
+    @XmlElementWrapper(name = "PaxJourneyList", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_AirShoppingRS")
+    @XmlElement(name = "PaxJourney", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_AirShoppingRS")
+    protected List<PaxJourney> paxJourneyList;
+
+    @XmlElementWrapper(name = "PaxList", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_AirShoppingRS")
+    @XmlElement(name = "Pax", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_AirShoppingRS")
+    protected List<Pax> paxList;
+
+    @XmlElementWrapper(name = "PaxSegmentList", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_AirShoppingRS")
+    @XmlElement(name = "PaxSegment", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_AirShoppingRS")
+    protected List<PaxSegment> paxSegmentList;
+
+    @XmlElementWrapper(name = "PriceClassList", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_AirShoppingRS")
+    @XmlElement(name = "PriceClass", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_AirShoppingRS", required = true)
+    protected List<PriceClass> priceClassList;
+
+    @XmlElementWrapper(name = "ServiceDefinitionList", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_AirShoppingRS")
+    @XmlElement(name = "ServiceDefinition", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_AirShoppingRS", required = true)
+    protected List<ServiceDefinition> serviceDefinitionList;
+
+    public List<BaggageAllowance> getBaggageAllowanceList() {
         return baggageAllowanceList;
     }
 
-    /**
-     * 设置baggageAllowanceList属性的值。
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link BaggageAllowanceList }
-     *     
-     */
-    public void setBaggageAllowanceList(BaggageAllowanceList value) {
-        this.baggageAllowanceList = value;
+    public void setBaggageAllowanceList(List<BaggageAllowance> baggageAllowanceList) {
+        this.baggageAllowanceList = baggageAllowanceList;
     }
 
-    /**
-     * 获取originDestList属性的值。
-     * 
-     * @return
-     *     possible object is
-     *     {@link OriginDestList }
-     *     
-     */
-    public OriginDestList getOriginDestList() {
+    public List<OriginDest> getOriginDestList() {
         return originDestList;
     }
 
-    /**
-     * 设置originDestList属性的值。
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link OriginDestList }
-     *     
-     */
-    public void setOriginDestList(OriginDestList value) {
-        this.originDestList = value;
+    public void setOriginDestList(List<OriginDest> originDestList) {
+        this.originDestList = originDestList;
     }
 
-    /**
-     * 获取paxJourneyList属性的值。
-     * 
-     * @return
-     *     possible object is
-     *     {@link PaxJourneyList }
-     *     
-     */
-    public PaxJourneyList getPaxJourneyList() {
+    public List<PaxJourney> getPaxJourneyList() {
         return paxJourneyList;
     }
 
-    /**
-     * 设置paxJourneyList属性的值。
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link PaxJourneyList }
-     *     
-     */
-    public void setPaxJourneyList(PaxJourneyList value) {
-        this.paxJourneyList = value;
+    public void setPaxJourneyList(List<PaxJourney> paxJourneyList) {
+        this.paxJourneyList = paxJourneyList;
     }
 
-    /**
-     * 获取paxList属性的值。
-     * 
-     * @return
-     *     possible object is
-     *     {@link PaxList }
-     *     
-     */
-    public PaxList getPaxList() {
+    public List<Pax> getPaxList() {
         return paxList;
     }
 
-    /**
-     * 设置paxList属性的值。
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link PaxList }
-     *     
-     */
-    public void setPaxList(PaxList value) {
-        this.paxList = value;
+    public void setPaxList(List<Pax> paxList) {
+        this.paxList = paxList;
     }
 
-    /**
-     * 获取paxSegmentList属性的值。
-     * 
-     * @return
-     *     possible object is
-     *     {@link PaxSegmentList }
-     *     
-     */
-    public PaxSegmentList getPaxSegmentList() {
+    public List<PaxSegment> getPaxSegmentList() {
         return paxSegmentList;
     }
 
-    /**
-     * 设置paxSegmentList属性的值。
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link PaxSegmentList }
-     *     
-     */
-    public void setPaxSegmentList(PaxSegmentList value) {
-        this.paxSegmentList = value;
+    public void setPaxSegmentList(List<PaxSegment> paxSegmentList) {
+        this.paxSegmentList = paxSegmentList;
     }
 
-    /**
-     * 获取priceClassList属性的值。
-     * 
-     * @return
-     *     possible object is
-     *     {@link PriceClassList }
-     *     
-     */
-    public PriceClassList getPriceClassList() {
+    public List<PriceClass> getPriceClassList() {
         return priceClassList;
     }
 
-    /**
-     * 设置priceClassList属性的值。
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link PriceClassList }
-     *     
-     */
-    public void setPriceClassList(PriceClassList value) {
-        this.priceClassList = value;
+    public void setPriceClassList(List<PriceClass> priceClassList) {
+        this.priceClassList = priceClassList;
     }
 
-    /**
-     * 获取serviceDefinitionList属性的值。
-     * 
-     * @return
-     *     possible object is
-     *     {@link ServiceDefinitionList }
-     *     
-     */
-    public ServiceDefinitionList getServiceDefinitionList() {
+    public List<ServiceDefinition> getServiceDefinitionList() {
         return serviceDefinitionList;
     }
 
-    /**
-     * 设置serviceDefinitionList属性的值。
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link ServiceDefinitionList }
-     *     
-     */
-    public void setServiceDefinitionList(ServiceDefinitionList value) {
-        this.serviceDefinitionList = value;
+    public void setServiceDefinitionList(List<ServiceDefinition> serviceDefinitionList) {
+        this.serviceDefinitionList = serviceDefinitionList;
     }
-
 }

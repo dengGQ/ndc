@@ -1,5 +1,6 @@
 package com.ndc.channel.flight.dto.flightSearch;
 
+import com.ndc.channel.flight.xmlBean.flightSearch.response.bean.ServiceDefinition;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -81,7 +82,9 @@ public class CorpApiTicketData {
 	@ApiModelProperty(value = "价格类型, 0: 未知, 1: fdPrice, 2: nfdPrice", required = false)
 	private Byte priceType;
 
-	private List<String> offerItemIdList;
+
+	private String paxId;
+	private String offerItemId;
 	private String pricingSystemCodeText;
 
 	private String priceClassID;
@@ -89,6 +92,7 @@ public class CorpApiTicketData {
 	private String priceClassName;
 	private String priceClassDesc;
 
-
 	private String fareTypeCode;
+
+	private List<TicketServiceDefinition> serviceDefinitionList;
 }

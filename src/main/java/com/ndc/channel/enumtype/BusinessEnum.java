@@ -6,10 +6,37 @@ import java.util.*;
 
 public class BusinessEnum {
 
+	public enum OperationalSuffixText{
+		T("T", "共享航班"), F("F","非共享航班");
+		private String code;
+		private String msg;
+		OperationalSuffixText(String code, String msg) {
+			this.code = code;
+			this.msg = msg;
+		}
+
+		public String getCode() {
+			return code;
+		}
+
+		public void setCode(String code) {
+			this.code = code;
+		}
+
+		public String getMsg() {
+			return msg;
+		}
+
+		public void setMsg(String msg) {
+			this.msg = msg;
+		}
+	}
+
 	public enum NdcApiInfo{
 
 		FLIGHT_SEARCH("A0534", "/ndc-shopping-common/shopping/basicShopping"),
-		OFFER_PRICE("A0535", "/ndc-flight-offer-price/price/flightOfferPrice");
+		OFFER_PRICE("A0535", "/ndc-flight-offer-price/price/flightOfferPrice"),
+		CREATE_ORDER("A0536", "/ndc-flight-order-create/flight/flightOrderCreate");
 
 		private String code;
 		private String path;

@@ -2,13 +2,14 @@ package com.ndc.channel.flight.tools;
 
 import com.ndc.channel.enumtype.BusinessEnum;
 import com.ndc.channel.exception.BusinessException;
+import com.ndc.channel.flight.xmlBean.createOrder.request.bean.IATAOrderCreateRQ;
+import com.ndc.channel.flight.xmlBean.createOrder.response.bean.IATAOrderViewRS;
 import com.ndc.channel.flight.xmlBean.flightSearch.request.bean.IATAAirShoppingRQ;
 import com.ndc.channel.flight.xmlBean.flightSearch.response.bean.IATAAirShoppingRS;
 import com.ndc.channel.flight.xmlBean.verifyPrice.request.bean.IATAOfferPriceRQ;
 import com.ndc.channel.flight.xmlBean.verifyPrice.response.bean.IATAOfferPriceRS;
 import com.ndc.channel.http.ChannelOKHttpService;
 import com.ndc.channel.model.NdcAccountInfo;
-import com.sun.xml.internal.bind.marshaller.NamespacePrefixMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -61,6 +62,24 @@ public class NdcApiTools {
         }
     }
 
+
+    /**
+     * 机票订单创建
+     * @param rq
+     * @return
+     */
+    public IATAOrderViewRS createOrder(IATAOrderCreateRQ rq) {
+        try{
+            final NdcAccountInfo accountInfo = new NdcAccountInfo(BusinessEnum.NdcApiInfo.CREATE_ORDER);
+
+            return remote(accountInfo, rq, IATAOrderCreateRQ.class, IATAOrderViewRS.class);
+        }catch (BusinessException e){
+            throw e;
+        }catch (Exception e){
+            log.error("东方航空Ndc接口异常", e);
+            return null;
+        }
+    }
 
     private <T> T remote(NdcAccountInfo accountInfo, Object rq, Class<?> reqClazz, Class<T> respClazz) throws Exception{
 

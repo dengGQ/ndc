@@ -113,7 +113,10 @@ public class CorpApiFlightListDataV2 {
 	@ApiModelProperty(value = "机票信息", required = true)
 	private List<CorpApiTicketData> tickets;
 
+	private String shoppingResponseID;
+
 	private String originDestID;
+	private String offerId;
 	private List<String> paxJourneyRefID;
 	private String paxJourneyID;
 	private List<String> paxSegmentRefID;
@@ -397,6 +400,22 @@ public class CorpApiFlightListDataV2 {
 
 	public void setTickets(List<CorpApiTicketData> tickets) {
 		this.tickets = tickets;
+	}
+
+	public String getShoppingResponseID() {
+		return shoppingResponseID;
+	}
+
+	public void setShoppingResponseID(String shoppingResponseID) {
+		this.shoppingResponseID = shoppingResponseID;
+	}
+
+	public String getOfferId() {
+		return offerId;
+	}
+
+	public void setOfferId(String offerId) {
+		this.offerId = offerId;
 	}
 
 	public String getOriginDestID() {

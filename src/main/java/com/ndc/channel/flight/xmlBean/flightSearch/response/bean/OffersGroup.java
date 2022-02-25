@@ -1,11 +1,7 @@
 
 package com.ndc.channel.flight.xmlBean.flightSearch.response.bean;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.*;
 import java.util.List;
 
 
@@ -35,14 +31,15 @@ import java.util.List;
 @XmlRootElement(name = "OffersGroup", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_AirShoppingRS")
 public class OffersGroup {
 
-    @XmlElement(name = "CarrierOffers", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_AirShoppingRS", required = true)
-    protected List<CarrierOffers> carrierOffers;
+    @XmlElementWrapper(name = "CarrierOffers", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_AirShoppingRS")
+    @XmlElement(name = "Offer", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_AirShoppingRS")
+    protected List<Offer> carrierOffers;
 
-    public List<CarrierOffers> getCarrierOffers() {
+    public List<Offer> getCarrierOffers() {
         return carrierOffers;
     }
 
-    public void setCarrierOffers(List<CarrierOffers> carrierOffers) {
+    public void setCarrierOffers(List<Offer> carrierOffers) {
         this.carrierOffers = carrierOffers;
     }
 }

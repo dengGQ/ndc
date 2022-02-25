@@ -64,7 +64,7 @@ public class FlightKeyUtils {
      * @param seatClassCode 舱位代码
      * @return
      */
-    public static String getTicketId(String flightId, String productType, String seatClassCode) {
-        return new StringBuffer().append(flightId).append(seatClassCode).append(productType).toString();
+    public static String getTicketId(String flightId, String productType, String seatClassCode, String offerItem) {
+        return new StringBuffer().append(flightId).append(seatClassCode).append(productType).append("@").append(offerItem).toString();
     }
 }
