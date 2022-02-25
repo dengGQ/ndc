@@ -2,12 +2,10 @@ package com.ndc.channel.flight.handler;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.ndc.channel.enumtype.BusinessEnum;
 import com.ndc.channel.exception.BusinessException;
 import com.ndc.channel.exception.BusinessExceptionCode;
-import com.ndc.channel.flight.dto.flightSearch.CorpApiFlightListDataV2;
-import com.ndc.channel.flight.dto.flightSearch.CorpApiTicketData;
-import com.ndc.channel.flight.dto.flightSearch.CorpApiTicketPolicy;
-import com.ndc.channel.flight.dto.flightSearch.TicketServiceDefinition;
+import com.ndc.channel.flight.dto.flightSearch.*;
 import com.ndc.channel.flight.dto.verifyPrice.CorpApiFlightVerifyPriceData;
 import com.ndc.channel.flight.dto.verifyPrice.FeiBaApiVerifyPriceReq;
 import com.ndc.channel.flight.dto.verifyPrice.FeibaApiVerificationParams;
@@ -96,10 +94,14 @@ public class NdcFlightVerifyPriceHandler {
             throw new BusinessException(BusinessExceptionCode.REQUEST_PARAM_ERROR, error.getDescText());
         }
 
-
         final Response response = iataOfferPriceRS.getResponse();
 
-        List<ServiceDefinition> serviceDefinitionList = response.getDataLists().getServiceDefinitionList();
+        final com.ndc.channel.flight.xmlBean.verifyPrice.response.bean.DataLists dataLists = response.getDataLists();
+        // 服务
+        List<ServiceDefinition> serviceDefinitionList = dataLists.getServiceDefinitionList();
+        // 行李额
+        final List<BaggageAllowance> baggageAllowanceList = dataLists.getBaggageAllowanceList();
+        final Map<String, BaggageAllowance> baggageAllowanceMap = baggageAllowanceList.stream().collect(Collectors.toMap(BaggageAllowance::getBaggageAllowanceID, Function.identity()));
 
         final ShoppingResponse shoppingResponse = response.getShoppingResponse();
         flightData.setShoppingResponseID(shoppingResponse.getShoppingResponseID());
@@ -115,11 +117,14 @@ public class NdcFlightVerifyPriceHandler {
 
         final String offerItemID = offerItem.getOfferItemID();
         final com.ndc.channel.flight.xmlBean.verifyPrice.response.bean.FareDetail fareDetail = offerItem.getFareDetail();
+        // 退改政策
         final String remarkText = fareDetail.getFareComponent().getFareRule().get(0).getRemark().getRemarkText();
 
+        // 票价
         final String ticketPrice = totalPrice.getBaseAmount().getValue();
-        final List<Tax> tax = totalPrice.getTaxSummary().getTax();
 
+        //税费
+        final List<Tax> tax = totalPrice.getTaxSummary().getTax();
         final Map<String, Tax> taxMap = tax.stream().collect(Collectors.toMap(Tax::getTaxCode, Function.identity()));
         final Tax buildFee = Optional.ofNullable(taxMap.get("CN")).orElse(EMPTY_TAX);
         final Tax oilFee = Optional.ofNullable(taxMap.get("YQ")).orElse(EMPTY_TAX);
@@ -132,12 +137,15 @@ public class NdcFlightVerifyPriceHandler {
         verifyRespData.setFlightNumber(flightData.getFlightNumber());
         verifyRespData.setSeatClassCode(ticketData.getSeatClassCode());
         verifyRespData.setSuccess(true);
-        verifyRespData.setServiceDefinitionList(getServiceDefinitionList(serviceDefinitionList));
 
-        final CorpApiTicketPolicy policy = new CorpApiTicketPolicy();
-        final JSONObject policyJson = JSONObject.parseObject(remarkText, JSONObject.class);
+        FlightBaggageInfoData baggageInfoData = new FlightBaggageInfoData();
+        verifyRespData.setServiceDefinitionList(getServiceDefinitionList(serviceDefinitionList, baggageAllowanceMap, baggageInfoData));
+
+        CorpApiTicketPolicy policy = new CorpApiTicketPolicy();
+        JSONObject policyJson = JSONObject.parseObject(remarkText, JSONObject.class);
         policy.setChangePolicy(policyJson.getString("comment"));
         policy.setRefundPolicy(policyJson.getString("comment"));
+        policy.setFlightBaggageInfoData(baggageInfoData);
         verifyRespData.setPolicy(policy);
 
         redisUtils.setStrExpire(redisFlightDataCacheKey, JSON.toJSONString(flightData), 1, TimeUnit.DAYS);
@@ -274,13 +282,41 @@ public class NdcFlightVerifyPriceHandler {
         return paxSegmentList;
     }
 
-    public List<TicketServiceDefinition> getServiceDefinitionList(List<ServiceDefinition> serviceDefinitionList) {
-        final List<TicketServiceDefinition> ticketServiceDefinitionList = Optional.ofNullable(serviceDefinitionList).orElseGet(Arrays::asList).stream().map(serviceDefinition -> {
-            final TicketServiceDefinition definition = new TicketServiceDefinition();
+    public List<TicketServiceDefinition> getServiceDefinitionList(List<ServiceDefinition> serviceDefinitionList, Map<String, BaggageAllowance> baggageAllowanceMap, FlightBaggageInfoData baggageInfoData) {
+        List<TicketServiceDefinition> ticketServiceDefinitionList = Optional.ofNullable(serviceDefinitionList).orElseGet(Arrays::asList).stream().map(serviceDefinition -> {
+            TicketServiceDefinition definition = new TicketServiceDefinition();
 
             definition.setServiceDefinitionID(serviceDefinition.getServiceDefinitionID());
             definition.setServiceCode(serviceDefinition.getServiceCode());
             definition.setName(serviceDefinition.getName());
+            ServiceDefinitionAssociation serviceDefinitionAssociation = serviceDefinition.getServiceDefinitionAssociation();
+            BaggageAllowance baggageAllowance = null;
+            if (serviceDefinitionAssociation != null && (baggageAllowance = baggageAllowanceMap.get(serviceDefinitionAssociation.getBaggageAllowanceRefID())) != null) {
+
+                // 行李额携带类型
+                String typeCode = baggageAllowance.getTypeCode();
+                // 行李额重量限制
+                WeightAllowance weightAllowance = baggageAllowance.getWeightAllowance();
+                // 行李额数量限制
+                PieceAllowance pieceAllowance = Optional.ofNullable(baggageAllowance.getPieceAllowance()).orElseGet(PieceAllowance::new);
+                // 行李额体积限制 图片地址
+                JSONObject jsonObject = JSONObject.parseObject(baggageAllowance.getDescText(), JSONObject.class);
+                String volume = jsonObject.getJSONObject("mediaObject").getJSONObject("binaryObject").getString("uniformResourceID");
+
+                MaximumWeightMeasure maximumWeightMeasure = weightAllowance.getMaximumWeightMeasure();
+                String unitStr = BusinessEnum.WeightUnit.getMsg(maximumWeightMeasure.getUnitCode());
+                if (BusinessEnum.BaggageType.CARRY_ON.getCode().equals(typeCode)) {
+
+                    baggageInfoData.setFreeBaggageWeight(maximumWeightMeasure.getValue() + unitStr);
+                    baggageInfoData.setCarryOnBaggageAmount(pieceAllowance.getTotalQty());
+                    baggageInfoData.setCarryOnBaggageVolume(volume);
+                }else if (BusinessEnum.BaggageType.CHECKED.getCode().equals(typeCode)){
+
+                    baggageInfoData.setCarryOnBaggageWeight(maximumWeightMeasure.getValue() + unitStr);
+                    baggageInfoData.setFreeBaggageAmount(pieceAllowance.getTotalQty());
+                    baggageInfoData.setFreeBaggageVolume(volume);
+                }
+            }
             return definition;
         }).collect(Collectors.toList());
 

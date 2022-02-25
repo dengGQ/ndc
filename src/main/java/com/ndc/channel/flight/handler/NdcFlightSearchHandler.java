@@ -69,15 +69,19 @@ public class NdcFlightSearchHandler {
         final List<String> paxJourneyRefID = originDest.getPaxJourneyRefID(); // 乘客行程ID
 
         // 乘客行程
-        List<PaxJourney> paxJourneyList = dataLists.getPaxJourneyList().stream()
+        final List<PaxJourney> paxJourneyList = dataLists.getPaxJourneyList().stream()
                 .filter(paxJourney -> paxJourneyRefID.contains(paxJourney.getPaxJourneyID()))
                 .collect(Collectors.toList());
 
         // 乘客航段
-        List<PaxSegment> paxSegmentList = dataLists.getPaxSegmentList();
+        final List<PaxSegment> paxSegmentList = dataLists.getPaxSegmentList();
 
         // 服务定义列表
-        List<ServiceDefinition> serviceDefinitionList = dataLists.getServiceDefinitionList();
+        final List<ServiceDefinition> serviceDefinitionList = dataLists.getServiceDefinitionList();
+
+        // 行李额信息
+        List<BaggageAllowance> baggageAllowanceList = dataLists.getBaggageAllowanceList();
+        final Map<String, BaggageAllowance> baggageAllowanceMap = baggageAllowanceList.stream().collect(Collectors.toMap(BaggageAllowance::getBaggageAllowanceID, Function.identity()));
 
         // 价格类型列表
         final List<PriceClass> priceClassList = dataLists.getPriceClassList();
@@ -151,7 +155,7 @@ public class NdcFlightSearchHandler {
                     }
                     List<ServiceDefinition> paxServiceDefinitionList = serviceDefinitionList.stream().filter(sd -> serviceDefinitionIdList.contains(sd.getServiceDefinitionID())).collect(Collectors.toList());
 
-                    final CorpApiTicketData ticketData = ticketDataConvertFromCarrierOffer(flightData.getFlightId(), item, paxServiceDefinitionList);
+                    final CorpApiTicketData ticketData = ticketDataConvertFromCarrierOffer(flightData.getFlightId(), item, paxServiceDefinitionList, baggageAllowanceMap);
                     ticketData.setPaxId(pax.getPaxID());
                     ticketData.setPricingSystemCodeText(pricingSystemCodeText);
                     ticketData.setPriceClassID(priceClass.getPriceClassID());
@@ -253,7 +257,7 @@ public class NdcFlightSearchHandler {
         return corpApiFlight;
     }
 
-    private CorpApiTicketData ticketDataConvertFromCarrierOffer(String flightId, OfferItem offerItem, List<ServiceDefinition> serviceDefinitionList) {
+    private CorpApiTicketData ticketDataConvertFromCarrierOffer(String flightId, OfferItem offerItem, List<ServiceDefinition> serviceDefinitionList, Map<String, BaggageAllowance> baggageAllowanceMap) {
         CorpApiTicketData ticketData = new CorpApiTicketData();
 
         final String offerItemID = offerItem.getOfferItemID();
@@ -283,19 +287,22 @@ public class NdcFlightSearchHandler {
         ticketData.setPrice(ticketData.getTicketPrice());
         ticketData.setPurchasePrice(ticketData.getTicketPrice());
 //        ticketData.setDiscount(ticketData.getTicketPrice().divide(ticketData.getFdPrice(),2, RoundingMode.HALF_UP));
-
-        List<FareRule> fareRule = fareComponent.getFareRule();
-        ticketData.setPolicy(parseTicketPolicy(fareRule));
-
         ticketData.setTicketId(FlightKeyUtils.getTicketId(flightId, ticketData.getProductType(), ticketData.getSeatClassCode(), offerItemID));
 
         ticketData.setOfferItemId(offerItemID);
-        ticketData.setServiceDefinitionList(getServiceDefinitionList(serviceDefinitionList));
+
+        FlightBaggageInfoData baggageInfoData = new FlightBaggageInfoData();
+        ticketData.setServiceDefinitionList(getServiceDefinitionList(serviceDefinitionList, baggageAllowanceMap, baggageInfoData));
+
+        List<FareRule> fareRule = fareComponent.getFareRule();
+        CorpApiTicketPolicy corpApiTicketPolicy = parseTicketPolicy(fareRule);
+        corpApiTicketPolicy.setFlightBaggageInfoData(baggageInfoData);
+        ticketData.setPolicy(corpApiTicketPolicy);
 
         return ticketData;
     }
 
-    public List<TicketServiceDefinition> getServiceDefinitionList(List<ServiceDefinition> serviceDefinitionList) {
+    public List<TicketServiceDefinition> getServiceDefinitionList(List<ServiceDefinition> serviceDefinitionList, Map<String, BaggageAllowance> baggageAllowanceMap, FlightBaggageInfoData baggageInfoData) {
         final List<TicketServiceDefinition> ticketServiceDefinitionList = Optional.ofNullable(serviceDefinitionList).orElseGet(Arrays::asList).stream().map(serviceDefinition -> {
             final TicketServiceDefinition definition = new TicketServiceDefinition();
 
@@ -303,6 +310,36 @@ public class NdcFlightSearchHandler {
             definition.setServiceCode(serviceDefinition.getServiceCode());
             definition.setDescText(Optional.ofNullable(serviceDefinition.getDesc()).orElseGet(Desc::new).getDescText());
             definition.setName(serviceDefinition.getName());
+            final ServiceDefinitionAssociation serviceDefinitionAssociation = serviceDefinition.getServiceDefinitionAssociation();
+
+            BaggageAllowance baggageAllowance = null;
+            if (serviceDefinitionAssociation != null && (baggageAllowance = baggageAllowanceMap.get(serviceDefinitionAssociation.getBaggageAllowanceRefID())) != null) {
+                // 行李额携带类型
+                String typeCode = baggageAllowance.getTypeCode();
+                // 行李额重量限制
+                WeightAllowance weightAllowance = baggageAllowance.getWeightAllowance();
+                // 行李额数量限制
+                PieceAllowance pieceAllowance = Optional.ofNullable(baggageAllowance.getPieceAllowance()).orElseGet(PieceAllowance::new);
+                // 行李额体积限制 图片地址
+                JSONObject jsonObject = JSONObject.parseObject(baggageAllowance.getDescText(), JSONObject.class);
+                String volume = jsonObject.getJSONObject("mediaObject").getJSONObject("binaryObject").getString("uniformResourceID");
+
+                MaximumWeightMeasure maximumWeightMeasure = weightAllowance.getMaximumWeightMeasure();
+                String unitStr = BusinessEnum.WeightUnit.getMsg(maximumWeightMeasure.getUnitCode());
+
+                if (BusinessEnum.BaggageType.CARRY_ON.getCode().equals(typeCode)) {
+
+                    baggageInfoData.setFreeBaggageWeight(maximumWeightMeasure.getValue() + unitStr);
+                    baggageInfoData.setCarryOnBaggageAmount(pieceAllowance.getTotalQty());
+                    baggageInfoData.setCarryOnBaggageVolume(volume);
+                }else if (BusinessEnum.BaggageType.CHECKED.getCode().equals(typeCode)){
+
+                    baggageInfoData.setCarryOnBaggageWeight(maximumWeightMeasure.getValue() + unitStr);
+                    baggageInfoData.setFreeBaggageAmount(pieceAllowance.getTotalQty());
+                    baggageInfoData.setFreeBaggageVolume(volume);
+                }
+            }
+
             return definition;
         }).collect(Collectors.toList());
 

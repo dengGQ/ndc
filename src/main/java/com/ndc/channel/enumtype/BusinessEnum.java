@@ -6,6 +6,52 @@ import java.util.*;
 
 public class BusinessEnum {
 
+	public enum BaggageType {
+
+		CARRY_ON("CarryOn", "随身"), CHECKED("Checked", "托运");
+
+		private String code;
+		private String msg;
+
+		private BaggageType(String code, String msg) {
+			this.code = code;
+			this.msg = msg;
+		}
+
+		public String getCode() {
+			return code;
+		}
+
+		public String getMsg() {
+			return msg;
+		}
+	}
+
+	public enum WeightUnit{
+
+		K("K", "KG"), L("L", "LB"), NO("", "");
+
+		private String code;
+		private String msg;
+
+		private WeightUnit(String code, String msg) {
+			this.code = code;
+			this.msg = msg;
+		}
+
+		public String getCode() {
+			return code;
+		}
+
+		public String getMsg() {
+			return msg;
+		}
+
+		public static String getMsg(String code) {
+			return Arrays.stream(WeightUnit.values()).filter(wu-> wu.code.equals(code)).findFirst().orElse(WeightUnit.NO).getMsg();
+		}
+	}
+
 	public enum OperationalSuffixText{
 		T("T", "共享航班"), F("F","非共享航班");
 		private String code;

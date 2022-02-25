@@ -1,6 +1,7 @@
 package com.ndc.channel.flight.dto.flightSearch;
 
 
+import com.ndc.channel.flight.xmlBean.flightSearch.response.bean.BaggageAllowance;
 import lombok.Data;
 
 @Data
