@@ -1,10 +1,93 @@
 package com.ndc.channel.enumtype;
 
 import com.ndc.channel.exception.BusinessException;
+import com.ndc.channel.exception.BusinessExceptionCode;
+import org.omg.CORBA.PUBLIC_MEMBER;
+import org.springframework.util.Assert;
 
 import java.util.*;
 
 public class BusinessEnum {
+
+	public enum GenderCode{
+		M("M", "男", "1"), F("F", "女", "2");
+
+		private String code;
+		private String msg;
+		private String nativeCode;
+
+		GenderCode(String code, String msg, String nativeCode) {
+			this.code = code;
+			this.msg = msg;
+			this.nativeCode = nativeCode;
+		}
+
+		public String getCode() {
+			return code;
+		}
+
+		public String getMsg() {
+			return msg;
+		}
+
+		public String getNativeCode() {
+			return nativeCode;
+		}
+
+		public static String getGenderCode(String nativeCode) {
+			Assert.notNull(nativeCode, "性别必填！");
+			return Arrays.stream(GenderCode.values())
+					.filter(genderCode -> genderCode.getNativeCode().equals(nativeCode))
+					.findFirst().orElseThrow(()->new BusinessException(BusinessExceptionCode.REQUEST_PARAM_ERROR, "性别类型转换错误:"+nativeCode))
+					.getCode();
+		}
+	}
+
+	public enum IdentityDocTypeCode{
+		ID_CARD("709", "居民身份证", "1"), PT("PT", "护照", "2"), _9CT("9CT", "台胞证", "5"),
+		_9CA("9CA","港澳通行证", "4"), _9CC("9CC","回乡证", "7"), TRP("TRP","台湾居民居住证", "7"),
+		GRP("GRP","港澳居民居住证", "7"), _9CN("9CN","大陆居民往来中国台湾通行证", "7"), TID("TID","中国台湾身份证", "7"),
+		_710("710","外国人永久居留证", "7"), MI("MI","军官证", "3"), GM("GM","军残证", "7"), POL("POL","警官证", "7"),
+		JC("JC","警残证", "7"), HH("HH","户口簿", "7"), BR("BR","出生证明", "7"), F1("F1","其他", "6");
+
+		private String code;
+		private String msg;
+
+		// 乘机人证件类型, 1 身份证； 2 护照； 3 军官证； 4 港澳通行证； 5 台胞证； 6 其他.
+		private String nativeCode;
+
+		private IdentityDocTypeCode(String code, String msg, String nativeCode) {
+			this.code = code;
+			this.msg = msg;
+			this.nativeCode = nativeCode;
+		}
+
+		public String getCode() {
+			return code;
+		}
+
+		public String getMsg() {
+			return msg;
+		}
+
+		public String getNativeCode() {
+			return nativeCode;
+		}
+
+		/**
+		 * 乘机人证件类型, 1 身份证； 2 护照； 3 军官证； 4 港澳通行证； 5 台胞证； 6 其他.
+		 * @param nativeCode
+		 * @return
+		 */
+		public static String getIdentityDocTypeCode(String nativeCode) {
+			Assert.notNull(nativeCode, "证件类型必填！");
+			return Arrays.stream(IdentityDocTypeCode.values())
+					.filter(identityDocTypeCode -> identityDocTypeCode.getNativeCode().equals(nativeCode)).findFirst()
+					.orElseThrow(()->new BusinessException(BusinessExceptionCode.REQUEST_PARAM_ERROR, "证件类型转换错误！"))
+					.getCode();
+		}
+
+	}
 
 	public enum BaggageType {
 

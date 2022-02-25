@@ -1,0 +1,328 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderCreateRQ" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="Name">
+    <xs:simpleType>
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="NDC_FLIGHT_ORDER_CREATE"/>
+        <xs:enumeration value="测试"/>
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="RefVersionNumber" type="xs:string"/>
+  <xs:element name="AirlineDesigCode" type="xs:string"/>
+  <xs:element name="DuplicateDesigInd" type="xs:string"/>
+  <xs:element name="MarketingCarrier">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="iata:AirlineDesigCode" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderCreateRQ"/>
+        <xs:element ref="iata:DuplicateDesigInd" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderCreateRQ"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="AgencyID" type="xs:string"/>
+  <xs:element name="ContactInfoRefID">
+    <xs:simpleType>
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="181dec42-1c58-43bd-b3a7-d274bfc52942"/>
+        <xs:enumeration value="7ddcd290-9e67-426a-b5ef-c8e5156477ac"/>
+        <xs:enumeration value="c93ffbfa-4dce-4fbf-b70e-1bce9ec08b76"/>
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="IATANumber" type="xs:string"/>
+  <xs:element name="PseudoCityID" type="xs:string"/>
+  <xs:element name="TypeCode" type="xs:string"/>
+  <xs:element name="TravelAgency">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="iata:AgencyID" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderCreateRQ"/>
+        <xs:element ref="iata:ContactInfoRefID" maxOccurs="unbounded" minOccurs="0" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderCreateRQ"/>
+        <xs:element ref="iata:IATANumber" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderCreateRQ"/>
+        <xs:element ref="iata:Name" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderCreateRQ"/>
+        <xs:element ref="iata:PseudoCityID" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderCreateRQ"/>
+        <xs:element ref="iata:TypeCode" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderCreateRQ"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Recipient">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="iata:MarketingCarrier" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderCreateRQ"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Sender">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="iata:TravelAgency" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderCreateRQ"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="AltLangID" type="xs:string"/>
+  <xs:element name="CorrelationID" type="xs:string"/>
+  <xs:element name="EchoTokenText" type="xs:string"/>
+  <xs:element name="PrimaryLangID" type="xs:string"/>
+  <xs:element name="RetransmissionInd" type="xs:string"/>
+  <xs:element name="SeqNumber" type="xs:string"/>
+  <xs:element name="Timestamp" type="xs:string"/>
+  <xs:element name="TrxID" type="xs:string"/>
+  <xs:element name="TrxStatusCode" type="xs:string"/>
+  <xs:element name="VersionNumber" type="xs:string"/>
+  <xs:element name="Qty" type="xs:string"/>
+  <xs:element name="OfferItemRefID" type="xs:string"/>
+  <xs:element name="PaxRefID" type="xs:string"/>
+  <xs:element name="SelectedALaCarteOfferItem">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="iata:Qty" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderCreateRQ"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="OfferRefID" type="xs:string"/>
+  <xs:element name="OwnerCode" type="xs:string"/>
+  <xs:element name="SelectedOfferItem">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="iata:OfferItemRefID" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderCreateRQ"/>
+        <xs:element ref="iata:PaxRefID" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderCreateRQ"/>
+        <xs:element ref="iata:SelectedALaCarteOfferItem" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderCreateRQ"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ShoppingResponseRefID" type="xs:string"/>
+  <xs:element name="SelectedOffer">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="iata:OfferRefID" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderCreateRQ"/>
+        <xs:element ref="iata:OwnerCode" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderCreateRQ"/>
+        <xs:element ref="iata:SelectedOfferItem" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderCreateRQ"/>
+        <xs:element ref="iata:ShoppingResponseRefID" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderCreateRQ"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="EmailAddressText">
+    <xs:simpleType>
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="test@test.com"/>
+        <xs:enumeration value="zhaozhentao@ceair.com"/>
+        <xs:enumeration value="GUOLITING@ceair.com"/>
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="CountryDialingCode">
+    <xs:simpleType>
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="86"/>
+        <xs:enumeration value="01"/>
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="LabelText">
+    <xs:simpleType>
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="Mobile"/>
+        <xs:enumeration value="Work"/>
+        <xs:enumeration value="Home"/>
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="PhoneNumber">
+    <xs:simpleType>
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="18100000000"/>
+        <xs:enumeration value="2112345678"/>
+        <xs:enumeration value="2187654321"/>
+        <xs:enumeration value="15921335523"/>
+        <xs:enumeration value="18802920671"/>
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="ContactInfoID">
+    <xs:simpleType>
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="181dec42-1c58-43bd-b3a7-d274bfc52942"/>
+        <xs:enumeration value="7ddcd290-9e67-426a-b5ef-c8e5156477ac"/>
+        <xs:enumeration value="c93ffbfa-4dce-4fbf-b70e-1bce9ec08b76"/>
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="ContactTypeText">
+    <xs:simpleType>
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="TRAVEL_AGENCY"/>
+        <xs:enumeration value="PRIMARY"/>
+        <xs:enumeration value="PAX"/>
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="EmailAddress">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="iata:EmailAddressText" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderCreateRQ"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Phone">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="iata:CountryDialingCode" minOccurs="0" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderCreateRQ"/>
+        <xs:element ref="iata:LabelText" minOccurs="0" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderCreateRQ"/>
+        <xs:element ref="iata:PhoneNumber" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderCreateRQ"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="IndividualID">
+    <xs:simpleType>
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="39f58b01-75df-4692-b9ff-226235ddd919"/>
+        <xs:enumeration value="5c7eeb19-6403-4856-85f4-0b6466b60444"/>
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="Surname">
+    <xs:simpleType>
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="TEST/ZZT"/>
+        <xs:enumeration value="测试/果果"/>
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="Individual">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="iata:GenderCode" minOccurs="0" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderCreateRQ"/>
+        <xs:element ref="iata:IndividualID" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderCreateRQ"/>
+        <xs:element ref="iata:Surname" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderCreateRQ"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ContactInfo">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="iata:ContactInfoID" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderCreateRQ"/>
+        <xs:element ref="iata:ContactTypeText" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderCreateRQ"/>
+        <xs:element ref="iata:EmailAddress" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderCreateRQ"/>
+        <xs:element ref="iata:Individual" minOccurs="0" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderCreateRQ"/>
+        <xs:element ref="iata:Phone" maxOccurs="unbounded" minOccurs="0" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderCreateRQ"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="EnterBeforeDate" type="xs:string"/>
+  <xs:element name="HostCountryCode" type="xs:string"/>
+  <xs:element name="Birthdate" type="xs:string"/>
+  <xs:element name="IdentityDocID" type="xs:string"/>
+  <xs:element name="IdentityDocTypeCode" type="xs:string"/>
+  <xs:element name="Visa">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="iata:EnterBeforeDate" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderCreateRQ"/>
+        <xs:element ref="iata:HostCountryCode" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderCreateRQ"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GenderCode" type="xs:string"/>
+  <xs:element name="CitizenshipCountryCode" type="xs:string"/>
+  <xs:element name="IdentityDoc">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="iata:Birthdate" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderCreateRQ"/>
+        <xs:element ref="iata:IdentityDocID" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderCreateRQ"/>
+        <xs:element ref="iata:IdentityDocTypeCode" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderCreateRQ"/>
+        <xs:element ref="iata:Visa" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderCreateRQ"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="PaxID" type="xs:string"/>
+  <xs:element name="PTC" type="xs:string"/>
+  <xs:element name="Pax">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="iata:CitizenshipCountryCode" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderCreateRQ"/>
+        <xs:element ref="iata:ContactInfoRefID" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderCreateRQ"/>
+        <xs:element ref="iata:IdentityDoc" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderCreateRQ"/>
+        <xs:element ref="iata:Individual" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderCreateRQ"/>
+        <xs:element ref="iata:PaxID" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderCreateRQ"/>
+        <xs:element ref="iata:PTC" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderCreateRQ"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ContactInfoList">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="iata:ContactInfo" maxOccurs="unbounded" minOccurs="0" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderCreateRQ"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="PaxList">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="iata:Pax" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderCreateRQ"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="CreateOrder">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="iata:SelectedOffer" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderCreateRQ"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="DataLists">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="iata:ContactInfoList" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderCreateRQ"/>
+        <xs:element ref="iata:PaxList" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderCreateRQ"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="MessageDoc">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="iata:Name" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderCreateRQ"/>
+        <xs:element ref="iata:RefVersionNumber" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderCreateRQ"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Party">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="iata:Recipient" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderCreateRQ"/>
+        <xs:element ref="iata:Sender" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderCreateRQ"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="PayloadAttributes">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="iata:AltLangID" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderCreateRQ"/>
+        <xs:element ref="iata:CorrelationID" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderCreateRQ"/>
+        <xs:element ref="iata:EchoTokenText" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderCreateRQ"/>
+        <xs:element ref="iata:PrimaryLangID" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderCreateRQ"/>
+        <xs:element ref="iata:RetransmissionInd" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderCreateRQ"/>
+        <xs:element ref="iata:SeqNumber" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderCreateRQ"/>
+        <xs:element ref="iata:Timestamp" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderCreateRQ"/>
+        <xs:element ref="iata:TrxID" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderCreateRQ"/>
+        <xs:element ref="iata:TrxStatusCode" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderCreateRQ"/>
+        <xs:element ref="iata:VersionNumber" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderCreateRQ"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Request">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="iata:CreateOrder" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderCreateRQ"/>
+        <xs:element ref="iata:DataLists" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderCreateRQ"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="IATA_OrderCreateRQ">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="iata:MessageDoc" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderCreateRQ"/>
+        <xs:element ref="iata:Party" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderCreateRQ"/>
+        <xs:element ref="iata:PayloadAttributes" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderCreateRQ"/>
+        <xs:element ref="iata:Request" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderCreateRQ"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

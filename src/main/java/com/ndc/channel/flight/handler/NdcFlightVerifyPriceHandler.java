@@ -73,7 +73,9 @@ public class NdcFlightVerifyPriceHandler {
 
         final String redisFlightDataCacheKey = RedisKeyConstants.getRedisFlightDataCacheKey(flightId);
         CorpApiFlightListDataV2 flightData = redisUtils.get(redisFlightDataCacheKey, CorpApiFlightListDataV2.class);
-        CorpApiTicketData ticketData = redisUtils.hGet(RedisKeyConstants.getRedisTicketDataCacheKey(flightId), ticketId, CorpApiTicketData.class);
+
+        final String redisTicketDataCacheKey = RedisKeyConstants.getRedisTicketDataCacheKey(flightId);
+        CorpApiTicketData ticketData = redisUtils.hGet(redisTicketDataCacheKey, ticketId, CorpApiTicketData.class);
 
         IATAOfferPriceRQ priceRQ = new IATAOfferPriceRQ();
 
@@ -112,6 +114,7 @@ public class NdcFlightVerifyPriceHandler {
                     throw new BusinessException(BusinessExceptionCode.REQUEST_PARAM_ERROR, "未找到成人报价信息！");
                 });
 
+        final String offerID = adtOffer.getOfferID();
         final OfferItem offerItem = adtOffer.getOfferItem();
         final TotalPrice totalPrice = adtOffer.getTotalPrice();
 
@@ -148,7 +151,10 @@ public class NdcFlightVerifyPriceHandler {
         policy.setFlightBaggageInfoData(baggageInfoData);
         verifyRespData.setPolicy(policy);
 
+        flightData.setOfferId(offerID);
+        ticketData.setOfferItemId(offerItemID);
         redisUtils.setStrExpire(redisFlightDataCacheKey, JSON.toJSONString(flightData), 1, TimeUnit.DAYS);
+        redisUtils.hset(redisTicketDataCacheKey, ticketId, JSONObject.toJSONString(ticketData));
 
         return verifyRespData;
     }

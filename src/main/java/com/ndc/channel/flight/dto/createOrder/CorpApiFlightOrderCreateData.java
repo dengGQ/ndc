@@ -6,6 +6,8 @@ import lombok.Data;
 @Data
 public class CorpApiFlightOrderCreateData {
 
+	private String groupOdrerNumber;
+
 	@ApiModelProperty("订单号")
 	private String orderNumber;
 

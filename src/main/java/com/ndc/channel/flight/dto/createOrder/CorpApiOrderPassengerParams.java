@@ -24,7 +24,7 @@ public class CorpApiOrderPassengerParams implements Serializable {
 	@ApiModelProperty(value = "旅客手机号", required = true)
 	private String phone;
 
-	@ApiModelProperty(value = "性别", required = true)
+	@ApiModelProperty(value = "性别, 1-男 2-女", required = true)
 	private String sex;
 
 	@ApiModelProperty(value = "乘客类型", required = true)
