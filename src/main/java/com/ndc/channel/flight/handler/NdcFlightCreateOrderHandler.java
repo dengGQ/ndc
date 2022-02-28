@@ -1,10 +1,9 @@
 package com.ndc.channel.flight.handler;
 
 import com.ndc.channel.enumtype.BusinessEnum;
-import com.ndc.channel.flight.dto.createOrder.CorpApiFlightOrderCreateData;
-import com.ndc.channel.flight.dto.createOrder.CorpApiOrderFlightTicketParams;
-import com.ndc.channel.flight.dto.createOrder.FlightOrderCreateReq;
-import com.ndc.channel.flight.dto.createOrder.OrderContactParams;
+import com.ndc.channel.exception.BusinessException;
+import com.ndc.channel.exception.BusinessExceptionCode;
+import com.ndc.channel.flight.dto.createOrder.*;
 import com.ndc.channel.flight.dto.flightSearch.CorpApiFlightListDataV2;
 import com.ndc.channel.flight.dto.flightSearch.CorpApiTicketData;
 import com.ndc.channel.flight.tools.NdcApiTools;
@@ -20,9 +19,8 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -42,6 +40,12 @@ public class NdcFlightCreateOrderHandler {
         createRQ.setRequest(getCreateOrderRequest(orderCreateReq));
 
         final IATAOrderViewRS orderViewRS = ndcApiTools.createOrder(createRQ);
+
+        com.ndc.channel.flight.xmlBean.createOrder.response.bean.Error error = orderViewRS.getError();
+        if (error != null) {
+            log.error("ndc创建订单失败，failReason={}", error.getError().getDescText());
+            throw new BusinessException(BusinessExceptionCode.REQUEST_PARAM_ERROR, "ndc创建订单失败！");
+        }
 
         final Order order = orderViewRS.getResponse().getOrder();
         final OrderItem orderItem = order.getOrderItem();
@@ -85,7 +89,9 @@ public class NdcFlightCreateOrderHandler {
 
         final List<ContactInfo> contactInfoList = getContactInfoList(req);
         dataLists.setContactInfoList(contactInfoList);
-        dataLists.setPaxList(getPaxList(req, contactInfoList.get(0)));
+
+        final ContactInfo paxContactInfo = contactInfoList.stream().filter(cf -> cf.getContactTypeText().equals("PAX")).findFirst().get();
+        dataLists.setPaxList(getPaxList(req, paxContactInfo));
 
         request.setDataLists(dataLists);
 
@@ -93,6 +99,21 @@ public class NdcFlightCreateOrderHandler {
     }
 
     private List<ContactInfo> getContactInfoList(FlightOrderCreateReq req) {
+
+        CorpApiOrderPassengerParams passengerParams = req.getPassengers().get(0);
+
+        final OrderContactParams orderContactParams = new OrderContactParams();
+        orderContactParams.setPhone(passengerParams.getPhone());
+        orderContactParams.setName(passengerParams.getFlightPassengerName());
+        orderContactParams.setContactType("PAX");
+
+        final OrderContactParams orderContactParams1= new OrderContactParams();
+        orderContactParams1.setPhone(passengerParams.getPhone());
+        orderContactParams1.setName(passengerParams.getFlightPassengerName());
+        orderContactParams1.setContactType("TRAVEL_AGENCY");
+
+        req.getContacts().add(orderContactParams);
+        req.getContacts().add(orderContactParams1);
 
         final List<ContactInfo> contactInfoList = req.getContacts().stream().map(contactParams -> {
             final ContactInfo contactInfo = new ContactInfo();
@@ -106,16 +127,16 @@ public class NdcFlightCreateOrderHandler {
             contactInfo.setIndividual(individual);
 
             contactInfo.setEmailAddress(null);
-            contactInfo.setContactTypeText("TRAVEL_AGENCY");
+            contactInfo.setContactTypeText(Optional.ofNullable(contactParams.getContactType()).orElse("PRIMARY"));
 
             final Phone phone = new Phone();
             phone.setPhoneNumber(contactParams.getPhone());
             phone.setCountryDialingCode("86");
             contactInfo.setPhone(phone);
 
-            EmailAddress emailAddress = new EmailAddress();
+            /*EmailAddress emailAddress = new EmailAddress();
             emailAddress.setEmailAddressText("565820745@qq.com");
-            contactInfo.setEmailAddress(emailAddress);
+            contactInfo.setEmailAddress(emailAddress);*/
 
             return contactInfo;
         }).collect(Collectors.toList());

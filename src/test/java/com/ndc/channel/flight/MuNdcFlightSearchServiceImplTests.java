@@ -9,10 +9,12 @@ import com.ndc.channel.flight.dto.createOrder.CorpApiOrderPassengerParams;
 import com.ndc.channel.flight.dto.createOrder.FlightOrderCreateReq;
 import com.ndc.channel.flight.dto.createOrder.OrderContactParams;
 import com.ndc.channel.flight.dto.flightSearch.CorpApiFlightListDataV2;
+import com.ndc.channel.flight.dto.orderPay.OrderPayReqParams;
 import com.ndc.channel.flight.dto.verifyPrice.CorpApiFlightVerifyPriceData;
 import com.ndc.channel.flight.dto.verifyPrice.FeiBaApiVerifyPriceReq;
 import com.ndc.channel.flight.dto.verifyPrice.FeibaApiVerificationParams;
 import com.ndc.channel.flight.handler.NdcFlightCreateOrderHandler;
+import com.ndc.channel.flight.handler.NdcFlightOrderPayHandler;
 import com.ndc.channel.flight.handler.NdcFlightSearchHandler;
 import com.ndc.channel.flight.handler.NdcFlightVerifyPriceHandler;
 import lombok.extern.slf4j.Slf4j;
@@ -45,7 +47,9 @@ public class MuNdcFlightSearchServiceImplTests {
     @Resource
     private NdcFlightCreateOrderHandler createOrderHandler;
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(MuNdcFlightSearchServiceImplTests.class);
+    @Resource
+    private NdcFlightOrderPayHandler orderPayHandler;
+
 
     @Test
     public void ndcFlightSearch() {
@@ -95,11 +99,23 @@ public class MuNdcFlightSearchServiceImplTests {
         OrderContactParams contactParams = new OrderContactParams();
         contactParams.setName("邓国泉");
         contactParams.setPhone("18611312771");
-        flightOrderCreateReq.setContacts(Arrays.asList(contactParams));
+        List<OrderContactParams> objects = new ArrayList<>();
+        objects.add(contactParams);
+        flightOrderCreateReq.setContacts(objects);
 
         createOrderHandler.createOrder(flightOrderCreateReq);
     }
 
+
+    @Test
+    public void orderPay() {
+
+        final OrderPayReqParams payReqParams = new OrderPayReqParams();
+
+        payReqParams.setOrderNumber("128019109991123672");
+        payReqParams.setGroupOrderNumber("128019109991123671");
+        orderPayHandler.orderPay(payReqParams);
+    }
 
 
 

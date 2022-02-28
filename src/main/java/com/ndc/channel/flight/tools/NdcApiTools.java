@@ -6,6 +6,7 @@ import com.ndc.channel.flight.xmlBean.createOrder.request.bean.IATAOrderCreateRQ
 import com.ndc.channel.flight.xmlBean.createOrder.response.bean.IATAOrderViewRS;
 import com.ndc.channel.flight.xmlBean.flightSearch.request.bean.IATAAirShoppingRQ;
 import com.ndc.channel.flight.xmlBean.flightSearch.response.bean.IATAAirShoppingRS;
+import com.ndc.channel.flight.xmlBean.orderPay.request.bean.IATAOrderChangeRQ;
 import com.ndc.channel.flight.xmlBean.verifyPrice.request.bean.IATAOfferPriceRQ;
 import com.ndc.channel.flight.xmlBean.verifyPrice.response.bean.IATAOfferPriceRS;
 import com.ndc.channel.http.ChannelOKHttpService;
@@ -73,6 +74,19 @@ public class NdcApiTools {
             final NdcAccountInfo accountInfo = new NdcAccountInfo(BusinessEnum.NdcApiInfo.CREATE_ORDER);
 
             return remote(accountInfo, rq, IATAOrderCreateRQ.class, IATAOrderViewRS.class);
+        }catch (BusinessException e){
+            throw e;
+        }catch (Exception e){
+            log.error("东方航空Ndc接口异常", e);
+            return null;
+        }
+    }
+
+    public com.ndc.channel.flight.xmlBean.orderPay.response.bean.IATAOrderViewRS orderPay(IATAOrderChangeRQ rq) {
+        try{
+            final NdcAccountInfo accountInfo = new NdcAccountInfo(BusinessEnum.NdcApiInfo.CREATE_ORDER);
+
+            return remote(accountInfo, rq, IATAOrderChangeRQ.class, com.ndc.channel.flight.xmlBean.orderPay.response.bean.IATAOrderViewRS.class);
         }catch (BusinessException e){
             throw e;
         }catch (Exception e){

@@ -15,6 +15,8 @@ public class OrderContactParams implements Serializable {
 	@ApiModelProperty(value="联系人电话",required=true)
 	private String phone;
 
+	private String contactType;
+
 	public String getName() {
 		return name;
 	}
@@ -30,5 +32,12 @@ public class OrderContactParams implements Serializable {
 	public void setPhone(String phone) {
 		this.phone = phone;
 	}
-	
+
+	public String getContactType() {
+		return contactType;
+	}
+
+	public void setContactType(String contactType) {
+		this.contactType = contactType;
+	}
 }

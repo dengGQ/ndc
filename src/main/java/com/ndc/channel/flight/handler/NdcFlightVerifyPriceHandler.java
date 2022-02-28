@@ -10,7 +10,7 @@ import com.ndc.channel.flight.dto.verifyPrice.CorpApiFlightVerifyPriceData;
 import com.ndc.channel.flight.dto.verifyPrice.FeiBaApiVerifyPriceReq;
 import com.ndc.channel.flight.dto.verifyPrice.FeibaApiVerificationParams;
 import com.ndc.channel.flight.tools.NdcApiTools;
-import com.ndc.channel.flight.xmlBean.flightSearch.common.Error;
+import com.ndc.channel.flight.xmlBean.verifyPrice.common.Error;
 import com.ndc.channel.flight.xmlBean.verifyPrice.request.bean.*;
 import com.ndc.channel.flight.xmlBean.verifyPrice.request.bean.Arrival;
 import com.ndc.channel.flight.xmlBean.verifyPrice.request.bean.DataLists;

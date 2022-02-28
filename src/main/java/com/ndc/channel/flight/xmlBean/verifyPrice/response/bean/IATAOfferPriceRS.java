@@ -1,7 +1,7 @@
 
 package com.ndc.channel.flight.xmlBean.verifyPrice.response.bean;
 
-import com.ndc.channel.flight.xmlBean.flightSearch.common.Error;
+import com.ndc.channel.flight.xmlBean.verifyPrice.common.Error;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;

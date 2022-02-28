@@ -165,7 +165,8 @@ public class BusinessEnum {
 
 		FLIGHT_SEARCH("A0534", "/ndc-shopping-common/shopping/basicShopping"),
 		OFFER_PRICE("A0535", "/ndc-flight-offer-price/price/flightOfferPrice"),
-		CREATE_ORDER("A0536", "/ndc-flight-order-create/flight/flightOrderCreate");
+		CREATE_ORDER("A0536", "/ndc-flight-order-create/flight/flightOrderCreate"),
+		ORDER_PAY("A0537", "/ndc-flight-order-payment/flight/flightOrderPayment");
 
 		private String code;
 		private String path;
