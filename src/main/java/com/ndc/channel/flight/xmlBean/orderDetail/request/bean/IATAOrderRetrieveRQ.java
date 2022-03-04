@@ -49,6 +49,16 @@ public class IATAOrderRetrieveRQ {
     @XmlElement(name = "Request", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderRetrieveRQ", required = true)
     protected Request request;
 
+    public IATAOrderRetrieveRQ() {
+    }
+
+    public IATAOrderRetrieveRQ(Order order) {
+        this.messageDoc = new MessageDoc();
+        this.party = new Party();
+        this.payloadAttributes = new PayloadAttributes();
+        this.request = new Request(order);
+    }
+
     /**
      * 获取messageDoc属性的值。
      * 

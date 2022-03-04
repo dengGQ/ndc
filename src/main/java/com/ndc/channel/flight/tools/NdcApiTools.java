@@ -6,6 +6,7 @@ import com.ndc.channel.flight.xmlBean.createOrder.request.bean.IATAOrderCreateRQ
 import com.ndc.channel.flight.xmlBean.createOrder.response.bean.IATAOrderViewRS;
 import com.ndc.channel.flight.xmlBean.flightSearch.request.bean.IATAAirShoppingRQ;
 import com.ndc.channel.flight.xmlBean.flightSearch.response.bean.IATAAirShoppingRS;
+import com.ndc.channel.flight.xmlBean.orderDetail.request.bean.IATAOrderRetrieveRQ;
 import com.ndc.channel.flight.xmlBean.orderPay.request.bean.IATAOrderChangeRQ;
 import com.ndc.channel.flight.xmlBean.verifyPrice.request.bean.IATAOfferPriceRQ;
 import com.ndc.channel.flight.xmlBean.verifyPrice.response.bean.IATAOfferPriceRS;
@@ -40,7 +41,7 @@ public class NdcApiTools {
         }catch (BusinessException e){
             throw e;
         }catch (Exception e){
-            log.error("Ndc机票查询异常", e);
+            log.error("东方Ndc机票查询接口异常", e);
             return null;
         }
     }
@@ -58,7 +59,7 @@ public class NdcApiTools {
         }catch (BusinessException e){
             throw e;
         }catch (Exception e){
-            log.error("东方航空Ndc接口异常", e);
+            log.error("东方航空Ndc验舱验价接口异常", e);
             return null;
         }
     }
@@ -77,20 +78,56 @@ public class NdcApiTools {
         }catch (BusinessException e){
             throw e;
         }catch (Exception e){
-            log.error("东方航空Ndc接口异常", e);
+            log.error("东方航空Ndc创单接口异常", e);
             return null;
         }
     }
 
+    /**
+     * 机票订单支付出票
+     * @param rq
+     * @return
+     */
     public com.ndc.channel.flight.xmlBean.orderPay.response.bean.IATAOrderViewRS orderPay(IATAOrderChangeRQ rq) {
         try{
-            final NdcAccountInfo accountInfo = new NdcAccountInfo(BusinessEnum.NdcApiInfo.CREATE_ORDER);
+            final NdcAccountInfo accountInfo = new NdcAccountInfo(BusinessEnum.NdcApiInfo.ORDER_PAY);
 
             return remote(accountInfo, rq, IATAOrderChangeRQ.class, com.ndc.channel.flight.xmlBean.orderPay.response.bean.IATAOrderViewRS.class);
         }catch (BusinessException e){
             throw e;
         }catch (Exception e){
-            log.error("东方航空Ndc接口异常", e);
+            log.error("东方航空Ndc订单支付接口异常", e);
+            return null;
+        }
+    }
+
+    /**
+     * 机票订单详情
+     * @param rq
+     * @return
+     */
+    public com.ndc.channel.flight.xmlBean.orderDetail.response.bean.IATAOrderViewRS orderDetail(IATAOrderRetrieveRQ rq) {
+        try{
+            final NdcAccountInfo accountInfo = new NdcAccountInfo(BusinessEnum.NdcApiInfo.ORDER_DETAIL);
+
+            return remote(accountInfo, rq, IATAOrderRetrieveRQ.class, com.ndc.channel.flight.xmlBean.orderDetail.response.bean.IATAOrderViewRS.class);
+        }catch (BusinessException e){
+            throw e;
+        }catch (Exception e){
+            log.error("东方航空Ndc订单详情接口异常", e);
+            return null;
+        }
+    }
+
+    public com.ndc.channel.flight.xmlBean.orderRefund.response.bean.IATAOrderViewRS refundApply(com.ndc.channel.flight.xmlBean.orderRefund.request.bean.IATAOrderRetrieveRQ rq) {
+        try{
+            final NdcAccountInfo accountInfo = new NdcAccountInfo(BusinessEnum.NdcApiInfo.REFUND_APPLY);
+
+            return remote(accountInfo, rq, com.ndc.channel.flight.xmlBean.orderRefund.request.bean.IATAOrderRetrieveRQ.class, com.ndc.channel.flight.xmlBean.orderRefund.response.bean.IATAOrderViewRS.class);
+        }catch (BusinessException e){
+            throw e;
+        }catch (Exception e){
+            log.error("东方航空Ndc退票申请接口异常", e);
             return null;
         }
     }

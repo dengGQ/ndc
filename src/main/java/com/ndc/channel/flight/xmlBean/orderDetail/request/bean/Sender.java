@@ -37,6 +37,10 @@ public class Sender {
     @XmlElement(name = "TravelAgency", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderRetrieveRQ", required = true)
     protected TravelAgency travelAgency;
 
+    public Sender() {
+        this.travelAgency = new TravelAgency();
+    }
+
     /**
      * 获取travelAgency属性的值。
      * 

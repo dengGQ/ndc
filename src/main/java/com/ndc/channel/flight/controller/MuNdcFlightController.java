@@ -3,11 +3,16 @@ package com.ndc.channel.flight.controller;
 import com.ndc.channel.exception.BusinessException;
 import com.ndc.channel.flight.dto.BusinessResponseFactory;
 import com.ndc.channel.flight.dto.ResponseData;
+import com.ndc.channel.flight.dto.createOrder.CorpApiFlightOrderCreateData;
+import com.ndc.channel.flight.dto.createOrder.FlightOrderCreateReq;
 import com.ndc.channel.flight.dto.flightSearch.CorpApiFlightListDataV2;
+import com.ndc.channel.flight.dto.orderDetail.NdcOrderDetailData;
+import com.ndc.channel.flight.dto.orderDetail.OrderTicketInfo;
+import com.ndc.channel.flight.dto.orderPay.OrderPayReqParams;
 import com.ndc.channel.flight.dto.verifyPrice.CorpApiFlightVerifyPriceData;
 import com.ndc.channel.flight.dto.verifyPrice.FeiBaApiVerifyPriceReq;
-import com.ndc.channel.flight.handler.NdcFlightSearchHandler;
-import com.ndc.channel.flight.handler.NdcFlightVerifyPriceHandler;
+import com.ndc.channel.flight.handler.*;
+import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -18,14 +23,21 @@ import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping("/ndc/flight")
+@RequestMapping("/ndc/corpapi/flight")
 public class MuNdcFlightController {
 
     @Resource
     private NdcFlightSearchHandler flightSearchHandler;
-
     @Resource
     private NdcFlightVerifyPriceHandler flightVerifyPriceHandler;
+    @Resource
+    private NdcFlightCreateOrderHandler createOrderHandler;
+    @Resource
+    private NdcFlightOrderPayHandler orderPayHandler;
+    @Resource
+    private NdcFlightOrderDetailHandler orderDetailHandler;
+    @Resource
+    private NdcFlightOrderRefundHandler orderRefundHandler;
 
     @PostMapping("/search/{flightDate}/{depCityCode}/{destCityCode}")
     @ApiOperation(value = "航班查询", notes = "航班查询", httpMethod = "POST", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -55,7 +67,72 @@ public class MuNdcFlightController {
             return BusinessResponseFactory.createSuccess(verifyPriceData);
         }catch (BusinessException exception) {
 
+            log.error("东航NDC机票验舱验价失败，失败原因={}", exception.getMessage());
+            return BusinessResponseFactory.createBusinessError(exception);
+        }
+    }
+
+    @PostMapping("/order/create")
+    @ApiOperation(value = "创单", httpMethod = "POST", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseData<Object> createOrder(@RequestBody FlightOrderCreateReq req) {
+
+        try {
+
+            CorpApiFlightOrderCreateData order = createOrderHandler.createOrder(req);
+
+            return BusinessResponseFactory.createSuccess(order);
+        }catch (BusinessException exception) {
+
             log.error("东航NDC创建机票订单失败，失败原因={}", exception.getMessage());
+            return BusinessResponseFactory.createBusinessError(exception);
+        }
+    }
+
+    @PostMapping("/order/ticket")
+    @ApiOperation(value = "支付出票", httpMethod = "POST", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseData<Boolean> orderPay(@RequestBody OrderPayReqParams payReqParams) {
+
+        try {
+
+            final Boolean result = orderPayHandler.orderPay(payReqParams);
+
+            return BusinessResponseFactory.createSuccess(result);
+        }catch (BusinessException exception) {
+
+            log.error("东航NDC机票订单支付失败，失败原因={}", exception.getMessage());
+            return BusinessResponseFactory.createBusinessError(exception);
+        }
+    }
+
+
+    @PostMapping("/order/detail/{orderId}")
+    @ApiOperation(value = "订单明细", httpMethod = "POST", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseData<List<OrderTicketInfo>> orderDetail(@PathVariable("orderId") String orderId) {
+
+        try {
+
+            final NdcOrderDetailData ndcOrderDetailData = orderDetailHandler.orderDetail(orderId);
+
+            return BusinessResponseFactory.createSuccess(ndcOrderDetailData.getTicketInfoList());
+        }catch (BusinessException exception) {
+
+            log.error("东航NDC机票订单明细查询失败，失败原因={}", exception.getMessage());
+            return BusinessResponseFactory.createBusinessError(exception);
+        }
+    }
+
+    @PostMapping("/refund/create")
+    @ApiOperation(value = "订单明细", httpMethod = "POST", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseData<String> refundCreate(@PathVariable("orderId") String orderId) {
+
+        try {
+
+            final String channelRefundOrderNumber = orderRefundHandler.refundApply(orderId);
+
+            return BusinessResponseFactory.createSuccess(channelRefundOrderNumber);
+        }catch (BusinessException exception) {
+
+            log.error("东航NDC退票申请失败，失败原因={}", exception.getMessage());
             return BusinessResponseFactory.createBusinessError(exception);
         }
     }

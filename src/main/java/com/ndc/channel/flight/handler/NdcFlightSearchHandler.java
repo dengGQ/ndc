@@ -110,6 +110,8 @@ public class NdcFlightSearchHandler {
                     throw new BusinessException(BusinessExceptionCode.REQUEST_PARAM_ERROR, "NDC航班查询未查到成人舱位！");
                 });
 
+        final String ownerTypeCode = offer.getOwnerTypeCode();
+        final String ownerCode = offer.getOwnerCode();
         final Map<String, String> persistenceFlightDataMap= new HashMap<>(32);
         final Map<String, Map<String, String>> persistenceTicketDataMap = new HashMap<>(32);
         for (CorpApiFlightListDataV2 flightData : flightDataList) {
@@ -169,6 +171,8 @@ public class NdcFlightSearchHandler {
             }
 
             flightData.setOfferId(offer.getOfferID());
+            flightData.setOwnerCode(ownerCode);
+            flightData.setOwnerTypeCode(ownerTypeCode);
             flightData.setTickets(corpApiTicketMap.values().stream().collect(Collectors.toList()));
 
             final Map<String, String> ticketStrMap = corpApiTicketMap.values().stream().collect(Collectors.toMap(CorpApiTicketData::getTicketId, v -> JSON.toJSONString(v)));

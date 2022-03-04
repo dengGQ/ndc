@@ -50,7 +50,7 @@ public class TravelAgency {
     @XmlElement(name = "AgencyID", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderCreateRQ", required = true)
     protected String agencyID;
     @XmlElement(name = "ContactInfoRefID", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderCreateRQ")
-    protected String contactInfoRefID;
+    protected List<String> contactInfoRefID;
     @XmlElement(name = "IATANumber", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderCreateRQ", required = true)
     protected String iataNumber;
     @XmlElement(name = "Name", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderCreateRQ", required = true)
@@ -61,15 +61,18 @@ public class TravelAgency {
     protected String typeCode;
 
     public TravelAgency() {
+    }
+
+    public TravelAgency(List<String> contactInfoRefID) {
         this.agencyID = "1462";
-        this.contactInfoRefID = UUID.randomUUID().toString();
+        this.contactInfoRefID = contactInfoRefID;
         this.iataNumber = "8332730";
         this.name = "天巡";
         this.pseudoCityID = "HGH121";
         this.typeCode = "OnlineTravelAgency";
     }
 
-    public TravelAgency(String agencyID, String contactInfoRefID, String iataNumber, String name, String pseudoCityID, String typeCode) {
+    public TravelAgency(String agencyID, List<String> contactInfoRefID, String iataNumber, String name, String pseudoCityID, String typeCode) {
         this.agencyID = agencyID;
         this.contactInfoRefID = contactInfoRefID;
         this.iataNumber = iataNumber;
@@ -124,11 +127,11 @@ public class TravelAgency {
      * 
      * 
      */
-    public String getContactInfoRefID() {
+    public List<String> getContactInfoRefID() {
         return this.contactInfoRefID;
     }
 
-    public void setContactInfoRefID(String contactInfoRefID) {
+    public void setContactInfoRefID(List<String> contactInfoRefID) {
         this.contactInfoRefID = contactInfoRefID;
     }
 

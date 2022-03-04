@@ -6,6 +6,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import java.util.List;
 
 
 /**
@@ -44,6 +45,11 @@ public class Party {
     public Party() {
         this.recipient = new Recipient();
         this.sender = new Sender();
+    }
+
+    public Party(List<String> contactInfoRefID) {
+        this.recipient = new Recipient();
+        this.sender = new Sender(contactInfoRefID);
     }
 
     public Party(Recipient recipient, Sender sender) {

@@ -6,6 +6,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import java.util.List;
 
 
 /**
@@ -38,7 +39,10 @@ public class Sender {
     protected TravelAgency travelAgency;
 
     public Sender() {
-        this.travelAgency = new TravelAgency();
+    }
+
+    public Sender(List<String> contactInfoRefID) {
+        this.travelAgency = new TravelAgency(contactInfoRefID);
     }
 
     public Sender(TravelAgency travelAgency) {

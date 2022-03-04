@@ -1,6 +1,8 @@
 package com.ndc.channel.http;
 
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import com.ndc.channel.exception.BusinessException;
 import com.ndc.channel.exception.BusinessExceptionCode;
 import okhttp3.*;
@@ -154,9 +156,6 @@ public class ChannelOKHttpService {
 			Response response = getClient(null,null).newCall(request).execute();
 			if (response.isSuccessful()) {
 				String result = response.body().string();
-//				logger.info(result);
-//				Document document = DocumentHelper.parseText(result);
-//				result = document.getRootElement().getText();
 				return result;
 			} else {
 				return null;
@@ -164,6 +163,80 @@ public class ChannelOKHttpService {
 		} catch (IOException e) {
 			//服务调用失败
 			throw new BusinessException(BusinessExceptionCode.SYSTEM_ERROR);
+		}
+	}
+
+	public String doPost(String url, String json) {
+		return doPost(url,json,null,null);
+	}
+
+	public String doPost(String url, String json,Map<String,String> headers,MediaType mediaType) {
+		MediaType mt = mediaType;
+		if(mt==null)
+			mt = MEDIA_TYPE_JSON;
+		RequestBody body = RequestBody.create(mt, json);
+		Request.Builder builder = new Request.Builder().url(url);
+		if(headers != null) {
+			Iterator iterator = headers.entrySet().iterator();
+			while(iterator.hasNext()) {
+				Entry entry = (Entry)iterator.next();
+				builder.addHeader(entry.getKey().toString(), entry.getValue().toString());
+			}
+		}
+		Request request = builder.post(body).build();
+		try {
+			Response response = getClient(null,null).newCall(request).execute();
+			return response.body().string();
+		} catch (IOException e) {
+			//服务调用失败
+			throw new BusinessException(BusinessExceptionCode.SYSTEM_SERVICE_TIMEOUT);
+		}
+	}
+
+	public <R> R doPost(String url, String json, Class<R> rClass) {
+		RequestBody body = RequestBody.create(MEDIA_TYPE_JSON, json);
+		Request.Builder builder = new Request.Builder().url(url);
+		Request request = builder.post(body).build();
+		try {
+			long begin = System.currentTimeMillis();
+			Response response = getClient(null,null).newCall(request).execute();
+			long end = System.currentTimeMillis();
+			if (response.isSuccessful()) {
+				String str = response.body().string();
+				logger.info("请求url={},param={},time={}", url, json, end-begin);
+				return JSON.parseObject(str, rClass);
+			}else{
+				logger.error("请求错误url={},param={},time={},response={}", url, json,end-begin, response.toString());
+				return null;
+			}
+		} catch (IOException e) {
+			//服务调用失败
+			logger.error("请求错误url={},param={},time={},response={}", url, json,e);
+			throw new BusinessException(BusinessExceptionCode.SYSTEM_SERVICE_TIMEOUT);
+		}
+	}
+
+	public <R> R doPost(String url, String json, TypeReference<R> typeReference) {
+		RequestBody body = RequestBody.create(MEDIA_TYPE_JSON, json);
+		Request.Builder builder = new Request.Builder().url(url);
+		Request request = builder.post(body).build();
+		try {
+			Response response = getClient(null,null).newCall(request).execute();
+			if (response.isSuccessful()) {
+				String str = response.body().string();
+				logger.info("请求url={},param={},response={}", url, json, str);
+				return JSON.parseObject(str, typeReference);
+
+			} else {
+				String str = response.toString();
+				logger.info("请求url={},param={},response={}", url, json, str);
+				return JSON.parseObject(str, typeReference);
+
+			}
+		} catch (IOException e) {
+			logger.error("请求ur={}, param={}, msg={}", url, json, e);
+			//服务调用失败
+			throw new BusinessException(BusinessExceptionCode.SYSTEM_SERVICE_TIMEOUT);
 		}
 	}
 }

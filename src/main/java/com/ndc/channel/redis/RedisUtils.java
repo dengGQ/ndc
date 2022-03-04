@@ -171,16 +171,33 @@ public class RedisUtils {
      * @param member
      * @param score
      */
-    public void zsetAddWithScore(String key, String member, long score) {
+    public void zsetAddWithScore(String key, String member, double score) {
+
         redisTemplate.opsForZSet().add(key, member, score);
     }
 
     public Set<String> zsetRange(String key, long start, long end) {
         return redisTemplate.opsForZSet().range(key, start, end);
     }
+    public Set<String> zsetRangeWithScores(String key, long start, long end) {
+        return redisTemplate.opsForZSet().rangeWithScores(key, start, end);
+    }
 
-    public void zsetRem(String key, String... members) {
-        redisTemplate.opsForZSet().remove(key, members);
+    public Set<String> zsetRangeByScore(String key, long start, long end) {
+        return redisTemplate.opsForZSet().rangeByScore(key, start, end);
+    }
+
+    public Set<ZSetOperations.TypedTuple> zsetRangeByScoreWithScores(String key, long start, long end) {
+        return redisTemplate.opsForZSet().rangeByScoreWithScores(key, start, end);
+    }
+
+    public Set<ZSetOperations.TypedTuple> rangeWithScores(String key, long start, long end) {
+        return redisTemplate.opsForZSet().rangeWithScores(key, start, end);
+    }
+
+
+    public long zsetRem(String key, String... members) {
+        return redisTemplate.opsForZSet().remove(key, members);
     }
 
     public Long zscard(String key) {

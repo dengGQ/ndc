@@ -37,6 +37,10 @@ public class Recipient {
     @XmlElement(name = "MarketingCarrier", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderRetrieveRQ", required = true)
     protected MarketingCarrier marketingCarrier;
 
+    public Recipient() {
+        this.marketingCarrier = new MarketingCarrier();
+    }
+
     /**
      * 获取marketingCarrier属性的值。
      * 

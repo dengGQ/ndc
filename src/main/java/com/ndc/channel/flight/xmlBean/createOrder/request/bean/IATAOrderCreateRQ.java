@@ -6,6 +6,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import java.util.List;
 
 
 /**
@@ -50,8 +51,11 @@ public class IATAOrderCreateRQ {
     protected Request request;
 
     public IATAOrderCreateRQ() {
+    }
+
+    public IATAOrderCreateRQ(List<String> contactInfoRefID) {
         this.messageDoc = new MessageDoc();
-        this.party = new Party();
+        this.party = new Party(contactInfoRefID);
         this.payloadAttributes = new PayloadAttributes();
     }
     /**

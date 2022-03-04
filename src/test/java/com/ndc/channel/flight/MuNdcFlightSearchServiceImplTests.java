@@ -1,36 +1,42 @@
 package com.ndc.channel.flight;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.ndc.channel.ChannelApplication;
 import com.ndc.channel.exception.BusinessException;
 import com.ndc.channel.exception.BusinessExceptionCode;
+import com.ndc.channel.executor.OrderDetailDelayQueryExecutor;
 import com.ndc.channel.flight.dto.createOrder.CorpApiOrderFlightTicketParams;
 import com.ndc.channel.flight.dto.createOrder.CorpApiOrderPassengerParams;
 import com.ndc.channel.flight.dto.createOrder.FlightOrderCreateReq;
 import com.ndc.channel.flight.dto.createOrder.OrderContactParams;
 import com.ndc.channel.flight.dto.flightSearch.CorpApiFlightListDataV2;
+import com.ndc.channel.flight.dto.orderDetail.NdcOrderDetailData;
+import com.ndc.channel.flight.dto.orderDetail.OrderTicketInfo;
 import com.ndc.channel.flight.dto.orderPay.OrderPayReqParams;
 import com.ndc.channel.flight.dto.verifyPrice.CorpApiFlightVerifyPriceData;
 import com.ndc.channel.flight.dto.verifyPrice.FeiBaApiVerifyPriceReq;
 import com.ndc.channel.flight.dto.verifyPrice.FeibaApiVerificationParams;
-import com.ndc.channel.flight.handler.NdcFlightCreateOrderHandler;
-import com.ndc.channel.flight.handler.NdcFlightOrderPayHandler;
-import com.ndc.channel.flight.handler.NdcFlightSearchHandler;
-import com.ndc.channel.flight.handler.NdcFlightVerifyPriceHandler;
+import com.ndc.channel.flight.handler.*;
+import com.ndc.channel.notice.NdcFlightOrderNotice;
+import com.ndc.channel.redis.RedisUtils;
+import groovy.lang.Tuple;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.redis.core.DefaultTypedTuple;
+import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = ChannelApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -50,6 +56,12 @@ public class MuNdcFlightSearchServiceImplTests {
     @Resource
     private NdcFlightOrderPayHandler orderPayHandler;
 
+    @Resource
+    private NdcFlightOrderDetailHandler orderDetailHandler;
+    @Resource
+    private RedisUtils redisUtils;
+    @Resource
+    private OrderDetailDelayQueryExecutor queryExecutor;
 
     @Test
     public void ndcFlightSearch() {
@@ -87,10 +99,10 @@ public class MuNdcFlightSearchServiceImplTests {
         flightOrderCreateReq.setTickets(Arrays.asList(ticketParams));
 
         CorpApiOrderPassengerParams passengerParams = new CorpApiOrderPassengerParams();
-        passengerParams.setFlightPassengerName("邓国泉");
+        passengerParams.setFlightPassengerName("测试");
         passengerParams.setPhone("18611312771");
-        passengerParams.setBirthday("1989-10-05");
-        passengerParams.setIdcardCode("411527198910052071");
+        passengerParams.setBirthday("1994-08-20");
+        passengerParams.setIdcardCode("411302199408201314");
         passengerParams.setIdcardType("1");
         passengerParams.setSex("1");
         flightOrderCreateReq.setPassengers(Arrays.asList(passengerParams));
@@ -112,40 +124,93 @@ public class MuNdcFlightSearchServiceImplTests {
 
         final OrderPayReqParams payReqParams = new OrderPayReqParams();
 
-        payReqParams.setOrderNumber("128019109991123672");
-        payReqParams.setGroupOrderNumber("128019109991123671");
+        payReqParams.setOrderNumber("1022030100204939");
+        payReqParams.setOrderNumber("1122030100182007");
         orderPayHandler.orderPay(payReqParams);
     }
 
 
+    @Test
+    public void orderDetail() {
+
+        final NdcOrderDetailData ndcOrderDetailData = orderDetailHandler.orderDetail("1022030100204939");
+
+        System.out.println(JSON.toJSONString(ndcOrderDetailData));
+    }
+
+    @Test
+    public void afterCreateOrder () {
+
+        queryExecutor.submitTask("1022030100204939", 5);
+        while (true){}
+    }
+
 
     static class BitMap{
 
+        // 能存下整数的个数：比如15个整数，len=15
         private int len;
-        private byte[] bitMap;
+        private byte[] byteArray;
 
         public BitMap(int len) {
             this.len = len;
-            bitMap = new byte[(len>>3)+1];
+            byteArray = new byte[(len>>3)+1];
         }
 
         public void set(int num, Boolean bool) {
 
             if (bool) {
 
-                bitMap[num/8] |= 1<< (num%8);
+                byteArray[num/8] |= 1<< (num%8);
             }else {
-                bitMap[num/8] &= ~(1<< (num%8));
+                byteArray[num/8] &= ~(1<< (num%8));
             }
         }
 
-        public boolean get(int num) {
+        /**
+         * 将num所在的位置从0变成1
+         * 将1左移position位后，position位置上自然就是1，其他位置都是0
+         * 然后和以前的数据做‘或’运算，这样，以前的数据position位置上就替换成1了，其他位置保持不变
+         */
+        public void add(int num) {
+            byteArray[getIdx(num)] |= 1 << getPosition(num);
+        }
 
-            return (bitMap[num/8] & (1 << (num % 8))) != 0 ? true : false;
+        /**
+         * 将num所在的位置从0变成1
+         * 将1左移position位后，position位置上自然就是1，其他位置都是0。然后再取反就变成position位置是0，其他位置都是1
+         * 然后和以前的数据做‘与’运算，这样，以前的数据position位置上替换成0了，其他位置保持不变
+         * @param num
+         */
+        public void remove(int num) {
+            byteArray[getIdx(num)] &= ~(1 << getPosition(num));
+        }
+
+        /**
+         * 判断num是否存在
+         * 同样将1左移position位使position位置上变成1，其他位置都是0，然后用这个数跟原数做与运算
+         * 因为其他位置都是0，只有position位置是1，所以只有原数据position位置也是1运算后的结果才会是1，否则就是0
+         * 如此边确定了num是否存在了
+         * @param num
+         * @return
+         */
+        public boolean isExits(int num) {
+
+            return (byteArray[num/8] & (1 << (num % 8))) != 0 ? true : false;
+        }
+
+        // num在byte[]数组中的位置
+        public int getIdx(int num) {
+            return num >> 3;
+        }
+
+        // num在byte[idx]中第几位, 等价于：num%8
+        public int getPosition(int num) {
+            return num & 0x07;
         }
 
         public byte[] getBitMap(){
-            return bitMap;
+            return byteArray;
         }
 
         public int getLen() {
@@ -154,10 +219,12 @@ public class MuNdcFlightSearchServiceImplTests {
     }
 
     public static void main(String[] args) {
+        final BitMap bitMap = new BitMap(6);
+        System.out.println(bitMap.getLen());
+        System.out.println(bitMap.getBitMap().length);
 
-        final NdcFlightSearchHandler searchHandler = new NdcFlightSearchHandler();
-        final List<CorpApiFlightListDataV2> corpApiFlightListDataV2s = searchHandler.flightSearch("2022-03-13", "SHA", "CAN");
-        System.out.println(JSON.toJSONString(corpApiFlightListDataV2s));
+        System.out.println(13%8);
+        System.out.println(13 & 7);
     }
 
 }

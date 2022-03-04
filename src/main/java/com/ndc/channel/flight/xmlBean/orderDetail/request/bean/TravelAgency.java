@@ -49,6 +49,12 @@ public class TravelAgency {
     @XmlElement(name = "TypeCode", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderRetrieveRQ", required = true)
     protected String typeCode;
 
+    public TravelAgency() {
+        this.agencyID = "1462";
+        this.name = "天巡";
+        this.typeCode = "OnlineTravelAgency";
+    }
+
     /**
      * 获取agencyID属性的值。
      * 

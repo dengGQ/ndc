@@ -3,21 +3,27 @@ package com.ndc.channel.flight.handler;
 import com.ndc.channel.enumtype.BusinessEnum;
 import com.ndc.channel.exception.BusinessException;
 import com.ndc.channel.exception.BusinessExceptionCode;
+import com.ndc.channel.executor.OrderDetailDelayQueryExecutor;
 import com.ndc.channel.flight.dto.createOrder.*;
 import com.ndc.channel.flight.dto.flightSearch.CorpApiFlightListDataV2;
 import com.ndc.channel.flight.dto.flightSearch.CorpApiTicketData;
 import com.ndc.channel.flight.tools.NdcApiTools;
 import com.ndc.channel.flight.xmlBean.createOrder.request.bean.*;
-import com.ndc.channel.flight.xmlBean.createOrder.response.bean.IATAOrderViewRS;
-import com.ndc.channel.flight.xmlBean.createOrder.response.bean.Order;
-import com.ndc.channel.flight.xmlBean.createOrder.response.bean.OrderItem;
-import com.ndc.channel.flight.xmlBean.createOrder.response.bean.TotalPrice;
+import com.ndc.channel.flight.xmlBean.createOrder.request.bean.ContactInfo;
+import com.ndc.channel.flight.xmlBean.createOrder.request.bean.DataLists;
+import com.ndc.channel.flight.xmlBean.createOrder.request.bean.IdentityDoc;
+import com.ndc.channel.flight.xmlBean.createOrder.request.bean.Individual;
+import com.ndc.channel.flight.xmlBean.createOrder.request.bean.Pax;
+import com.ndc.channel.flight.xmlBean.createOrder.request.bean.Phone;
+import com.ndc.channel.flight.xmlBean.createOrder.response.bean.*;
 import com.ndc.channel.redis.RedisKeyConstants;
 import com.ndc.channel.redis.RedisUtils;
+import com.ndc.channel.service.NdcFlightApiOrderRelService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -29,15 +35,25 @@ public class NdcFlightCreateOrderHandler {
 
     @Resource
     private NdcApiTools ndcApiTools;
-
     @Resource
     private RedisUtils redisUtils;
+    @Resource
+    private NdcFlightApiOrderRelService orderRelService;
+
+    @Resource
+    private OrderDetailDelayQueryExecutor detailDelayQueryExecutor;
 
     public CorpApiFlightOrderCreateData createOrder(FlightOrderCreateReq orderCreateReq) {
         CorpApiFlightOrderCreateData orderCreateData = new CorpApiFlightOrderCreateData();
 
-        IATAOrderCreateRQ createRQ = new IATAOrderCreateRQ();
-        createRQ.setRequest(getCreateOrderRequest(orderCreateReq));
+        final Request request = getCreateOrderRequest(orderCreateReq);
+
+        final List<String> contactIdList = request.getDataLists().getContactInfoList().stream().filter(contactInfo -> {
+            return !contactInfo.getContactTypeText().equals("PAX");
+        }).map(ContactInfo::getContactInfoID).collect(Collectors.toList());
+
+        IATAOrderCreateRQ createRQ = new IATAOrderCreateRQ(contactIdList);
+        createRQ.setRequest(request);
 
         final IATAOrderViewRS orderViewRS = ndcApiTools.createOrder(createRQ);
 
@@ -47,7 +63,8 @@ public class NdcFlightCreateOrderHandler {
             throw new BusinessException(BusinessExceptionCode.REQUEST_PARAM_ERROR, "ndc创建订单失败！");
         }
 
-        final Order order = orderViewRS.getResponse().getOrder();
+        final Response response = orderViewRS.getResponse();
+        final Order order = response.getOrder();
         final OrderItem orderItem = order.getOrderItem();
 
         // 交易订单号
@@ -58,9 +75,23 @@ public class NdcFlightCreateOrderHandler {
         String statusCode = orderItem.getStatusCode();
         String paymentTimeLimitDateTime = orderItem.getPaymentTimeLimitDateTime();
         TotalPrice totalPrice = order.getTotalPrice();
+        TotalAmount totalAmount = totalPrice.getTotalAmount();
 
-        orderCreateData.setGroupOdrerNumber(orderID);
-        orderCreateData.setOrderNumber(orderItemID);
+        final BaseAmount baseAmount = totalPrice.getBaseAmount();
+
+        orderCreateData.setOrderNumber(orderID);
+        orderCreateData.setOrderItemId(orderItemID);
+        orderCreateData.setSettlementMoney(new BigDecimal(totalAmount.getValue()));
+        orderCreateData.setTicketPrice(new BigDecimal(baseAmount.getValue()));
+        orderCreateData.setTktl(paymentTimeLimitDateTime);
+        orderCreateData.setOwnerCode(order.getOwnerCode());
+        orderCreateData.setOwnerTypeCode(order.getOwnerTypeCode());
+
+        // NDC订单关键信息保存
+        orderRelService.insertEntity(orderCreateReq, orderCreateData);
+
+        // 发布异步查询订单详情任务
+        detailDelayQueryExecutor.submitTask(orderID, 60L);
 
         return orderCreateData;
     }

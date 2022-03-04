@@ -1,12 +1,15 @@
 
 package com.ndc.channel.flight.xmlBean.createOrder.request.bean;
 
+import sun.security.provider.MD5;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
@@ -78,15 +81,15 @@ public class PayloadAttributes {
 
     public PayloadAttributes() {
         this.altLangID = "CN";
-        this.correlationID = "";
+        this.correlationID = UUID.randomUUID().toString();;
         this.echoTokenText = UUID.randomUUID().toString();
         this.primaryLangID = "CN";
         this.retransmissionInd = "false";
         this.seqNumber = "1";
-        this.timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"));
-        this.trxID = "";
+        this.timestamp = LocalDateTime.now().atZone(ZoneId.of("+8")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX"));
+        this.trxID = UUID.randomUUID().toString();
         this.trxStatusCode = "0";
-        this.versionNumber = "";
+        this.versionNumber = "18.2";
     }
 
     public PayloadAttributes(String altLangID, String correlationID, String echoTokenText, String primaryLangID, String retransmissionInd, String seqNumber, String timestamp, String trxID, String trxStatusCode, String versionNumber) {
@@ -101,7 +104,6 @@ public class PayloadAttributes {
         this.trxStatusCode = trxStatusCode;
         this.versionNumber = versionNumber;
     }
-
 
     /**
      * 获取altLangID属性的值。

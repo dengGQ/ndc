@@ -113,6 +113,8 @@ public class CorpApiFlightListDataV2 {
 	@ApiModelProperty(value = "机票信息", required = true)
 	private List<CorpApiTicketData> tickets;
 
+	private String ownerTypeCode;
+	private String ownerCode;
 	private String shoppingResponseID;
 
 	private String originDestID;
@@ -456,5 +458,21 @@ public class CorpApiFlightListDataV2 {
 
 	public void setPaxSegmentID(String paxSegmentID) {
 		this.paxSegmentID = paxSegmentID;
+	}
+
+	public String getOwnerTypeCode() {
+		return ownerTypeCode;
+	}
+
+	public void setOwnerTypeCode(String ownerTypeCode) {
+		this.ownerTypeCode = ownerTypeCode;
+	}
+
+	public String getOwnerCode() {
+		return ownerCode;
+	}
+
+	public void setOwnerCode(String ownerCode) {
+		this.ownerCode = ownerCode;
 	}
 }

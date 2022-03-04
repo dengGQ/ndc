@@ -10,7 +10,9 @@ import lombok.Data;
 @ApiModel("订单支付请求参数")
 public class OrderPayReqParams {
 
-    private String groupOrderNumber;
+    @ApiModelProperty(value = "外部订单号", required = false, hidden = true)
+    private String externalOrderNumber;
 
+    @ApiModelProperty(value = "订单号", required = true)
     private String orderNumber;
 }

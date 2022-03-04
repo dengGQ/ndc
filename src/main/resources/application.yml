@@ -8,7 +8,8 @@ spring:
       config: classpath:/ehcache/ehcache.xml
     type: ehcache
   redis:
-    host: db-replication.redis.svc.flybycs.com
+#    host: db-replication.redis.svc.flybycs.com
+    host: localhost
     password: feibaredis
     port: 6379
     timeout: 5000ms
@@ -19,6 +20,27 @@ spring:
         max-wait: -1
         max-idle: 10
         min-idle: 1
+  datasource:
+    # 使用druid数据源
+    druid:
+      url: jdbc:mysql://other-mysql-flyby-100.mysql.svc.flybycs.com/flybycloud?useUnicode=true&characterEncoding=utf-8&autoReconnect=true&zeroDateTimeBehavior=convertToNull&serverTimezone=GMT%2B8
+      username: chenyoujing
+      password: D6iJZ11pxcrMexykBg
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      filters: stat
+      maxActive: 300
+      initialSize: 5
+      maxWait: 60000
+      minIdle: 5
+      timeBetweenEvictionRunsMillis: 60000
+      minEvictableIdl eTimeMillis: 300000
+      minEvictableIdleTimeMillis: 300000
+      validationQuery: select 'x'
+      testWhileIdle: true
+      testOnBorrow: false
+      testOnReturn: false
+      poolPreparedStatements: true
+      maxOpenPreparedStatements: 20
 ibeplus:
   #ota：生产环境，目前阶段不要提交  develop：测试环境
   baseurl: http://espeed.srv.prod.flybytrip.com/develop/
@@ -28,6 +50,11 @@ ibeplus:
     #password: Gx58aT2p03iP   #生成环境密码
     iatanumber: 08315860
 
+
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  configuration:
+    mapUnderscoreToCamelCase: true
 
 
 xxl:

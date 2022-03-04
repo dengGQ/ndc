@@ -9,6 +9,51 @@ import java.util.*;
 
 public class BusinessEnum {
 
+	/**
+	 * 客票状态
+	 */
+	public enum TicketStatus {
+
+		_708("已换开"),B("客票已使用"),
+		BD("旅客已登机"),CK("正在办理值机"),
+		I("客票有效"),PE("客票已换开为纸票"),
+		RF("客票已退"),S("客票已挂起"),V("作废");
+
+		private String label;
+
+		TicketStatus(String label) {
+			this.label = label;
+		}
+
+		public String getLabel() {
+			return label;
+		}
+	}
+
+	/**
+	 * 订单项状态：OUTINVOICE-已出票
+	 */
+	public enum OrderItemStatusCode {
+
+		CANCELLEDBYCUSTOMER("订单项目预订已被客户取消或者因支付时间超时系统自动取消"),
+		ENTITLED("等待接收"),NOTENTITLED("无权接收"),BOOKFAIL("预订失败"),WAITEPAY("等待支付"),WAITEOUTINVOICE("等待开票"),OUTINVOICE("已开票"),
+		INVOICING("开票中"),FAILUREOUTINVOICE("开票失败"),REFUNDED("已退票"),REFUNDFAIL("退票失败"),ONREFUND("退票中"),
+		REFUNDERROR("差错退款"),INVALID("无效订单"),BOOKSUCCESS("预订成功"),BOOKCANCEL("取消预订"),PAYING("支付中"),ABNORMAL("异常"),UNKNOWN("未知");
+		private String label;
+
+		OrderItemStatusCode(String label) {
+			this.label = label;
+		}
+
+		public String getLabel() {
+			return label;
+		}
+
+		public static String getLabelByName(String name) {
+			return Arrays.stream(OrderItemStatusCode.values()).filter(s->s.name().equals(name)).findFirst().orElse(UNKNOWN).getLabel();
+		}
+	}
+
 	public enum GenderCode{
 		M("M", "男", "1"), F("F", "女", "2");
 
@@ -166,7 +211,12 @@ public class BusinessEnum {
 		FLIGHT_SEARCH("A0534", "/ndc-shopping-common/shopping/basicShopping"),
 		OFFER_PRICE("A0535", "/ndc-flight-offer-price/price/flightOfferPrice"),
 		CREATE_ORDER("A0536", "/ndc-flight-order-create/flight/flightOrderCreate"),
-		ORDER_PAY("A0537", "/ndc-flight-order-payment/flight/flightOrderPayment");
+		ORDER_PAY("A0537", "/ndc-flight-order-payment/flight/flightOrderPayment"),
+		ORDER_DETAIL("A0538", "/ndc-flight-order-retrieve/flight/flightOrderRetrieve"),
+		REFUND_MONEY_QUERY("A0540", "/ndc-flight-ticket-refund/refund/flightRefundFee"),
+		REFUND_APPLY("A0539", "/ndc-flight-ticket-refund/refund/flightRefundApply"),
+		REFUND_CONFIRM("A0541", "//ndc-flight-ticket-refund/refund/flightRefundConfirm");
+
 
 		private String code;
 		private String path;

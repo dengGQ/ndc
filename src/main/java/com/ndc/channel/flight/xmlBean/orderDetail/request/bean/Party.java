@@ -41,6 +41,11 @@ public class Party {
     @XmlElement(name = "Sender", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderRetrieveRQ", required = true)
     protected Sender sender;
 
+    public Party() {
+        this.recipient = new Recipient();
+        this.sender = new Sender();
+    }
+
     /**
      * 获取recipient属性的值。
      * 
