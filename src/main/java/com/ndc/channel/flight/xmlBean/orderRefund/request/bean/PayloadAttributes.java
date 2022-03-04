@@ -6,6 +6,9 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.UUID;
 
 
 /**
@@ -72,6 +75,19 @@ public class PayloadAttributes {
     protected String trxStatusCode;
     @XmlElement(name = "VersionNumber", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderRetrieveRQ", required = true)
     protected String versionNumber;
+
+    public PayloadAttributes() {
+        this.altLangID = "CN";
+        this.correlationID = "";
+        this.echoTokenText = UUID.randomUUID().toString();
+        this.primaryLangID = "CN";
+        this.retransmissionInd = "false";
+        this.seqNumber = "1";
+        this.timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"));
+        this.trxID = "";
+        this.trxStatusCode = "0";
+        this.versionNumber = "";
+    }
 
     /**
      * 获取altLangID属性的值。

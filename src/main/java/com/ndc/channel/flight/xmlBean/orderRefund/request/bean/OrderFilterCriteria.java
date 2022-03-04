@@ -37,6 +37,13 @@ public class OrderFilterCriteria {
     @XmlElement(name = "Order", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderRetrieveRQ", required = true)
     protected Order order;
 
+    public OrderFilterCriteria() {
+    }
+
+    public OrderFilterCriteria(Order order) {
+        this.order = order;
+    }
+
     /**
      * 获取order属性的值。
      * 

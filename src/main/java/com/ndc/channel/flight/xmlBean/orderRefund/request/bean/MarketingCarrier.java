@@ -41,6 +41,11 @@ public class MarketingCarrier {
     @XmlElement(name = "DuplicateDesigInd", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderRetrieveRQ", required = true)
     protected String duplicateDesigInd;
 
+    public MarketingCarrier() {
+        this.airlineDesigCode = "MU";
+        this.duplicateDesigInd = "false";
+    }
+
     /**
      * 获取airlineDesigCode属性的值。
      * 

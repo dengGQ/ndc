@@ -45,6 +45,14 @@ public class Order {
     @XmlElement(name = "OwnerTypeCode", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderRetrieveRQ", required = true)
     protected String ownerTypeCode;
 
+    public Order() {
+    }
+
+    public Order(String orderID, String ownerCode) {
+        this.orderID = orderID;
+        this.ownerCode = ownerCode;
+    }
+
     /**
      * 获取orderID属性的值。
      * 
