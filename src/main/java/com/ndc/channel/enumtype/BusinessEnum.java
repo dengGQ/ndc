@@ -218,20 +218,20 @@ public class BusinessEnum {
 		REFUND_CONFIRM("A0541", "//ndc-flight-ticket-refund/refund/flightRefundConfirm");
 
 
-		private String code;
-		private String path;
+		private String apiCode;
+		private String apiPath;
 
-		public String getCode() {
-			return code;
+		public String getApiCode() {
+			return apiCode;
 		}
 
-		public String getPath() {
-			return path;
+		public String getApiPath() {
+			return apiPath;
 		}
 
-		NdcApiInfo(String code, String path) {
-			this.code = code;
-			this.path = path;
+		NdcApiInfo(String apiCode, String apiPath) {
+			this.apiCode = apiCode;
+			this.apiPath = apiPath;
 		}
 	}
 

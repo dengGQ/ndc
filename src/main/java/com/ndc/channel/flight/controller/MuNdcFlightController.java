@@ -122,8 +122,8 @@ public class MuNdcFlightController {
     }
 
     @PostMapping("/refund/create")
-    @ApiOperation(value = "订单明细", httpMethod = "POST", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseData<String> refundCreate(@PathVariable("orderId") String orderId) {
+    @ApiOperation(value = "退票申请", httpMethod = "POST", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseData<String> refundApply(String orderId) {
 
         try {
 

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ndc.channel.mapper.NdcAccountInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.ndc.channel.entity.NdcAccountInfo" >
+    <id column="account_id" property="accountId" jdbcType="BIGINT" />
+    <result column="account_code" property="accountCode" jdbcType="VARCHAR" />
+    <result column="account_name" property="accountName" jdbcType="VARCHAR" />
+    <result column="api_url" property="apiUrl" jdbcType="VARCHAR" />
+    <result column="params" property="params" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    account_id, account_code, account_name, api_url, params, create_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from ndc_account_info
+    where account_id = #{accountId,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from ndc_account_info
+    where account_id = #{accountId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.ndc.channel.entity.NdcAccountInfo" >
+    insert into ndc_account_info (account_id, account_code, account_name, 
+      api_url, params, create_time
+      )
+    values (#{accountId,jdbcType=BIGINT}, #{accountCode,jdbcType=VARCHAR}, #{accountName,jdbcType=VARCHAR}, 
+      #{apiUrl,jdbcType=VARCHAR}, #{params,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.ndc.channel.entity.NdcAccountInfo" >
+    insert into ndc_account_info
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="accountId != null" >
+        account_id,
+      </if>
+      <if test="accountCode != null" >
+        account_code,
+      </if>
+      <if test="accountName != null" >
+        account_name,
+      </if>
+      <if test="apiUrl != null" >
+        api_url,
+      </if>
+      <if test="params != null" >
+        params,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="accountId != null" >
+        #{accountId,jdbcType=BIGINT},
+      </if>
+      <if test="accountCode != null" >
+        #{accountCode,jdbcType=VARCHAR},
+      </if>
+      <if test="accountName != null" >
+        #{accountName,jdbcType=VARCHAR},
+      </if>
+      <if test="apiUrl != null" >
+        #{apiUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="params != null" >
+        #{params,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ndc.channel.entity.NdcAccountInfo" >
+    update ndc_account_info
+    <set >
+      <if test="accountCode != null" >
+        account_code = #{accountCode,jdbcType=VARCHAR},
+      </if>
+      <if test="accountName != null" >
+        account_name = #{accountName,jdbcType=VARCHAR},
+      </if>
+      <if test="apiUrl != null" >
+        api_url = #{apiUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="params != null" >
+        params = #{params,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where account_id = #{accountId,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ndc.channel.entity.NdcAccountInfo" >
+    update ndc_account_info
+    set account_code = #{accountCode,jdbcType=VARCHAR},
+      account_name = #{accountName,jdbcType=VARCHAR},
+      api_url = #{apiUrl,jdbcType=VARCHAR},
+      params = #{params,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP}
+    where account_id = #{accountId,jdbcType=BIGINT}
+  </update>
+</mapper>

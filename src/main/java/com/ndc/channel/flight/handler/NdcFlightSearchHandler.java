@@ -12,6 +12,8 @@ import com.ndc.channel.flight.xmlBean.flightSearch.common.Error;
 import com.ndc.channel.flight.xmlBean.flightSearch.request.bean.*;
 import com.ndc.channel.flight.xmlBean.flightSearch.response.RemarkText;
 import com.ndc.channel.flight.xmlBean.flightSearch.response.bean.*;
+import com.ndc.channel.mapper.NdcAccountInfoMapper;
+import com.ndc.channel.model.NdcAccountInfoData;
 import com.ndc.channel.redis.RedisKeyConstants;
 import com.ndc.channel.redis.RedisUtils;
 import com.ndc.channel.util.FlightKeyUtils;
@@ -40,6 +42,7 @@ public class NdcFlightSearchHandler {
     private RedisUtils redisUtils;
 
     public List<CorpApiFlightListDataV2> flightSearch(String flightDate, String depCityCode, String destCityCode) {
+
         IATAAirShoppingRQ flightSearchParams = getFlightSearchParams(flightDate, depCityCode, destCityCode);
 
         IATAAirShoppingRS iataAirShoppingRS = apiTools.flightSearch(flightSearchParams);
