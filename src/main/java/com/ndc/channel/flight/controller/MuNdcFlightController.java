@@ -6,6 +6,7 @@ import com.ndc.channel.flight.dto.ResponseData;
 import com.ndc.channel.flight.dto.createOrder.CorpApiFlightOrderCreateData;
 import com.ndc.channel.flight.dto.createOrder.FlightOrderCreateReq;
 import com.ndc.channel.flight.dto.flightSearch.CorpApiFlightListDataV2;
+import com.ndc.channel.flight.dto.flightSearch.FlightSearchReq;
 import com.ndc.channel.flight.dto.orderDetail.NdcOrderDetailData;
 import com.ndc.channel.flight.dto.orderDetail.OrderTicketInfo;
 import com.ndc.channel.flight.dto.orderPay.OrderPayReqParams;
@@ -23,7 +24,7 @@ import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping("/ndc/corpapi/flight")
+@RequestMapping("/ndc/flight/channel/standardChannel")
 public class MuNdcFlightController {
 
     @Resource
@@ -39,14 +40,12 @@ public class MuNdcFlightController {
     @Resource
     private NdcFlightOrderRefundHandler orderRefundHandler;
 
-    @PostMapping("/search/{flightDate}/{depCityCode}/{destCityCode}")
+    @PostMapping("/corpapi/flight/search")
     @ApiOperation(value = "航班查询", notes = "航班查询", httpMethod = "POST", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseData<List<CorpApiFlightListDataV2>> flightSearch(@PathVariable("flightDate") String flightDate, @PathVariable("depCityCode") String depCityCode, @PathVariable("destCityCode") String destCityCode) {
-
+    public ResponseData<List<CorpApiFlightListDataV2>> flightSearch(@RequestBody FlightSearchReq searchReq) {
         try {
 
-            List<CorpApiFlightListDataV2> flightListDataList = flightSearchHandler.flightSearch(flightDate, depCityCode, destCityCode);
-
+            List<CorpApiFlightListDataV2> flightListDataList = flightSearchHandler.flightSearch(searchReq.getFlightDate(), searchReq.getFromCity(), searchReq.getToCity());
             return BusinessResponseFactory.createSuccess(flightListDataList);
         }catch (BusinessException exception) {
 
@@ -56,7 +55,7 @@ public class MuNdcFlightController {
     }
 
 
-    @PostMapping("/price/verification")
+    @PostMapping("/corpapi/flight/price/verification")
     @ApiOperation(value = "验价", notes = "验价", httpMethod = "POST", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseData<CorpApiFlightVerifyPriceData> verifyPrice(@RequestBody FeiBaApiVerifyPriceReq req) {
 
@@ -72,7 +71,7 @@ public class MuNdcFlightController {
         }
     }
 
-    @PostMapping("/order/create")
+    @PostMapping("/corpapi/flight/order/create")
     @ApiOperation(value = "创单", httpMethod = "POST", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseData<Object> createOrder(@RequestBody FlightOrderCreateReq req) {
 
@@ -88,7 +87,7 @@ public class MuNdcFlightController {
         }
     }
 
-    @PostMapping("/order/ticket")
+    @PostMapping("/corpapi/flight/order/ticket")
     @ApiOperation(value = "支付出票", httpMethod = "POST", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseData<Boolean> orderPay(@RequestBody OrderPayReqParams payReqParams) {
 
@@ -105,7 +104,7 @@ public class MuNdcFlightController {
     }
 
 
-    @PostMapping("/order/detail/{orderId}")
+    @PostMapping("/corpapi/flight/order/detail/{orderId}")
     @ApiOperation(value = "订单明细", httpMethod = "POST", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseData<List<OrderTicketInfo>> orderDetail(@PathVariable("orderId") String orderId) {
 
@@ -121,7 +120,7 @@ public class MuNdcFlightController {
         }
     }
 
-    @PostMapping("/refund/create")
+    @PostMapping("/corpapi/flight/refund/create")
     @ApiOperation(value = "退票申请", httpMethod = "POST", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseData<String> refundApply(String orderId) {
 

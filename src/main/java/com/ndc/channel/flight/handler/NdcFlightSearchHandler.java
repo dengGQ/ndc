@@ -26,6 +26,11 @@ import javax.annotation.Resource;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.Period;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
@@ -126,10 +131,10 @@ public class NdcFlightSearchHandler {
             final Map<String, CorpApiTicketData> corpApiTicketMap = new HashMap<>();//ticketDataList.stream().collect(Collectors.toMap(CorpApiTicketData::getTicketId, v -> JSON.toJSONString(v)));
             
             // 遍历报价项目
-            for (OfferItem item : offer.getOfferItem()) {
+            for (OfferItem offerItem : offer.getOfferItem()) {
 
                 // 报价详细信息
-                FareDetail fareDetail = item.getFareDetail().get(0);
+                FareDetail fareDetail = offerItem.getFareDetail().get(0);
 
                 // 票价计算组件
                 FareComponent fareComponent = fareDetail.getFareComponent().get(0);
@@ -148,7 +153,7 @@ public class NdcFlightSearchHandler {
                 if (paxSegmentRefID.contains(flightData.getPaxSegmentID())) {
 
                     // 乘客与服务之间的映射
-                    Map<String, List<String>> serviceDefinitionRefIDMapping = Optional.ofNullable(item.getService()).orElseGet(Arrays::asList).stream()
+                    Map<String, List<String>> serviceDefinitionRefIDMapping = Optional.ofNullable(offerItem.getService()).orElseGet(Arrays::asList).stream()
                             .collect(Collectors.groupingBy(
                                     ser -> ser.getPaxRefID() + ser.getServiceAssociations().getServiceDefinitionRef().getPaxSegmentRefID(),
                                     Collectors.mapping(ser -> ser.getServiceAssociations().getServiceDefinitionRef().getServiceDefinitionRefID(),
@@ -160,7 +165,7 @@ public class NdcFlightSearchHandler {
                     }
                     List<ServiceDefinition> paxServiceDefinitionList = serviceDefinitionList.stream().filter(sd -> serviceDefinitionIdList.contains(sd.getServiceDefinitionID())).collect(Collectors.toList());
 
-                    final CorpApiTicketData ticketData = ticketDataConvertFromCarrierOffer(flightData.getFlightId(), item, paxServiceDefinitionList, baggageAllowanceMap);
+                    CorpApiTicketData ticketData = ticketDataConvertFromCarrierOffer(flightData.getFlightId(), offerItem, paxServiceDefinitionList, baggageAllowanceMap);
                     ticketData.setPaxId(pax.getPaxID());
                     ticketData.setPricingSystemCodeText(pricingSystemCodeText);
                     ticketData.setPriceClassID(priceClass.getPriceClassID());
@@ -169,14 +174,23 @@ public class NdcFlightSearchHandler {
                     ticketData.setPriceClassDesc(priceClass.getDesc().getDescText());
                     ticketData.setFareTypeCode(fareTypeCode);
 
+                    List<TaxSummary> taxSummary = offerItem.getPrice().getTaxSummary();
+
                     corpApiTicketMap.put(ticketData.getTicketId(), ticketData);
+                    BigDecimal BuildFee = taxSummary.stream().map(t->new BigDecimal(t.getTotalTaxAmount().getValue())).reduce(BigDecimal::add).orElse(BigDecimal.ZERO);
+                    flightData.setBuildFee(BuildFee);
                 }
             }
 
             flightData.setOfferId(offer.getOfferID());
             flightData.setOwnerCode(ownerCode);
             flightData.setOwnerTypeCode(ownerTypeCode);
-            flightData.setTickets(corpApiTicketMap.values().stream().collect(Collectors.toList()));
+            flightData.setOilFee(BigDecimal.ZERO);
+            List<CorpApiTicketData> ticketDataList = corpApiTicketMap.values().stream().collect(Collectors.toList());
+
+            final boolean isPresent = ticketDataList.get(0).getServiceDefinitionList().stream().filter(serviceDef -> BusinessEnum.ServiceName.MEAL.name().equals(serviceDef.getName())).findFirst().isPresent();
+            flightData.setMealType(isPresent ? "1" : "0");
+            flightData.setTickets(ticketDataList);
 
             final Map<String, String> ticketStrMap = corpApiTicketMap.values().stream().collect(Collectors.toMap(CorpApiTicketData::getTicketId, v -> JSON.toJSONString(v)));
             persistenceTicketDataMap.put(RedisKeyConstants.getRedisTicketDataCacheKey(flightData.getFlightId()), ticketStrMap);
@@ -204,7 +218,7 @@ public class NdcFlightSearchHandler {
         OperatingCarrierInfo operatingCarrierInfo = paxSegment.getOperatingCarrierInfo();
         Dep dep = paxSegment.getDep();
         Arrival arrival = paxSegment.getArrival();
-        String duration = paxSegment.getDuration();
+//        String duration = paxSegment.getDuration();
 
         Map<String, List<DatedOperatingLeg>> legMapping = paxSegment.getDatedOperatingLeg().stream().collect(Collectors.groupingBy(leg -> StringUtils.isEmpty(leg.getOnGroundDuration()) ? "0" : "1"));
         CarrierAircraftType carrierAircraftType = legMapping.get("0").get(0).getCarrierAircraftType();
@@ -220,25 +234,28 @@ public class NdcFlightSearchHandler {
         corpApiFlight.setAirlineCode(marketingCarrierInfo.getCarrierDesigCode());
         corpApiFlight.setAirlineShortName("东方航空");
 
-        corpApiFlight.setFlyingTime(duration);
 
         corpApiFlight.setTpm(null);
         corpApiFlight.setPlaneType(carrierAircraftType.getCarrierAircraftTypeName());
-        corpApiFlight.setMealType(null);
+//        corpApiFlight.setMealType(null);
 
-        String departureTime = DateTimeUtils.parseStringToString(dep.getAircraftScheduledDateTime(), DateTimeUtils.PATTEN_YYYY_MM_DDTHH_MM_SS_SSS_XXX, DateTimeUtils.PATTEN_HHMM);
+        final String depDateTime = dep.getAircraftScheduledDateTime();
+        String departureTime = DateTimeUtils.parseStringToString(depDateTime, DateTimeUtils.PATTEN_YYYY_MM_DDTHH_MM_SS_SSS_XXX, DateTimeUtils.PATTEN_HHMM);
         corpApiFlight.setDepartureTime(departureTime);
         corpApiFlight.setDepartureCityCode(depCityCode);
         corpApiFlight.setDepartureAirportCode(dep.getIATALocationCode());
         corpApiFlight.setDepartureAirport(dep.getStationName());
         corpApiFlight.setDepartureTerminal(dep.getTerminalName());
 
-        String arriveTime = DateTimeUtils.parseStringToString(arrival.getAircraftScheduledDateTime(), DateTimeUtils.PATTEN_YYYY_MM_DDTHH_MM_SS_SSS_XXX, DateTimeUtils.PATTEN_HHMM);
+        final String destDateTime = arrival.getAircraftScheduledDateTime();
+        String arriveTime = DateTimeUtils.parseStringToString(destDateTime, DateTimeUtils.PATTEN_YYYY_MM_DDTHH_MM_SS_SSS_XXX, DateTimeUtils.PATTEN_HHMM);
         corpApiFlight.setDestinationTime(arriveTime);
         corpApiFlight.setDestinationCityCode(destCityCode);
         corpApiFlight.setDestinationAirportCode(arrival.getIATALocationCode());
         corpApiFlight.setDestinationAirport(arrival.getStationName());
         corpApiFlight.setDestinationTerminal(arrival.getTerminalName());
+
+        corpApiFlight.setFlyingTime(getFlyTime(depDateTime, destDateTime, DateTimeUtils.PATTEN_YYYY_MM_DDTHH_MM_SS_SSS_XXX));
 
         corpApiFlight.setIsStopover("0");
         List<DatedOperatingLeg> datedOperatingLegs = legMapping.get("1");
@@ -272,7 +289,6 @@ public class NdcFlightSearchHandler {
         final ServiceDefinition seatSaleSd = serviceDefinitionList.stream().filter(sd -> sd.getName().equals("SEAT_SALE")).findFirst().orElse(null);
 
         final FareDetail fareDetail = offerItem.getFareDetail().get(0);
-        final List<TaxSummary> taxSummary = offerItem.getPrice().getTaxSummary();
 
         final FareComponent fareComponent = fareDetail.getFareComponent().get(0);
 
@@ -492,6 +508,25 @@ public class NdcFlightSearchHandler {
 
         return affinityOriginDest;
     }
+
+    public static String getFlyTime(String depTime, String arrTime, String dateFormat) {
+
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(dateFormat);
+
+        LocalDateTime depDate = LocalDateTime.parse(depTime, dateTimeFormatter);
+        LocalDateTime arrDate = LocalDateTime.parse(arrTime, dateTimeFormatter);
+
+        Duration duration = Duration.between(depDate, arrDate);
+
+        long seconds = duration.getSeconds();
+
+        long hour = seconds / 3600;
+        long minutes = ((seconds % 3600) / 60);
+
+        return (hour == 0 ? "00" : (hour < 10 ? "0"+hour : hour)) + ":" +(minutes == 0 ? "00" : (minutes < 10 ? "0"+minutes : minutes));
+    }
+
+
 
     public static void saveAsFileWriter(String content, String filePath) {
         FileWriter fwriter = null;

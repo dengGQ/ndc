@@ -9,6 +9,20 @@ import java.util.*;
 
 public class BusinessEnum {
 
+	public enum ServiceName{
+
+		WIFI("wifi"),
+		BAGGAGE("行李额"),
+		MEAL("餐食"),
+		SEAT("座位");
+
+		private String label;
+
+		ServiceName(String label) {
+			this.label = label;
+		}
+	}
+
 	/**
 	 * 客票状态
 	 */
