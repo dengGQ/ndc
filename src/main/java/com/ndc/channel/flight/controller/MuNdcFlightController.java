@@ -10,6 +10,8 @@ import com.ndc.channel.flight.dto.flightSearch.FlightSearchReq;
 import com.ndc.channel.flight.dto.orderDetail.NdcOrderDetailData;
 import com.ndc.channel.flight.dto.orderDetail.OrderTicketInfo;
 import com.ndc.channel.flight.dto.orderPay.OrderPayReqParams;
+import com.ndc.channel.flight.dto.refund.RefundChangeMoneyQueryParams;
+import com.ndc.channel.flight.dto.refund.RefundChangeMoneyQueryResp;
 import com.ndc.channel.flight.dto.verifyPrice.CorpApiFlightVerifyPriceData;
 import com.ndc.channel.flight.dto.verifyPrice.FeiBaApiVerifyPriceReq;
 import com.ndc.channel.flight.handler.*;
@@ -135,6 +137,23 @@ public class MuNdcFlightController {
             return BusinessResponseFactory.createBusinessError(exception);
         }
     }
+
+    @PostMapping("/corpapi/flight/queryRefundChangeFee")
+    @ApiOperation(value = "退改费用查询", httpMethod = "POST", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseData<RefundChangeMoneyQueryResp> refundChangeFeeQuery(@RequestBody RefundChangeMoneyQueryParams params) {
+
+        try {
+
+            final RefundChangeMoneyQueryResp resp = orderRefundHandler.refundMoneyQuery(params);
+
+            return BusinessResponseFactory.createSuccess(resp);
+        }catch (BusinessException exception) {
+
+            log.error("东航NDC退票申请失败，失败原因={}", exception.getMessage());
+            return BusinessResponseFactory.createBusinessError(exception);
+        }
+    }
+
 
 
 }

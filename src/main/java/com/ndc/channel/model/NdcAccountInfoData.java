@@ -18,6 +18,8 @@ public class NdcAccountInfoData {
 
     private String params;
 
+    private String bankAccountID;
+
     private JSONObject jsonParams;
 
     private BusinessEnum.NdcApiInfo ndcApiInfo;
@@ -55,5 +57,21 @@ public class NdcAccountInfoData {
             jsonParams = JSONObject.parseObject(params);
         }
         return jsonParams.getString("Authorization");
+    }
+
+    public void setApiUrl(String apiUrl) {
+        this.apiUrl = apiUrl;
+    }
+
+    public String getBankAccountID() {
+        return bankAccountID;
+    }
+
+    public void setBankAccountID(String bankAccountID) {
+        this.bankAccountID = bankAccountID;
+    }
+
+    public void setParams(String params) {
+        this.params = params;
     }
 }

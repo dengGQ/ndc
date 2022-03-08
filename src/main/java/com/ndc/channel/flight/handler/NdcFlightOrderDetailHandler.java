@@ -111,7 +111,8 @@ public class NdcFlightOrderDetailHandler {
 
         log.info("NDC订单明细查询结果={}", JSON.toJSONString(ndcOrderDetailData));
 
-        if (ndcOrderDetailData.getOrderStatus().equals(BusinessEnum.OrderItemStatusCode.INVOICING.name())) {
+        if (BusinessEnum.OrderItemStatusCode.INVOICING.name().equals(ndcOrderDetailData.getOrderStatus())
+                || BusinessEnum.OrderItemStatusCode.PAYING.name().equals(ndcOrderDetailData.getOrderStatus())) {
 
             detailDelayQueryExecutor.submitTask(orderId, 60*10);
         }else {

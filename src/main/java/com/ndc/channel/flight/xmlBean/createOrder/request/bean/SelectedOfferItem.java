@@ -6,6 +6,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import java.util.List;
 
 
 /**
@@ -41,7 +42,7 @@ public class SelectedOfferItem {
     @XmlElement(name = "OfferItemRefID", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderCreateRQ", required = true)
     protected String offerItemRefID;
     @XmlElement(name = "PaxRefID", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderCreateRQ", required = true)
-    protected String paxRefID;
+    protected List<String> paxRefID;
     @XmlElement(name = "SelectedALaCarteOfferItem", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderCreateRQ", required = true)
     protected SelectedALaCarteOfferItem selectedALaCarteOfferItem;
 
@@ -77,7 +78,7 @@ public class SelectedOfferItem {
      *     {@link String }
      *     
      */
-    public String getPaxRefID() {
+    public List<String> getPaxRefID() {
         return paxRefID;
     }
 
@@ -89,7 +90,7 @@ public class SelectedOfferItem {
      *     {@link String }
      *     
      */
-    public void setPaxRefID(String value) {
+    public void setPaxRefID(List<String> value) {
         this.paxRefID = value;
     }
 

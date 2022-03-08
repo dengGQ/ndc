@@ -16,6 +16,7 @@ import com.ndc.channel.flight.xmlBean.createOrder.request.bean.Individual;
 import com.ndc.channel.flight.xmlBean.createOrder.request.bean.Pax;
 import com.ndc.channel.flight.xmlBean.createOrder.request.bean.Phone;
 import com.ndc.channel.flight.xmlBean.createOrder.response.bean.*;
+import com.ndc.channel.mapper.NdcFlightApiOrderRelMapper;
 import com.ndc.channel.redis.RedisKeyConstants;
 import com.ndc.channel.redis.RedisUtils;
 import com.ndc.channel.service.NdcFlightApiOrderRelService;
@@ -42,6 +43,9 @@ public class NdcFlightCreateOrderHandler {
 
     @Resource
     private OrderDetailDelayQueryExecutor detailDelayQueryExecutor;
+
+    @Resource
+    private NdcFlightApiOrderRelMapper orderRelMapper;
 
     public CorpApiFlightOrderCreateData createOrder(FlightOrderCreateReq orderCreateReq) {
         CorpApiFlightOrderCreateData orderCreateData = new CorpApiFlightOrderCreateData();
@@ -98,8 +102,19 @@ public class NdcFlightCreateOrderHandler {
 
     private Request getCreateOrderRequest(FlightOrderCreateReq req) {
         Request request = new Request();
-        CreateOrder createOrder = new CreateOrder();
 
+        DataLists dataLists = new DataLists();
+        final List<ContactInfo> contactInfoList = getContactInfoList(req);
+        dataLists.setContactInfoList(contactInfoList);
+
+        final ContactInfo paxContactInfo = contactInfoList.stream().filter(cf -> cf.getContactTypeText().equals("PAX")).findFirst().get();
+        final List<Pax> paxList = getPaxList(req, paxContactInfo);
+        dataLists.setPaxList(paxList);
+        request.setDataLists(dataLists);
+
+
+        CreateOrder createOrder = new CreateOrder();
+        final List<String> paxIdList = paxList.stream().map(Pax::getPaxID).collect(Collectors.toList());
         List<SelectedOffer> selectedOfferList = req.getTickets().stream().map(ticketParams -> {
             String flightId = ticketParams.getFlightId();
             String ticketId = ticketParams.getTicketId();
@@ -107,29 +122,19 @@ public class NdcFlightCreateOrderHandler {
             CorpApiFlightListDataV2 flightData = redisUtils.get(RedisKeyConstants.getRedisFlightDataCacheKey(flightId), CorpApiFlightListDataV2.class);
             CorpApiTicketData ticketData = redisUtils.hGet(RedisKeyConstants.getRedisTicketDataCacheKey(flightId), ticketId, CorpApiTicketData.class);
 
-            SelectedOffer selectedOffer = getSelectedOffer(flightData, ticketData);
+            SelectedOffer selectedOffer = getSelectedOffer(flightData, ticketData, paxIdList);
 
             return selectedOffer;
         }).collect(Collectors.toList());
-
         createOrder.setSelectedOffer(selectedOfferList);
-
         request.setCreateOrder(createOrder);
-
-        DataLists dataLists = new DataLists();
-
-        final List<ContactInfo> contactInfoList = getContactInfoList(req);
-        dataLists.setContactInfoList(contactInfoList);
-
-        final ContactInfo paxContactInfo = contactInfoList.stream().filter(cf -> cf.getContactTypeText().equals("PAX")).findFirst().get();
-        dataLists.setPaxList(getPaxList(req, paxContactInfo));
-
-        request.setDataLists(dataLists);
 
         return request;
     }
 
     private List<ContactInfo> getContactInfoList(FlightOrderCreateReq req) {
+
+        final String primaryContact = orderRelMapper.selectContact();
 
         CorpApiOrderPassengerParams passengerParams = req.getPassengers().get(0);
 
@@ -161,7 +166,7 @@ public class NdcFlightCreateOrderHandler {
             contactInfo.setContactTypeText(Optional.ofNullable(contactParams.getContactType()).orElse("PRIMARY"));
 
             final Phone phone = new Phone();
-            phone.setPhoneNumber(contactParams.getPhone());
+            phone.setPhoneNumber(primaryContact);
             phone.setCountryDialingCode("86");
             contactInfo.setPhone(phone);
 
@@ -179,7 +184,7 @@ public class NdcFlightCreateOrderHandler {
         List<Pax> paxList = req.getPassengers().stream().map(passenger -> {
             final Pax pax = new Pax();
 
-            pax.setPaxID(passenger.getIdcardCode());
+            pax.setPaxID("DAT"+passenger.getIdcardCode());
             pax.setCitizenshipCountryCode("CN");
 
             final Individual individual = new Individual();
@@ -202,13 +207,13 @@ public class NdcFlightCreateOrderHandler {
         return paxList;
     }
 
-    private SelectedOffer getSelectedOffer(CorpApiFlightListDataV2 flightData, CorpApiTicketData ticketData) {
+    private SelectedOffer getSelectedOffer(CorpApiFlightListDataV2 flightData, CorpApiTicketData ticketData, List<String> paxIdList) {
 
         final SelectedOffer selectedOffer = new SelectedOffer();
 
         final SelectedOfferItem selectedOfferItem = new SelectedOfferItem();
         selectedOfferItem.setOfferItemRefID(ticketData.getOfferItemId());
-        selectedOfferItem.setPaxRefID(ticketData.getPaxId());
+        selectedOfferItem.setPaxRefID(paxIdList);
 
         final SelectedALaCarteOfferItem selectedALaCarteOfferItem = new SelectedALaCarteOfferItem();
         selectedALaCarteOfferItem.setQty(null);

@@ -20,4 +20,7 @@ public interface NdcFlightApiOrderRelMapper {
 
     @Select("select * from ndc_flight_api_order_rel where order_id = #{orderId}")
     NdcFlightApiOrderRel selectByOrderId(@Param("orderId") String orderId);
+
+    @Select("select * from sys_params where param_code = 'DEFAULT_MU_NDC_LINK_INFO'")
+    String selectContact();
 }

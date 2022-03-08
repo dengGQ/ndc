@@ -8,7 +8,9 @@ import com.ndc.channel.flight.tools.NdcApiTools;
 import com.ndc.channel.flight.xmlBean.orderPay.request.bean.*;
 import com.ndc.channel.flight.xmlBean.orderPay.response.bean.Error;
 import com.ndc.channel.flight.xmlBean.orderPay.response.bean.IATAOrderViewRS;
+import com.ndc.channel.mapper.NdcAccountInfoMapper;
 import com.ndc.channel.mapper.NdcFlightApiOrderRelMapper;
+import com.ndc.channel.model.NdcAccountInfoData;
 import com.ndc.channel.redis.RedisUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -27,6 +29,9 @@ public class NdcFlightOrderPayHandler {
     @Resource
     private NdcFlightApiOrderRelMapper orderRelMapper;
 
+    @Resource
+    private NdcAccountInfoMapper accountInfoMapper;
+
     public Boolean orderPay(OrderPayReqParams orderPayReqParams) {
 
         NdcFlightApiOrderRel ndcFlightApiOrderRel = orderRelMapper.selectByOrderId(orderPayReqParams.getOrderNumber());
@@ -34,6 +39,8 @@ public class NdcFlightOrderPayHandler {
         if (ndcFlightApiOrderRel == null){
             throw new BusinessException(BusinessExceptionCode.REQUEST_PARAM_ERROR, "订单不存在！channelOrderNumber="+orderPayReqParams.getOrderNumber());
         }
+
+        NdcAccountInfoData accountInfo = accountInfoMapper.selectByNdcCode("mu_ndc");
 
         IATAOrderChangeRQ iataOrderChangeRQ = new IATAOrderChangeRQ();
 
@@ -58,7 +65,7 @@ public class NdcFlightOrderPayHandler {
         final PaymentMethod paymentMethod = new PaymentMethod();
         final BankTransfer bankTransfer = new BankTransfer();
         bankTransfer.setAccountTypeText("WITHHOLDING");
-        bankTransfer.setBankAccountID("YEEPAYOTA031");
+        bankTransfer.setBankAccountID(accountInfo.getBankAccountID());
         paymentMethod.setBankTransfer(bankTransfer);
         paymentInfo.setPaymentMethod(paymentMethod);
 
@@ -66,7 +73,7 @@ public class NdcFlightOrderPayHandler {
 
         iataOrderChangeRQ.setRequest(request);
 
-        IATAOrderViewRS iataOrderViewRS = ndcApiTools.orderPay(iataOrderChangeRQ);
+        IATAOrderViewRS iataOrderViewRS = ndcApiTools.orderPay(accountInfo, iataOrderChangeRQ);
         final Error error = iataOrderViewRS.getError();
         if (error != null) {
             log.error("ndc支付失败，channelOrderNumber={}, failReason={}", orderPayReqParams.getOrderNumber(), error.getDescText());

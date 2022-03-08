@@ -15,6 +15,8 @@ public class NdcAccountInfo implements Serializable {
 
     private String apiUrl;
 
+    private String bankAccountId;
+
     private String params;
 
     private Date createTime;
@@ -45,6 +47,14 @@ public class NdcAccountInfo implements Serializable {
 
     public void setAccountName(String accountName) {
         this.accountName = accountName;
+    }
+
+    public String getBankAccountId() {
+        return bankAccountId;
+    }
+
+    public void setBankAccountId(String bankAccountId) {
+        this.bankAccountId = bankAccountId;
     }
 
     public String getApiUrl() {

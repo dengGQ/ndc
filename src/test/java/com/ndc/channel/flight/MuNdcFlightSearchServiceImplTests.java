@@ -124,8 +124,7 @@ public class MuNdcFlightSearchServiceImplTests {
 
         final OrderPayReqParams payReqParams = new OrderPayReqParams();
 
-        payReqParams.setOrderNumber("1022030100204939");
-        payReqParams.setOrderNumber("1122030100182007");
+        payReqParams.setOrderNumber("1022030800206114");
         orderPayHandler.orderPay(payReqParams);
     }
 
@@ -133,7 +132,7 @@ public class MuNdcFlightSearchServiceImplTests {
     @Test
     public void orderDetail() {
 
-        final NdcOrderDetailData ndcOrderDetailData = orderDetailHandler.orderDetail("1022030100204939");
+        final NdcOrderDetailData ndcOrderDetailData = orderDetailHandler.orderDetail("1022030800206114");
 
         System.out.println(JSON.toJSONString(ndcOrderDetailData));
     }
