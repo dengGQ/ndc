@@ -1,6 +1,8 @@
 
 package com.ndc.channel.flight.xmlBean.orderRefund.request.bean;
 
+import com.ndc.channel.entity.NdcFlightApiOrderRel;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -52,11 +54,11 @@ public class IATAOrderRetrieveRQ {
     public IATAOrderRetrieveRQ() {
     }
 
-    public IATAOrderRetrieveRQ(String orderId, String ownerCode) {
+    public IATAOrderRetrieveRQ(String orderId, NdcFlightApiOrderRel orderRel) {
         this.messageDoc = new MessageDoc();
         this.party = new Party();
         this.payloadAttributes = new PayloadAttributes();
-        this.request = new Request(new Order(orderId, ownerCode));
+        this.request = new Request(new Order(orderId, orderRel));
     }
 
     /**

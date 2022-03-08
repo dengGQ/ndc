@@ -14,10 +14,13 @@ import com.ndc.channel.flight.dto.flightSearch.CorpApiFlightListDataV2;
 import com.ndc.channel.flight.dto.orderDetail.NdcOrderDetailData;
 import com.ndc.channel.flight.dto.orderDetail.OrderTicketInfo;
 import com.ndc.channel.flight.dto.orderPay.OrderPayReqParams;
+import com.ndc.channel.flight.dto.refund.RefundChangeMoneyQueryParams;
+import com.ndc.channel.flight.dto.refund.RefundChangeMoneyQueryResp;
 import com.ndc.channel.flight.dto.verifyPrice.CorpApiFlightVerifyPriceData;
 import com.ndc.channel.flight.dto.verifyPrice.FeiBaApiVerifyPriceReq;
 import com.ndc.channel.flight.dto.verifyPrice.FeibaApiVerificationParams;
 import com.ndc.channel.flight.handler.*;
+import com.ndc.channel.flight.xmlBean.orderRefund.response.bean.Response;
 import com.ndc.channel.notice.NdcFlightOrderNotice;
 import com.ndc.channel.redis.RedisUtils;
 import groovy.lang.Tuple;
@@ -63,9 +66,12 @@ public class MuNdcFlightSearchServiceImplTests {
     @Resource
     private OrderDetailDelayQueryExecutor queryExecutor;
 
+    @Resource
+    private NdcFlightOrderRefundHandler orderRefundHandler;
+
     @Test
     public void ndcFlightSearch() {
-        final List<CorpApiFlightListDataV2> corpApiFlightListDataV2s = searchHandler.flightSearch("2022-06-26", "SHA", "PEK");
+        final List<CorpApiFlightListDataV2> corpApiFlightListDataV2s = searchHandler.flightSearch("2022-06-26", "SHA", "CAN");
         log.info("ndcFlightSearch={}", JSON.toJSONString(corpApiFlightListDataV2s));
     }
 
@@ -132,9 +138,20 @@ public class MuNdcFlightSearchServiceImplTests {
     @Test
     public void orderDetail() {
 
-        final NdcOrderDetailData ndcOrderDetailData = orderDetailHandler.orderDetail("1022030800206114");
+        final NdcOrderDetailData ndcOrderDetailData = orderDetailHandler.orderDetail("1022030800206118");
 
         System.out.println(JSON.toJSONString(ndcOrderDetailData));
+    }
+
+    @Test
+    public void refundMoneyQuery() {
+
+        RefundChangeMoneyQueryParams params = new RefundChangeMoneyQueryParams();
+
+        params.setRefundWay(Byte.valueOf("1"));
+        params.setChannelOrderNumber("1022030800206118");
+
+        RefundChangeMoneyQueryResp queryResp = orderRefundHandler.refundMoneyQuery(params);
     }
 
     @Test

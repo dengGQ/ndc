@@ -9,6 +9,60 @@ import java.util.*;
 
 public class BusinessEnum {
 
+	public enum ChangeRefundTypeCode {
+
+		CANCELLATION("Cancellation", "取消（退票）"),
+		CHANGE("Change", "变更【改签】"),
+		NO_SHOW("NoShow", "误机"),
+		OTHER("Other", "其他"),
+		UPGRADE("Upgrade(", "改升");
+		private String code;
+		private String label;
+
+		public String getCode() {
+			return code;
+		}
+
+		public String getLabel() {
+			return label;
+		}
+
+		ChangeRefundTypeCode(String code, String label) {
+			this.code = code;
+			this.label = label;
+		}
+	}
+
+	/**
+	 * 退票方式：1-自愿退票；2-非自愿退票,航变；3-非自愿，病退;4-非自愿,升舱或换开；5-其他
+	 */
+	public enum RefundWay{
+		_10("10", "由于自身原因无法成行, 同意扣除退票手续费退票"),_11("11","易享退"), _21("21","由于航空公司原因, 无法成行, 申请全额退票"),
+		_22("22","由于乘机人因病(身故), 无法成行, 申请全额退票"), _23("23","重购相同客票且已使用, 申请全额退票"), _24("24","其他（疫情、拒签、系统原因等）");
+
+		private String code;
+		private String label;
+
+		RefundWay(String code, String label) {
+			this.code = code;
+			this.label = label;
+		}
+
+		public static String getReasonCode(byte refundWay) {
+			if (refundWay == 1) {
+				return "10";
+			}else if(refundWay == 2) {
+				return "21";
+			}else if(refundWay == 3) {
+				return "22";
+			}else if(refundWay == 4) {
+				return "23";
+			}else {
+				return "24";
+			}
+		}
+	}
+
 	public enum ServiceName{
 
 		WIFI("wifi"),

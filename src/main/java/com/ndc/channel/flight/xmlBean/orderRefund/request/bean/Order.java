@@ -1,6 +1,8 @@
 
 package com.ndc.channel.flight.xmlBean.orderRefund.request.bean;
 
+import com.ndc.channel.entity.NdcFlightApiOrderRel;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -48,9 +50,10 @@ public class Order {
     public Order() {
     }
 
-    public Order(String orderID, String ownerCode) {
+    public Order(String orderID, NdcFlightApiOrderRel orderRel) {
         this.orderID = orderID;
-        this.ownerCode = ownerCode;
+        this.ownerCode = orderRel.getOwnerCode();
+        this.ownerTypeCode = orderRel.getOwnerTypeCode();
     }
 
     /**

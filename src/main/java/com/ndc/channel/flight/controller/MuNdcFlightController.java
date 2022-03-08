@@ -10,6 +10,8 @@ import com.ndc.channel.flight.dto.flightSearch.FlightSearchReq;
 import com.ndc.channel.flight.dto.orderDetail.NdcOrderDetailData;
 import com.ndc.channel.flight.dto.orderDetail.OrderTicketInfo;
 import com.ndc.channel.flight.dto.orderPay.OrderPayReqParams;
+import com.ndc.channel.flight.dto.refund.RefundApplyParams;
+import com.ndc.channel.flight.dto.refund.RefundApplyPassengerParams;
 import com.ndc.channel.flight.dto.refund.RefundChangeMoneyQueryParams;
 import com.ndc.channel.flight.dto.refund.RefundChangeMoneyQueryResp;
 import com.ndc.channel.flight.dto.verifyPrice.CorpApiFlightVerifyPriceData;
@@ -124,11 +126,11 @@ public class MuNdcFlightController {
 
     @PostMapping("/corpapi/flight/refund/create")
     @ApiOperation(value = "退票申请", httpMethod = "POST", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseData<String> refundApply(String orderId) {
+    public ResponseData<String> refundApply(@RequestBody RefundApplyParams params) {
 
         try {
 
-            final String channelRefundOrderNumber = orderRefundHandler.refundApply(orderId);
+            final String channelRefundOrderNumber = orderRefundHandler.refundConfire(params);
 
             return BusinessResponseFactory.createSuccess(channelRefundOrderNumber);
         }catch (BusinessException exception) {

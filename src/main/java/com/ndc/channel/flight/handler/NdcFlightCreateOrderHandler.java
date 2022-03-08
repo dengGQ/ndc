@@ -134,45 +134,43 @@ public class NdcFlightCreateOrderHandler {
 
     private List<ContactInfo> getContactInfoList(FlightOrderCreateReq req) {
 
-        final String primaryContact = orderRelMapper.selectContact();
+        final String[] primaryContactStr = orderRelMapper.selectContact().split(",");
 
         CorpApiOrderPassengerParams passengerParams = req.getPassengers().get(0);
 
-        final OrderContactParams orderContactParams = new OrderContactParams();
-        orderContactParams.setPhone(passengerParams.getPhone());
-        orderContactParams.setName(passengerParams.getFlightPassengerName());
-        orderContactParams.setContactType("PAX");
+        final OrderContactParams primaryContact = new OrderContactParams();
+        primaryContact.setName(primaryContactStr[0]);
+        primaryContact.setPhone(primaryContactStr[1]);
+        primaryContact.setContactType("PRIMARY");
 
-        final OrderContactParams orderContactParams1= new OrderContactParams();
-        orderContactParams1.setPhone(passengerParams.getPhone());
-        orderContactParams1.setName(passengerParams.getFlightPassengerName());
-        orderContactParams1.setContactType("TRAVEL_AGENCY");
+        final OrderContactParams passengerContact = new OrderContactParams();
+        passengerContact.setPhone(passengerParams.getPhone());
+        passengerContact.setName(passengerParams.getFlightPassengerName());
+        passengerContact.setContactType("PAX");
 
-        req.getContacts().add(orderContactParams);
-        req.getContacts().add(orderContactParams1);
+        final OrderContactParams travelAgentOrderContact= new OrderContactParams();
+        travelAgentOrderContact.setName(primaryContactStr[0]);
+        travelAgentOrderContact.setPhone(primaryContactStr[1]);
+        travelAgentOrderContact.setContactType("TRAVEL_AGENCY");
+
+        req.getContacts().add(passengerContact);
+        req.getContacts().add(travelAgentOrderContact);
 
         final List<ContactInfo> contactInfoList = req.getContacts().stream().map(contactParams -> {
             final ContactInfo contactInfo = new ContactInfo();
             contactInfo.setContactInfoID(UUID.randomUUID().toString());
+            contactInfo.setContactTypeText(contactParams.getContactType());
 
-            final Individual individual = new Individual();
-
-            individual.setSurname(contactParams.getName());
-            individual.setGenderCode(null);
-            individual.setIndividualID(null);
-            contactInfo.setIndividual(individual);
-
-            contactInfo.setEmailAddress(null);
-            contactInfo.setContactTypeText(Optional.ofNullable(contactParams.getContactType()).orElse("PRIMARY"));
+            if (contactParams.getContactType().equals("PRIMARY")) {
+                final Individual individual = new Individual();
+                individual.setSurname(contactParams.getName());
+                contactInfo.setIndividual(individual);
+            }
 
             final Phone phone = new Phone();
-            phone.setPhoneNumber(primaryContact);
+            phone.setPhoneNumber(contactParams.getPhone());
             phone.setCountryDialingCode("86");
             contactInfo.setPhone(phone);
-
-            /*EmailAddress emailAddress = new EmailAddress();
-            emailAddress.setEmailAddressText("565820745@qq.com");
-            contactInfo.setEmailAddress(emailAddress);*/
 
             return contactInfo;
         }).collect(Collectors.toList());

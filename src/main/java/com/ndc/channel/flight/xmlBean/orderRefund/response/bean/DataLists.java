@@ -1,11 +1,8 @@
 
 package com.ndc.channel.flight.xmlBean.orderRefund.response.bean;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.*;
+import java.util.List;
 
 
 /**
@@ -44,161 +41,75 @@ import javax.xml.bind.annotation.XmlType;
 @XmlRootElement(name = "DataLists", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderViewRS")
 public class DataLists {
 
-    @XmlElement(name = "BaggageAllowanceList", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderViewRS", required = true)
-    protected BaggageAllowanceList baggageAllowanceList;
-    @XmlElement(name = "ContactInfoList", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderViewRS", required = true)
-    protected ContactInfoList contactInfoList;
-    @XmlElement(name = "PaxList", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderViewRS", required = true)
-    protected PaxList paxList;
-    @XmlElement(name = "PaxSegmentList", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderViewRS", required = true)
-    protected PaxSegmentList paxSegmentList;
-    @XmlElement(name = "PriceClassList", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderViewRS", required = true)
-    protected PriceClassList priceClassList;
-    @XmlElement(name = "ServiceDefinitionList", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderViewRS", required = true)
-    protected ServiceDefinitionList serviceDefinitionList;
+    @XmlElement(name = "BaggageAllowance", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderViewRS", required = true)
+    @XmlElementWrapper(name = "BaggageAllowanceList", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderViewRS", required = true)
+    protected List<BaggageAllowance> baggageAllowanceList;
 
-    /**
-     * 获取baggageAllowanceList属性的值。
-     * 
-     * @return
-     *     possible object is
-     *     {@link BaggageAllowanceList }
-     *     
-     */
-    public BaggageAllowanceList getBaggageAllowanceList() {
+    @XmlElement(name = "ContactInfo", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderViewRS", required = true)
+    @XmlElementWrapper(name = "ContactInfoList", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderViewRS", required = true)
+    protected List<ContactInfo> contactInfoList;
+
+    @XmlElement(name = "Pax", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderViewRS", required = true)
+    @XmlElementWrapper(name = "PaxList", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderViewRS", required = true)
+    protected List<Pax> paxList;
+
+    @XmlElement(name = "PaxSegment", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderViewRS", required = true)
+    @XmlElementWrapper(name = "PaxSegmentList", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderViewRS", required = true)
+    protected List<PaxSegment> paxSegmentList;
+
+    @XmlElement(name = "PriceClass", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderViewRS", required = true)
+    @XmlElementWrapper(name = "PriceClassList", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderViewRS", required = true)
+    protected List<PriceClass> priceClassList;
+
+    @XmlElement(name = "ServiceDefinition", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderViewRS", required = true)
+    @XmlElementWrapper(name = "ServiceDefinitionList", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderViewRS", required = true)
+    protected List<ServiceDefinition> serviceDefinitionList;
+
+    public List<BaggageAllowance> getBaggageAllowanceList() {
         return baggageAllowanceList;
     }
 
-    /**
-     * 设置baggageAllowanceList属性的值。
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link BaggageAllowanceList }
-     *     
-     */
-    public void setBaggageAllowanceList(BaggageAllowanceList value) {
-        this.baggageAllowanceList = value;
+    public void setBaggageAllowanceList(List<BaggageAllowance> baggageAllowanceList) {
+        this.baggageAllowanceList = baggageAllowanceList;
     }
 
-    /**
-     * 获取contactInfoList属性的值。
-     * 
-     * @return
-     *     possible object is
-     *     {@link ContactInfoList }
-     *     
-     */
-    public ContactInfoList getContactInfoList() {
+    public List<ContactInfo> getContactInfoList() {
         return contactInfoList;
     }
 
-    /**
-     * 设置contactInfoList属性的值。
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link ContactInfoList }
-     *     
-     */
-    public void setContactInfoList(ContactInfoList value) {
-        this.contactInfoList = value;
+    public void setContactInfoList(List<ContactInfo> contactInfoList) {
+        this.contactInfoList = contactInfoList;
     }
 
-    /**
-     * 获取paxList属性的值。
-     * 
-     * @return
-     *     possible object is
-     *     {@link PaxList }
-     *     
-     */
-    public PaxList getPaxList() {
+    public List<Pax> getPaxList() {
         return paxList;
     }
 
-    /**
-     * 设置paxList属性的值。
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link PaxList }
-     *     
-     */
-    public void setPaxList(PaxList value) {
-        this.paxList = value;
+    public void setPaxList(List<Pax> paxList) {
+        this.paxList = paxList;
     }
 
-    /**
-     * 获取paxSegmentList属性的值。
-     * 
-     * @return
-     *     possible object is
-     *     {@link PaxSegmentList }
-     *     
-     */
-    public PaxSegmentList getPaxSegmentList() {
+    public List<PaxSegment> getPaxSegmentList() {
         return paxSegmentList;
     }
 
-    /**
-     * 设置paxSegmentList属性的值。
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link PaxSegmentList }
-     *     
-     */
-    public void setPaxSegmentList(PaxSegmentList value) {
-        this.paxSegmentList = value;
+    public void setPaxSegmentList(List<PaxSegment> paxSegmentList) {
+        this.paxSegmentList = paxSegmentList;
     }
 
-    /**
-     * 获取priceClassList属性的值。
-     * 
-     * @return
-     *     possible object is
-     *     {@link PriceClassList }
-     *     
-     */
-    public PriceClassList getPriceClassList() {
+    public List<PriceClass> getPriceClassList() {
         return priceClassList;
     }
 
-    /**
-     * 设置priceClassList属性的值。
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link PriceClassList }
-     *     
-     */
-    public void setPriceClassList(PriceClassList value) {
-        this.priceClassList = value;
+    public void setPriceClassList(List<PriceClass> priceClassList) {
+        this.priceClassList = priceClassList;
     }
 
-    /**
-     * 获取serviceDefinitionList属性的值。
-     * 
-     * @return
-     *     possible object is
-     *     {@link ServiceDefinitionList }
-     *     
-     */
-    public ServiceDefinitionList getServiceDefinitionList() {
+    public List<ServiceDefinition> getServiceDefinitionList() {
         return serviceDefinitionList;
     }
 
-    /**
-     * 设置serviceDefinitionList属性的值。
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link ServiceDefinitionList }
-     *     
-     */
-    public void setServiceDefinitionList(ServiceDefinitionList value) {
-        this.serviceDefinitionList = value;
+    public void setServiceDefinitionList(List<ServiceDefinition> serviceDefinitionList) {
+        this.serviceDefinitionList = serviceDefinitionList;
     }
-
 }
