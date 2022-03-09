@@ -198,7 +198,7 @@ public class NdcApiTools {
         headers.put("chnlCode", accountInfo.getChnlCode());
         headers.put("Authorization", accountInfo.getAuthorization());
         headers.put("apiCode", accountInfo.getNdcApiInfo().getApiCode());
-        String resp = null;channelOKHttpService.doPostXml(url, xmlParams1, headers);
+        String resp = channelOKHttpService.doPostXml(url, xmlParams1, headers);
 
         String respLog = resp;
         if (accountInfo.getNdcApiInfo().getApiCode().equals("A0534")) {

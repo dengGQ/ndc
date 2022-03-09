@@ -53,7 +53,7 @@ public class Coupon {
     @XmlElement(name = "CouponStatusCode", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderViewRS", required = true)
     protected String couponStatusCode;
     @XmlElement(name = "NonRefundableInd", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderViewRS", required = true)
-    protected String nonRefundableInd;
+    protected Boolean nonRefundableInd;
     @XmlElement(name = "RemarkText", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderViewRS", required = true)
     protected String remarkText;
 
@@ -161,7 +161,7 @@ public class Coupon {
      *     {@link String }
      *     
      */
-    public String getNonRefundableInd() {
+    public Boolean getNonRefundableInd() {
         return nonRefundableInd;
     }
 
@@ -173,7 +173,7 @@ public class Coupon {
      *     {@link String }
      *     
      */
-    public void setNonRefundableInd(String value) {
+    public void setNonRefundableInd(Boolean value) {
         this.nonRefundableInd = value;
     }
 

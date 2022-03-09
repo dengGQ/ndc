@@ -85,7 +85,7 @@ public class BusinessEnum {
 		_708("已换开"),B("客票已使用"),
 		BD("旅客已登机"),CK("正在办理值机"),
 		I("客票有效"),PE("客票已换开为纸票"),
-		RF("客票已退"),S("客票已挂起"),V("作废");
+		RF("客票已退"),S("客票已挂起"),V("作废"), UN_KNOW("未知");
 
 		private String label;
 
@@ -95,6 +95,11 @@ public class BusinessEnum {
 
 		public String getLabel() {
 			return label;
+		}
+
+		public static String getLabelByCode(String code) {
+			return Arrays.stream(TicketStatus.values())
+					.filter(ticketStatus -> ticketStatus.name().equals(code)).findFirst().orElse(UN_KNOW).getLabel();
 		}
 	}
 

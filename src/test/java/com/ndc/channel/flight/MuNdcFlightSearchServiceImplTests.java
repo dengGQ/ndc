@@ -71,7 +71,7 @@ public class MuNdcFlightSearchServiceImplTests {
 
     @Test
     public void ndcFlightSearch() {
-        final List<CorpApiFlightListDataV2> corpApiFlightListDataV2s = searchHandler.flightSearch("2022-06-26", "SHA", "CAN");
+        final List<CorpApiFlightListDataV2> corpApiFlightListDataV2s = searchHandler.flightSearch("2022-06-26", "SHA", "PEK");
         log.info("ndcFlightSearch={}", JSON.toJSONString(corpApiFlightListDataV2s));
     }
 
@@ -114,12 +114,12 @@ public class MuNdcFlightSearchServiceImplTests {
         flightOrderCreateReq.setPassengers(Arrays.asList(passengerParams));
 
 
-        OrderContactParams contactParams = new OrderContactParams();
-        contactParams.setName("邓国泉");
-        contactParams.setPhone("18611312771");
-        List<OrderContactParams> objects = new ArrayList<>();
-        objects.add(contactParams);
-        flightOrderCreateReq.setContacts(objects);
+//        OrderContactParams contactParams = new OrderContactParams();
+//        contactParams.setName("邓国泉");
+//        contactParams.setPhone("18611312771");
+//        List<OrderContactParams> objects = new ArrayList<>();
+//        objects.add(contactParams);
+//        flightOrderCreateReq.setContacts(objects);
 
         createOrderHandler.createOrder(flightOrderCreateReq);
     }

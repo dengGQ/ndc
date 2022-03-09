@@ -31,6 +31,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -47,6 +48,11 @@ public class NdcFlightOrderRefundHandler {
         return null;
     }
 
+    /**
+     * 机票退票金额查询
+     * @param params
+     * @return
+     */
     public RefundChangeMoneyQueryResp refundMoneyQuery(RefundChangeMoneyQueryParams params) {
 
         NdcFlightApiOrderRel ndcOrderRel = apiOrderRelMapper.selectByOrderId(params.getChannelOrderNumber());
@@ -85,6 +91,11 @@ public class NdcFlightOrderRefundHandler {
         return resp;
     }
 
+    /**
+     * 机票退票申请
+     * @param orderId
+     * @return
+     */
     private Response refundApply(String orderId) {
 
         NdcFlightApiOrderRel ndcFlightApiOrderRel = apiOrderRelMapper.selectByOrderId(orderId);
@@ -100,7 +111,19 @@ public class NdcFlightOrderRefundHandler {
 
         Response response = refundApplyResult.getResponse();
 
+        Ticket ticket = response.getOrderAmendment().getTicketDocInfo().getTicket();
+        Coupon coupon = ticket.getCoupon();
+        //客票状态
+        String couponStatusCode = coupon.getCouponStatusCode();
+
+        // 不可退标识，true不可退，false可退
+        Boolean nonRefundableInd = coupon.getNonRefundableInd();
+
+        if (nonRefundableInd) {
+            throw new BusinessException(BusinessExceptionCode.REQUEST_PARAM_ERROR, "不可退，客票状态（"+BusinessEnum.TicketStatus.getLabelByCode(couponStatusCode)+")");
+        }
         return response;
+
     }
 
     private IATAOrderChangeRQ createRefundAmountQueryReqParams(RefundChangeMoneyQueryParams params, NdcFlightApiOrderRel ndcOrderRel, DataLists dataLists) {
@@ -150,8 +173,14 @@ public class NdcFlightOrderRefundHandler {
         final List<com.ndc.channel.flight.xmlBean.refundAmountSearch.request.bean.ContactInfo> contactInfoList = JSONObject.parseObject(JSON.toJSONString(dataLists.getContactInfoList()), new TypeReference<List<com.ndc.channel.flight.xmlBean.refundAmountSearch.request.bean.ContactInfo>>() {
         });
 
+        final com.ndc.channel.flight.xmlBean.refundAmountSearch.request.bean.ContactInfo primaryContact = contactInfoList.stream().filter(cf -> cf.getContactTypeText().equals("PRIMARY")).findFirst().get();
+        final com.ndc.channel.flight.xmlBean.refundAmountSearch.request.bean.Individual individual = primaryContact.getIndividual();
+        individual.setSurname("邓国泉");
+
+        primaryContact.setContactTypeText("APPLICANT");
+
         dataList.setPaxList(paxList);
-        dataList.setContactInfoList(contactInfoList);
+        dataList.setContactInfoList(contactInfoList.stream().filter(c->!c.getContactTypeText().equals("TRAVEL_AGENCY")).collect(Collectors.toList()));
 
         return dataList;
     }

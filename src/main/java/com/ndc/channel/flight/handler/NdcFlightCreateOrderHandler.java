@@ -25,6 +25,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -153,10 +154,7 @@ public class NdcFlightCreateOrderHandler {
         travelAgentOrderContact.setPhone(primaryContactStr[1]);
         travelAgentOrderContact.setContactType("TRAVEL_AGENCY");
 
-        req.getContacts().add(passengerContact);
-        req.getContacts().add(travelAgentOrderContact);
-
-        final List<ContactInfo> contactInfoList = req.getContacts().stream().map(contactParams -> {
+        final List<ContactInfo> contactInfoList = Arrays.asList(primaryContact, passengerContact, travelAgentOrderContact).stream().map(contactParams -> {
             final ContactInfo contactInfo = new ContactInfo();
             contactInfo.setContactInfoID(UUID.randomUUID().toString());
             contactInfo.setContactTypeText(contactParams.getContactType());
