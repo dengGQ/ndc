@@ -11,9 +11,9 @@ import com.ndc.channel.flight.dto.refund.RefundApplyParams;
 import com.ndc.channel.flight.dto.refund.RefundChangeMoneyQueryParams;
 import com.ndc.channel.flight.dto.refund.RefundChangeMoneyQueryResp;
 import com.ndc.channel.flight.tools.NdcApiTools;
-import com.ndc.channel.flight.xmlBean.orderRefund.request.bean.IATAOrderRetrieveRQ;
-import com.ndc.channel.flight.xmlBean.orderRefund.response.bean.*;
-import com.ndc.channel.flight.xmlBean.orderRefund.response.bean.Error;
+import com.ndc.channel.flight.xmlBean.refundApply.request.bean.IATAOrderRetrieveRQ;
+import com.ndc.channel.flight.xmlBean.refundApply.response.bean.*;
+import com.ndc.channel.flight.xmlBean.refundApply.response.bean.Error;
 import com.ndc.channel.flight.xmlBean.refundAmountSearch.request.bean.BookingRef;
 import com.ndc.channel.flight.xmlBean.refundAmountSearch.request.bean.IATAOrderChangeRQ;
 import com.ndc.channel.flight.xmlBean.refundAmountSearch.request.bean.OrderChangeParameters;
@@ -22,8 +22,6 @@ import com.ndc.channel.flight.xmlBean.refundAmountSearch.response.bean.refund.Or
 import com.ndc.channel.flight.xmlBean.refundAmountSearch.response.bean.refund.PaymentInfo;
 import com.ndc.channel.mapper.NdcFlightApiOrderRelMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections.CollectionUtils;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -31,7 +29,6 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Slf4j

@@ -11,7 +11,6 @@ import com.ndc.channel.flight.xmlBean.orderPay.request.bean.IATAOrderChangeRQ;
 import com.ndc.channel.flight.xmlBean.verifyPrice.request.bean.IATAOfferPriceRQ;
 import com.ndc.channel.flight.xmlBean.verifyPrice.response.bean.IATAOfferPriceRS;
 import com.ndc.channel.http.ChannelOKHttpService;
-import com.ndc.channel.entity.NdcAccountInfo;
 import com.ndc.channel.mapper.NdcAccountInfoMapper;
 import com.ndc.channel.model.NdcAccountInfoData;
 import lombok.extern.slf4j.Slf4j;
@@ -145,14 +144,14 @@ public class NdcApiTools {
      * @param rq
      * @return
      */
-    public com.ndc.channel.flight.xmlBean.orderRefund.response.bean.IATAOrderViewRS refundApply(com.ndc.channel.flight.xmlBean.orderRefund.request.bean.IATAOrderRetrieveRQ rq) {
+    public com.ndc.channel.flight.xmlBean.refundApply.response.bean.IATAOrderViewRS refundApply(com.ndc.channel.flight.xmlBean.refundApply.request.bean.IATAOrderRetrieveRQ rq) {
         try{
 
             NdcAccountInfoData accountInfo = accountInfoMapper.selectByNdcCode("mu_ndc");
 
             accountInfo.setNdcApiInfo(BusinessEnum.NdcApiInfo.REFUND_APPLY);
 
-            return remote(accountInfo, rq, com.ndc.channel.flight.xmlBean.orderRefund.request.bean.IATAOrderRetrieveRQ.class, com.ndc.channel.flight.xmlBean.orderRefund.response.bean.IATAOrderViewRS.class);
+            return remote(accountInfo, rq, com.ndc.channel.flight.xmlBean.refundApply.request.bean.IATAOrderRetrieveRQ.class, com.ndc.channel.flight.xmlBean.refundApply.response.bean.IATAOrderViewRS.class);
         }catch (BusinessException e){
             throw e;
         }catch (Exception e){
