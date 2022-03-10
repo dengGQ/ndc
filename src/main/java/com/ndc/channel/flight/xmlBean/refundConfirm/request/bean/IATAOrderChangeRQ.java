@@ -1,0 +1,158 @@
+
+package com.ndc.channel.flight.xmlBean.refundConfirm.request.bean;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
+import java.util.List;
+
+
+/**
+ * <p>anonymous complex type的 Java 类。
+ * 
+ * <p>以下模式片段指定包含在此类中的预期内容。
+ * 
+ * <pre>
+ * &lt;complexType>
+ *   &lt;complexContent>
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *       &lt;sequence>
+ *         &lt;element ref="{http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ}MessageDoc"/>
+ *         &lt;element ref="{http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ}Party"/>
+ *         &lt;element ref="{http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ}PayloadAttributes"/>
+ *         &lt;element ref="{http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ}Request"/>
+ *       &lt;/sequence>
+ *     &lt;/restriction>
+ *   &lt;/complexContent>
+ * &lt;/complexType>
+ * </pre>
+ * 
+ * 
+ */
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "", propOrder = {
+    "messageDoc",
+    "party",
+    "payloadAttributes",
+    "request"
+})
+@XmlRootElement(name = "IATA_OrderChangeRQ", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ")
+public class IATAOrderChangeRQ {
+
+    @XmlElement(name = "MessageDoc", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ", required = true)
+    protected MessageDoc messageDoc;
+    @XmlElement(name = "Party", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ", required = true)
+    protected Party party;
+    @XmlElement(name = "PayloadAttributes", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ", required = true)
+    protected PayloadAttributes payloadAttributes;
+    @XmlElement(name = "Request", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ", required = true)
+    protected Request request;
+
+    public IATAOrderChangeRQ() {
+    }
+
+    public IATAOrderChangeRQ(List<String> contactInfoRefID) {
+        this.messageDoc = new MessageDoc();
+        this.party = new Party(contactInfoRefID);
+        this.payloadAttributes = new PayloadAttributes();
+    }
+
+    /**
+     * 获取messageDoc属性的值。
+     * 
+     * @return
+     *     possible object is
+     *     {@link MessageDoc }
+     *     
+     */
+    public MessageDoc getMessageDoc() {
+        return messageDoc;
+    }
+
+    /**
+     * 设置messageDoc属性的值。
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link MessageDoc }
+     *     
+     */
+    public void setMessageDoc(MessageDoc value) {
+        this.messageDoc = value;
+    }
+
+    /**
+     * 获取party属性的值。
+     * 
+     * @return
+     *     possible object is
+     *     {@link Party }
+     *     
+     */
+    public Party getParty() {
+        return party;
+    }
+
+    /**
+     * 设置party属性的值。
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Party }
+     *     
+     */
+    public void setParty(Party value) {
+        this.party = value;
+    }
+
+    /**
+     * 获取payloadAttributes属性的值。
+     * 
+     * @return
+     *     possible object is
+     *     {@link PayloadAttributes }
+     *     
+     */
+    public PayloadAttributes getPayloadAttributes() {
+        return payloadAttributes;
+    }
+
+    /**
+     * 设置payloadAttributes属性的值。
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link PayloadAttributes }
+     *     
+     */
+    public void setPayloadAttributes(PayloadAttributes value) {
+        this.payloadAttributes = value;
+    }
+
+    /**
+     * 获取request属性的值。
+     * 
+     * @return
+     *     possible object is
+     *     {@link Request }
+     *     
+     */
+    public Request getRequest() {
+        return request;
+    }
+
+    /**
+     * 设置request属性的值。
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Request }
+     *     
+     */
+    public void setRequest(Request value) {
+        this.request = value;
+    }
+
+}

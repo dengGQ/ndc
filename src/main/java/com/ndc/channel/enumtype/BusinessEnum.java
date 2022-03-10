@@ -82,10 +82,17 @@ public class BusinessEnum {
 	 */
 	public enum TicketStatus {
 
-		_708("已换开"),B("客票已使用"),
-		BD("旅客已登机"),CK("正在办理值机"),
-		I("客票有效"),PE("客票已换开为纸票"),
-		RF("客票已退"),S("客票已挂起"),V("作废"), UN_KNOW("未知");
+		_708("已换开"),
+
+		B("客票已使用"),
+		BD("旅客已登机"),
+		CK("正在办理值机"),
+		I("客票有效"),
+		PE("客票已换开为纸票"),
+		RF("客票已退"),
+		S("客票已挂起"),
+		V("作废"),
+		UN_KNOW("未知");
 
 		private String label;
 
@@ -109,9 +116,31 @@ public class BusinessEnum {
 	public enum OrderItemStatusCode {
 
 		CANCELLEDBYCUSTOMER("订单项目预订已被客户取消或者因支付时间超时系统自动取消"),
-		ENTITLED("等待接收"),NOTENTITLED("无权接收"),BOOKFAIL("预订失败"),WAITEPAY("等待支付"),WAITEOUTINVOICE("等待开票"),OUTINVOICE("已开票"),
-		INVOICING("开票中"),FAILUREOUTINVOICE("开票失败"),REFUNDED("已退票"),REFUNDFAIL("退票失败"),ONREFUND("退票中"),
-		REFUNDERROR("差错退款"),INVALID("无效订单"),BOOKSUCCESS("预订成功"),BOOKCANCEL("取消预订"),PAYING("支付中"),ABNORMAL("异常"),UNKNOWN("未知");
+		ENTITLED("等待接收"),
+		NOTENTITLED("无权接收"),
+
+		BOOKSUCCESS("预订成功"),
+		BOOKCANCEL("取消预订"),
+		BOOKFAIL("预订失败"),
+
+		WAITEPAY("等待支付"),
+		PAYING("支付中"),
+
+		WAITEOUTINVOICE("等待开票"),
+		OUTINVOICE("已开票"),
+		INVOICING("开票中"),
+		FAILUREOUTINVOICE("开票失败"),
+
+		REFUNDED("已退票"),
+		REFUNDFAIL("退票失败"),
+		ONREFUND("退票中"),
+		REFUNDERROR("差错退款"),
+
+		INVALID("无效订单"),
+
+		ABNORMAL("异常"),
+		UNKNOWN("未知");
+
 		private String label;
 
 		OrderItemStatusCode(String label) {
@@ -124,6 +153,10 @@ public class BusinessEnum {
 
 		public static String getLabelByName(String name) {
 			return Arrays.stream(OrderItemStatusCode.values()).filter(s->s.name().equals(name)).findFirst().orElse(UNKNOWN).getLabel();
+		}
+
+		public static List<OrderItemStatusCode> getIncompleteStatusCode() {
+			return Arrays.asList(ENTITLED, WAITEPAY, PAYING, WAITEOUTINVOICE, INVOICING, ONREFUND);
 		}
 	}
 

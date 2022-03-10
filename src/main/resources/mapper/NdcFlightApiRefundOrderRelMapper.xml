@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ndc.channel.mapper.NdcFlightApiRefundOrderRelMapper" >
+  <resultMap id="BaseResultMap" type="com.ndc.channel.entity.NdcFlightApiRefundOrderRel" >
+    <id column="rel_id" property="relId" jdbcType="INTEGER" />
+    <result column="order_id" property="orderId" jdbcType="VARCHAR" />
+    <result column="refund_id" property="refundId" jdbcType="VARCHAR" />
+    <result column="external_refund_number" property="externalRefundNumber" jdbcType="VARCHAR" />
+    <result column="after_refund_ticket_url" property="afterRefundTicketUrl" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    rel_id, order_id, refund_id, external_refund_number, after_refund_ticket_url, create_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from ndc_flight_api_refund_order_rel
+    where rel_id = #{relId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from ndc_flight_api_refund_order_rel
+    where rel_id = #{relId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.ndc.channel.entity.NdcFlightApiRefundOrderRel" >
+    insert into ndc_flight_api_refund_order_rel (rel_id, order_id, refund_id, 
+      external_refund_number, after_refund_ticket_url, 
+      create_time)
+    values (#{relId,jdbcType=INTEGER}, #{orderId,jdbcType=VARCHAR}, #{refundId,jdbcType=VARCHAR}, 
+      #{externalRefundNumber,jdbcType=VARCHAR}, #{afterRefundTicketUrl,jdbcType=VARCHAR}, 
+      #{createTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ndc.channel.entity.NdcFlightApiRefundOrderRel" >
+    insert into ndc_flight_api_refund_order_rel
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="relId != null" >
+        rel_id,
+      </if>
+      <if test="orderId != null" >
+        order_id,
+      </if>
+      <if test="refundId != null" >
+        refund_id,
+      </if>
+      <if test="externalRefundNumber != null" >
+        external_refund_number,
+      </if>
+      <if test="afterRefundTicketUrl != null" >
+        after_refund_ticket_url,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="relId != null" >
+        #{relId,jdbcType=INTEGER},
+      </if>
+      <if test="orderId != null" >
+        #{orderId,jdbcType=VARCHAR},
+      </if>
+      <if test="refundId != null" >
+        #{refundId,jdbcType=VARCHAR},
+      </if>
+      <if test="externalRefundNumber != null" >
+        #{externalRefundNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="afterRefundTicketUrl != null" >
+        #{afterRefundTicketUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ndc.channel.entity.NdcFlightApiRefundOrderRel" >
+    update ndc_flight_api_refund_order_rel
+    <set >
+      <if test="orderId != null" >
+        order_id = #{orderId,jdbcType=VARCHAR},
+      </if>
+      <if test="refundId != null" >
+        refund_id = #{refundId,jdbcType=VARCHAR},
+      </if>
+      <if test="externalRefundNumber != null" >
+        external_refund_number = #{externalRefundNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="afterRefundTicketUrl != null" >
+        after_refund_ticket_url = #{afterRefundTicketUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where rel_id = #{relId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ndc.channel.entity.NdcFlightApiRefundOrderRel" >
+    update ndc_flight_api_refund_order_rel
+    set order_id = #{orderId,jdbcType=VARCHAR},
+      refund_id = #{refundId,jdbcType=VARCHAR},
+      external_refund_number = #{externalRefundNumber,jdbcType=VARCHAR},
+      after_refund_ticket_url = #{afterRefundTicketUrl,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP}
+    where rel_id = #{relId,jdbcType=INTEGER}
+  </update>
+</mapper>

@@ -1,13 +1,12 @@
 package com.ndc.channel.flight.handler;
 
 import com.alibaba.fastjson.JSON;
-import com.ndc.channel.entity.NdcFlightApiOrderRel;
+import com.alibaba.fastjson.JSONObject;
 import com.ndc.channel.enumtype.BusinessEnum;
 import com.ndc.channel.exception.BusinessException;
 import com.ndc.channel.exception.BusinessExceptionCode;
 import com.ndc.channel.executor.OrderDetailDelayQueryExecutor;
-import com.ndc.channel.flight.dto.createOrder.FlightOrderNoticeData;
-import com.ndc.channel.flight.dto.createOrder.FlightOrderPassengerData;
+import com.ndc.channel.flight.dto.MsgBody;
 import com.ndc.channel.flight.dto.orderDetail.NdcOrderDetailData;
 import com.ndc.channel.flight.dto.orderDetail.OrderTicketInfo;
 import com.ndc.channel.flight.tools.NdcApiTools;
@@ -15,8 +14,6 @@ import com.ndc.channel.flight.xmlBean.orderDetail.request.bean.IATAOrderRetrieve
 import com.ndc.channel.flight.xmlBean.orderDetail.request.bean.Order;
 import com.ndc.channel.flight.xmlBean.orderDetail.response.bean.*;
 import com.ndc.channel.flight.xmlBean.orderDetail.response.bean.Error;
-import com.ndc.channel.http.ChannelOKHttpService;
-import com.ndc.channel.mapper.NdcFlightApiOrderRelMapper;
 import com.ndc.channel.notice.NdcFlightOrderNotice;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -106,17 +103,20 @@ public class NdcFlightOrderDetailHandler {
         return detailData;
     }
 
-    public void orderStatusProcess(String orderId) {
-        NdcOrderDetailData ndcOrderDetailData = this.orderDetail(orderId);
+    public void orderStatusProcess(String msgBody) {
+
+        final MsgBody mb = JSONObject.parseObject(msgBody, MsgBody.class);
+        final String msgType = mb.getMsgType();
+
+        NdcOrderDetailData ndcOrderDetailData = this.orderDetail(mb.getPrimaryKey());
 
         log.info("NDC订单明细查询结果={}", JSON.toJSONString(ndcOrderDetailData));
 
-        if (BusinessEnum.OrderItemStatusCode.INVOICING.name().equals(ndcOrderDetailData.getOrderStatus())
-                || BusinessEnum.OrderItemStatusCode.PAYING.name().equals(ndcOrderDetailData.getOrderStatus())) {
+        if (BusinessEnum.OrderItemStatusCode.getIncompleteStatusCode().contains(ndcOrderDetailData.getOrderStatus())) {
 
-            detailDelayQueryExecutor.submitTask(orderId, 60*10);
+            detailDelayQueryExecutor.submitTask(msgBody, 60*10);
         }else {
-            flightOrderNotice.bookingResultNotice(ndcOrderDetailData);
+            flightOrderNotice.notice(msgType, ndcOrderDetailData);
         }
     }
 }

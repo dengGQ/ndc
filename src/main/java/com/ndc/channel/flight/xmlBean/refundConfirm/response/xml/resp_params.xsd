@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderViewRS" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="OrderID" type="xs:string"/>
+  <xs:element name="OwnerCode" type="xs:string"/>
+  <xs:element name="OwnerTypeCode" type="xs:string"/>
+  <xs:element name="Order">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="iata:OrderID" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderViewRS"/>
+        <xs:element ref="iata:OwnerCode" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderViewRS"/>
+        <xs:element ref="iata:OwnerTypeCode" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderViewRS"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Name" type="xs:string"/>
+  <xs:element name="RefVersionNumber" type="xs:string"/>
+  <xs:element name="AltLangID" type="xs:string"/>
+  <xs:element name="CorrelationID" type="xs:string"/>
+  <xs:element name="EchoTokenText" type="xs:string"/>
+  <xs:element name="PrimaryLangID" type="xs:string"/>
+  <xs:element name="RetransmissionInd" type="xs:string"/>
+  <xs:element name="SeqNumber" type="xs:string"/>
+  <xs:element name="Timestamp" type="xs:string"/>
+  <xs:element name="TrxID" type="xs:string"/>
+  <xs:element name="TrxStatusCode" type="xs:string"/>
+  <xs:element name="VersionNumber" type="xs:string"/>
+  <xs:element name="Code" type="xs:string"/>
+  <xs:element name="DescText" type="xs:string"/>
+  <xs:element name="Response">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="iata:Order" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderViewRS"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="MessageDoc">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="iata:Name" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderViewRS"/>
+        <xs:element ref="iata:RefVersionNumber" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderViewRS"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="PayloadAttributes">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="iata:AltLangID" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderViewRS"/>
+        <xs:element ref="iata:CorrelationID" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderViewRS"/>
+        <xs:element ref="iata:EchoTokenText" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderViewRS"/>
+        <xs:element ref="iata:PrimaryLangID" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderViewRS"/>
+        <xs:element ref="iata:RetransmissionInd" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderViewRS"/>
+        <xs:element ref="iata:SeqNumber" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderViewRS"/>
+        <xs:element ref="iata:Timestamp" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderViewRS"/>
+        <xs:element ref="iata:TrxID" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderViewRS"/>
+        <xs:element ref="iata:TrxStatusCode" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderViewRS"/>
+        <xs:element ref="iata:VersionNumber" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderViewRS"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Error">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="iata:Code" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderViewRS"/>
+        <xs:element ref="iata:DescText" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderViewRS"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="IATA_OrderViewRS">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="iata:Response" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderViewRS"/>
+        <xs:element ref="iata:MessageDoc" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderViewRS"/>
+        <xs:element ref="iata:PayloadAttributes" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderViewRS"/>
+        <xs:element ref="iata:Error" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderViewRS"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

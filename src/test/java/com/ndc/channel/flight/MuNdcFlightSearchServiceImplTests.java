@@ -3,6 +3,7 @@ package com.ndc.channel.flight;
 import com.alibaba.fastjson.JSON;
 import com.ndc.channel.ChannelApplication;
 import com.ndc.channel.executor.OrderDetailDelayQueryExecutor;
+import com.ndc.channel.flight.dto.MsgBody;
 import com.ndc.channel.flight.dto.createOrder.CorpApiOrderFlightTicketParams;
 import com.ndc.channel.flight.dto.createOrder.CorpApiOrderPassengerParams;
 import com.ndc.channel.flight.dto.createOrder.FlightOrderCreateReq;
@@ -124,6 +125,8 @@ public class MuNdcFlightSearchServiceImplTests {
     @Test
     public void orderDetail() {
 
+        // 1022030800206118 已退
+        // 1022030900206462
         final NdcOrderDetailData ndcOrderDetailData = orderDetailHandler.orderDetail("1022030800206118");
 
         System.out.println(JSON.toJSONString(ndcOrderDetailData));
@@ -136,6 +139,7 @@ public class MuNdcFlightSearchServiceImplTests {
 
         params.setRefundWay(Byte.valueOf("1"));
         params.setChannelOrderNumber("1022030800206118");
+        params.setTicketNumList(Arrays.asList("7811157639813"));
 
         RefundChangeMoneyQueryResp queryResp = orderRefundHandler.refundMoneyQuery(params);
     }
@@ -143,7 +147,12 @@ public class MuNdcFlightSearchServiceImplTests {
     @Test
     public void afterCreateOrder () {
 
-        queryExecutor.submitTask("1022030100204939", 5);
+        final MsgBody msgBody = new MsgBody();
+        msgBody.setMsgType("1");
+        msgBody.setPrimaryKey("1022030900206462");
+        final String s = JSON.toJSONString(msgBody);
+
+        queryExecutor.submitTask(s, 5);
         while (true){}
     }
 

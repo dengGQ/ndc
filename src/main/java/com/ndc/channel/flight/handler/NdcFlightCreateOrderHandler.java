@@ -65,7 +65,7 @@ public class NdcFlightCreateOrderHandler {
         com.ndc.channel.flight.xmlBean.createOrder.response.bean.Error error = orderViewRS.getError();
         if (error != null) {
             log.error("ndc创建订单失败，failReason={}", error.getError().getDescText());
-            throw new BusinessException(BusinessExceptionCode.REQUEST_PARAM_ERROR, "ndc创建订单失败！");
+            throw new BusinessException(BusinessExceptionCode.REQUEST_PARAM_ERROR, "NDC创建订单失败！");
         }
 
         final Response response = orderViewRS.getResponse();

@@ -160,6 +160,11 @@ public class NdcApiTools {
         }
     }
 
+    /**
+     * 退票金额查询
+     * @param rq
+     * @return
+     */
     public com.ndc.channel.flight.xmlBean.refundAmountSearch.response.bean.refund.IATAOrderViewRS refundAmountQuery(com.ndc.channel.flight.xmlBean.refundAmountSearch.request.bean.IATAOrderChangeRQ rq) {
 
         try {
@@ -169,6 +174,27 @@ public class NdcApiTools {
             accountInfo.setNdcApiInfo(BusinessEnum.NdcApiInfo.REFUND_MONEY_QUERY);
 
             return remote(accountInfo, rq, com.ndc.channel.flight.xmlBean.refundAmountSearch.request.bean.IATAOrderChangeRQ.class, com.ndc.channel.flight.xmlBean.refundAmountSearch.response.bean.refund.IATAOrderViewRS.class);
+        }catch (BusinessException e) {
+            throw e;
+        }catch (Exception e) {
+            log.error("东方航空Ndc退票金额查询异常", e);
+            return null;
+        }
+    }
+
+    /**
+     * 退票确认(退票单提交)
+     * @param rq
+     * @return
+     */
+    public com.ndc.channel.flight.xmlBean.refundConfirm.response.bean.IATAOrderViewRS refundConfirm(com.ndc.channel.flight.xmlBean.refundConfirm.request.bean.IATAOrderChangeRQ rq) {
+        try {
+
+            NdcAccountInfoData accountInfo = accountInfoMapper.selectByNdcCode("mu_ndc");
+
+            accountInfo.setNdcApiInfo(BusinessEnum.NdcApiInfo.REFUND_CONFIRM);
+
+            return remote(accountInfo, rq, com.ndc.channel.flight.xmlBean.refundConfirm.request.bean.IATAOrderChangeRQ.class, com.ndc.channel.flight.xmlBean.refundConfirm.response.bean.IATAOrderViewRS.class);
         }catch (BusinessException e) {
             throw e;
         }catch (Exception e) {

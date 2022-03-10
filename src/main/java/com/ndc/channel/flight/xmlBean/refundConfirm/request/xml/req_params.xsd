@@ -1,0 +1,333 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="Name">
+    <xs:simpleType>
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="NDC_FLIGHT_TICKET_REFUND_CONFIRM"/>
+        <xs:enumeration value="测试"/>
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="RefVersionNumber" type="xs:string"/>
+  <xs:element name="AirlineDesigCode" type="xs:string"/>
+  <xs:element name="DuplicateDesigInd" type="xs:string"/>
+  <xs:element name="MarketingCarrier">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="iata:AirlineDesigCode" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ"/>
+        <xs:element ref="iata:DuplicateDesigInd" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="TravelAgentID" type="xs:string"/>
+  <xs:element name="AgencyID" type="xs:string"/>
+  <xs:element name="ContactInfoRefID">
+    <xs:simpleType>
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="34b987fe09064679b148eb6433495b64"/>
+        <xs:enumeration value="200520651624682936"/>
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="TravelAgent">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="iata:TravelAgentID" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="TypeCode" type="xs:string"/>
+  <xs:element name="TravelAgency">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="iata:AgencyID" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ"/>
+        <xs:element ref="iata:Name" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ"/>
+        <xs:element ref="iata:ContactInfoRefID" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ"/>
+        <xs:element ref="iata:TravelAgent" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ"/>
+        <xs:element ref="iata:TypeCode" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Recipient">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="iata:MarketingCarrier" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Sender">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="iata:TravelAgency" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="AltLangID" type="xs:string"/>
+  <xs:element name="CorrelationID" type="xs:string"/>
+  <xs:element name="EchoTokenText" type="xs:string"/>
+  <xs:element name="PrimaryLangID" type="xs:string"/>
+  <xs:element name="RetransmissionInd" type="xs:string"/>
+  <xs:element name="SeqNumber" type="xs:string"/>
+  <xs:element name="Timestamp" type="xs:string"/>
+  <xs:element name="TrxID" type="xs:string"/>
+  <xs:element name="TrxStatusCode" type="xs:string"/>
+  <xs:element name="VersionNumber" type="xs:string"/>
+  <xs:element name="Carrier">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="iata:AirlineDesigCode" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="BookingEntity">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="iata:Carrier" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="BookingID">
+    <xs:simpleType>
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="20052065"/>
+        <xs:enumeration value="7812404053812"/>
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="BookingRefTypeCode">
+    <xs:simpleType>
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="1"/>
+        <xs:enumeration value="709"/>
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="EmailAddressText" type="xs:string"/>
+  <xs:element name="IndividualID">
+    <xs:simpleType>
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="5ae697d6-6043-4dc3-9125-8351e6e8458f"/>
+        <xs:enumeration value="d02785b11b40483aaabf69b48780b640"/>
+        <xs:enumeration value="121332324"/>
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="Surname" type="xs:string"/>
+  <xs:element name="CountryDialingCode" type="xs:string"/>
+  <xs:element name="PhoneNumber" type="xs:string"/>
+  <xs:element name="ContactInfoID">
+    <xs:simpleType>
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="34b987fe09064679b148eb6433495b64"/>
+        <xs:enumeration value="200520651624682936"/>
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="ContactTypeText">
+    <xs:simpleType>
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="APPLICANT"/>
+        <xs:enumeration value="PAX"/>
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="EmailAddress">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="iata:EmailAddressText" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Individual">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="iata:IndividualID" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ"/>
+        <xs:element ref="iata:Surname" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Phone">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="iata:CountryDialingCode" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ"/>
+        <xs:element ref="iata:PhoneNumber" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ContactInfo">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="iata:ContactInfoID" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ"/>
+        <xs:element ref="iata:ContactTypeText" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ"/>
+        <xs:element ref="iata:EmailAddress" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ"/>
+        <xs:element ref="iata:Individual" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ"/>
+        <xs:element ref="iata:Phone" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="BinaryObject">
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="xs:string">
+          <xs:attribute type="xs:string" name="FileName"/>
+          <xs:attribute type="xs:string" name="Format"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="DescText" type="xs:string"/>
+  <xs:element name="MediaID" type="xs:string"/>
+  <xs:element name="Media">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="iata:BinaryObject" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ"/>
+        <xs:element ref="iata:DescText" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ"/>
+        <xs:element ref="iata:MediaID" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="IdentityDocID" type="xs:string"/>
+  <xs:element name="IdentityDocTypeCode" type="xs:string"/>
+  <xs:element name="IdentityDoc">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="iata:IdentityDocID" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ"/>
+        <xs:element ref="iata:IdentityDocTypeCode" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ"/>
+        <xs:element ref="iata:Surname" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="PaxID" type="xs:string"/>
+  <xs:element name="PTC" type="xs:string"/>
+  <xs:element name="Pax">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="iata:ContactInfoRefID" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ"/>
+        <xs:element ref="iata:IdentityDoc" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ"/>
+        <xs:element ref="iata:Individual" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ"/>
+        <xs:element ref="iata:PaxID" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ"/>
+        <xs:element ref="iata:PTC" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ContactInfoList">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="iata:ContactInfo" maxOccurs="unbounded" minOccurs="0" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="MediaList">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="iata:Media" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="PaxList">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="iata:Pax" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="OrderID" type="xs:string"/>
+  <xs:element name="OwnerCode" type="xs:string"/>
+  <xs:element name="OwnerTypeCode" type="xs:string"/>
+  <xs:element name="RemarkText" type="xs:string"/>
+  <xs:element name="ReasonCode" type="xs:string"/>
+  <xs:element name="Remark">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="iata:RemarkText" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="BookingRef">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="iata:BookingEntity" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ"/>
+        <xs:element ref="iata:BookingID" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ"/>
+        <xs:element ref="iata:BookingRefTypeCode" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="DataLists">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="iata:ContactInfoList" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ"/>
+        <xs:element ref="iata:MediaList" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ"/>
+        <xs:element ref="iata:PaxList" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Order">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="iata:OrderID" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ"/>
+        <xs:element ref="iata:OwnerCode" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ"/>
+        <xs:element ref="iata:OwnerTypeCode" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="OrderChangeParameters">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="iata:ReasonCode" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ"/>
+        <xs:element ref="iata:Remark" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="MessageDoc">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="iata:Name" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ"/>
+        <xs:element ref="iata:RefVersionNumber" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Party">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="iata:Recipient" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ"/>
+        <xs:element ref="iata:Sender" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="PayloadAttributes">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="iata:AltLangID" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ"/>
+        <xs:element ref="iata:CorrelationID" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ"/>
+        <xs:element ref="iata:EchoTokenText" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ"/>
+        <xs:element ref="iata:PrimaryLangID" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ"/>
+        <xs:element ref="iata:RetransmissionInd" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ"/>
+        <xs:element ref="iata:SeqNumber" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ"/>
+        <xs:element ref="iata:Timestamp" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ"/>
+        <xs:element ref="iata:TrxID" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ"/>
+        <xs:element ref="iata:TrxStatusCode" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ"/>
+        <xs:element ref="iata:VersionNumber" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Request">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="iata:BookingRef" maxOccurs="unbounded" minOccurs="0" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ"/>
+        <xs:element ref="iata:DataLists" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ"/>
+        <xs:element ref="iata:Order" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ"/>
+        <xs:element ref="iata:OrderChangeParameters" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="IATA_OrderChangeRQ">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="iata:MessageDoc" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ"/>
+        <xs:element ref="iata:Party" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ"/>
+        <xs:element ref="iata:PayloadAttributes" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ"/>
+        <xs:element ref="iata:Request" xmlns:iata="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

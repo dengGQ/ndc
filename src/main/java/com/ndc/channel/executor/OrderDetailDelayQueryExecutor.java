@@ -29,9 +29,9 @@ public class OrderDetailDelayQueryExecutor {
     @Resource
     private NdcFlightOrderDetailHandler orderDetailHandler;
 
-    public void submitTask(String orderId, long delaySecond) {
+    public void submitTask(String msgBody, long delaySecond) {
 
-        redisUtils.zsetAddWithScore(orderStatusQueryKey, orderId, System.currentTimeMillis() / 1000 + delaySecond);
+        redisUtils.zsetAddWithScore(orderStatusQueryKey, msgBody, System.currentTimeMillis() / 1000 + delaySecond);
 
         if (th == null || th.getState() == Thread.State.TERMINATED) {
 
@@ -55,15 +55,15 @@ public class OrderDetailDelayQueryExecutor {
 
                     ZSetOperations.TypedTuple typedTuple = tupleSet.stream().collect(Collectors.toList()).get(0);
                     long score = typedTuple.getScore().longValue();
-                    String orderId = typedTuple.getValue().toString();
+                    String msgBody = typedTuple.getValue().toString();
                     long currentV = System.currentTimeMillis()/1000;
 
                     if ((currentV - score) >= 0) {
 
-                        if (redisUtils.zsetRem(orderStatusQueryKey, orderId.toString()) > 0) {
+                        if (redisUtils.zsetRem(orderStatusQueryKey, msgBody) > 0) {
 
-                            log.info("开始干活, orderI={}, score={}, current={}", orderId, score, currentV);
-                            orderDetailHandler.orderStatusProcess(orderId);
+                            log.info("开始干活, msgBody={}, score={}, current={}", msgBody, score, currentV);
+                            orderDetailHandler.orderStatusProcess(msgBody);
                         }
                     }else {
                         log.info("有任务，但未到工作时间或任务已被其他兄弟做了.............");

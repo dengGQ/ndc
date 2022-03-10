@@ -1,0 +1,29 @@
+<IATA_OrderViewRS xmlns="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderViewRS">
+    <Response>
+        <Order>
+            <OrderID>1020022500059867</OrderID>
+            <OwnerCode>MU</OwnerCode>
+            <OwnerTypeCode>ORA</OwnerTypeCode>
+        </Order>
+    </Response>
+    <MessageDoc>
+        <Name>NDC_FLIGHT_TICKET_REFUND_CONFIRM</Name>
+        <RefVersionNumber>18.2</RefVersionNumber>
+    </MessageDoc>
+    <PayloadAttributes>
+        <AltLangID>CN</AltLangID>
+        <CorrelationID>6c2c1a0b-bdb4-493e-89e9-c8def146347d</CorrelationID>
+        <EchoTokenText>08997d4f-02ab-465c-890f-c1ec2b98652e</EchoTokenText>
+        <PrimaryLangID>CN</PrimaryLangID>
+        <RetransmissionInd>false</RetransmissionInd>
+        <SeqNumber>1</SeqNumber>
+        <Timestamp>2020-02-25T11:38:34.396+08:00</Timestamp>
+        <TrxID>7642-201905291520104681860256040</TrxID>
+        <TrxStatusCode>5</TrxStatusCode>
+        <VersionNumber>18.2</VersionNumber>
+    </PayloadAttributes>
+    <Error>
+        <Code>308</Code>
+        <DescText>Received from data invalid</DescText>
+    </Error>
+</IATA_OrderViewRS>

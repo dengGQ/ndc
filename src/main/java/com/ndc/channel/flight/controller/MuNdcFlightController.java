@@ -130,7 +130,7 @@ public class MuNdcFlightController {
 
         try {
 
-            final String channelRefundOrderNumber = orderRefundHandler.refundConfire(params);
+            final String channelRefundOrderNumber = orderRefundHandler.refundConfirm(params);
 
             return BusinessResponseFactory.createSuccess(channelRefundOrderNumber);
         }catch (BusinessException exception) {

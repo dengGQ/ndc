@@ -3,6 +3,8 @@ package com.ndc.channel.notice;
 import com.alibaba.fastjson.JSON;
 import com.ndc.channel.entity.NdcFlightApiOrderRel;
 import com.ndc.channel.enumtype.BusinessEnum;
+import com.ndc.channel.exception.BusinessException;
+import com.ndc.channel.exception.BusinessExceptionCode;
 import com.ndc.channel.flight.dto.createOrder.FlightOrderNoticeData;
 import com.ndc.channel.flight.dto.createOrder.FlightOrderPassengerData;
 import com.ndc.channel.flight.dto.orderDetail.NdcOrderDetailData;
@@ -26,7 +28,23 @@ public class NdcFlightOrderNotice {
     @Resource
     private ChannelOKHttpService okHttpService;
 
-    public void bookingResultNotice(NdcOrderDetailData ndcOrderDetailData) {
+    public void notice(String msgType, NdcOrderDetailData detailData) {
+        switch (msgType) {
+            case "1":
+                bookingResultNotice(detailData);
+                break;
+            case "2":
+                refundResultNotice(detailData);
+                break;
+            case "3":
+                changeResultNotice(detailData);
+                break;
+            default:
+                throw new BusinessException(BusinessExceptionCode.REQUEST_PARAM_ERROR, "不支持的消息类型");
+        }
+    }
+
+    private void bookingResultNotice(NdcOrderDetailData ndcOrderDetailData) {
 
         String orderId = ndcOrderDetailData.getChannelGroupOrderNumber();
         NdcFlightApiOrderRel ndcFlightApiOrderRel = orderRelMapper.selectByOrderId(orderId);
@@ -64,7 +82,20 @@ public class NdcFlightOrderNotice {
         }
     }
 
-    public void refundResultNotice(NdcOrderDetailData ndcOrderDetailData) {}
+    private void refundResultNotice(NdcOrderDetailData ndcOrderDetailData) {
 
-    public void changeResultNotice(NdcOrderDetailData ndcOrderDetailData) {}
+    }
+
+    private void changeResultNotice(NdcOrderDetailData ndcOrderDetailData) {}
+
+    public static void main(String[] args) {
+        String a = "1";
+        switch (a){
+            case "1":
+                System.out.println("----------");
+                break;
+            default:
+                System.out.println("==========");
+        }
+    }
 }
