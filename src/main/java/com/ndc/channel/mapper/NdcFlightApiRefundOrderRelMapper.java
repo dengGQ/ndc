@@ -18,6 +18,6 @@ public interface NdcFlightApiRefundOrderRelMapper {
 
     int updateByPrimaryKey(NdcFlightApiRefundOrderRel record);
 
-    @Select("select * from ndc_flight_api_order_rel where refund_id = #{refundId}")
+    @Select("select * from ndc_flight_api_refund_order_rel where refund_id = #{refundId}")
     NdcFlightApiRefundOrderRel selectByRefundId(@Param("refundId") String refundId);
 }
