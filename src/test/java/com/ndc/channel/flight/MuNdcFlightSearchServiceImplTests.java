@@ -2,6 +2,7 @@ package com.ndc.channel.flight;
 
 import com.alibaba.fastjson.JSON;
 import com.ndc.channel.ChannelApplication;
+import com.ndc.channel.entity.NdcFlightApiOrderRel;
 import com.ndc.channel.executor.OrderDetailDelayQueryExecutor;
 import com.ndc.channel.flight.dto.MsgBody;
 import com.ndc.channel.flight.dto.createOrder.CorpApiOrderFlightTicketParams;
@@ -16,6 +17,8 @@ import com.ndc.channel.flight.dto.verifyPrice.CorpApiFlightVerifyPriceData;
 import com.ndc.channel.flight.dto.verifyPrice.FeiBaApiVerifyPriceReq;
 import com.ndc.channel.flight.dto.verifyPrice.FeibaApiVerificationParams;
 import com.ndc.channel.flight.handler.*;
+import com.ndc.channel.flight.xmlBean.refundOrderDetail.response.bean.Response;
+import com.ndc.channel.mapper.NdcFlightApiOrderRelMapper;
 import com.ndc.channel.redis.RedisUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
@@ -55,6 +58,9 @@ public class MuNdcFlightSearchServiceImplTests {
 
     @Resource
     private NdcFlightOrderRefundHandler orderRefundHandler;
+
+    @Resource
+    private NdcFlightRefundOrderDetailHandler detailHandler;
 
     @Test
     public void ndcFlightSearch() {
@@ -127,7 +133,8 @@ public class MuNdcFlightSearchServiceImplTests {
 
         // 1022030800206118 已退
         // 1022030900206462
-        final NdcOrderDetailData ndcOrderDetailData = orderDetailHandler.orderDetail("1022030800206118");
+        // 1022031000207068
+        final NdcOrderDetailData ndcOrderDetailData = orderDetailHandler.orderDetail("1022031000207068");
 
         System.out.println(JSON.toJSONString(ndcOrderDetailData));
     }
@@ -144,12 +151,23 @@ public class MuNdcFlightSearchServiceImplTests {
         RefundChangeMoneyQueryResp queryResp = orderRefundHandler.refundMoneyQuery(params);
     }
 
+
+    @Resource
+    private NdcFlightApiOrderRelMapper orderRelMapper;
+
+    @Test
+    public void refundOrderQuery() {
+        final NdcOrderDetailData response = detailHandler.orderDetail("1022030800206118");
+
+        System.out.println(JSON.toJSONString(response));
+    }
+
     @Test
     public void afterCreateOrder () {
 
         final MsgBody msgBody = new MsgBody();
         msgBody.setMsgType("1");
-        msgBody.setPrimaryKey("1022030900206462");
+        msgBody.setBusinessNumber("1022031100207207");
         final String s = JSON.toJSONString(msgBody);
 
         queryExecutor.submitTask(s, 5);

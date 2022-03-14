@@ -1,12 +1,12 @@
 package com.ndc.channel.flight.handler;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
+import com.ndc.channel.entity.NdcFlightApiOrderRel;
 import com.ndc.channel.enumtype.BusinessEnum;
 import com.ndc.channel.exception.BusinessException;
 import com.ndc.channel.exception.BusinessExceptionCode;
-import com.ndc.channel.executor.OrderDetailDelayQueryExecutor;
-import com.ndc.channel.flight.dto.MsgBody;
+import com.ndc.channel.flight.dto.createOrder.FlightOrderNoticeData;
+import com.ndc.channel.flight.dto.createOrder.FlightOrderPassengerData;
 import com.ndc.channel.flight.dto.orderDetail.NdcOrderDetailData;
 import com.ndc.channel.flight.dto.orderDetail.OrderTicketInfo;
 import com.ndc.channel.flight.tools.NdcApiTools;
@@ -14,7 +14,8 @@ import com.ndc.channel.flight.xmlBean.orderDetail.request.bean.IATAOrderRetrieve
 import com.ndc.channel.flight.xmlBean.orderDetail.request.bean.Order;
 import com.ndc.channel.flight.xmlBean.orderDetail.response.bean.*;
 import com.ndc.channel.flight.xmlBean.orderDetail.response.bean.Error;
-import com.ndc.channel.notice.NdcFlightOrderNotice;
+import com.ndc.channel.http.ChannelOKHttpService;
+import com.ndc.channel.mapper.NdcFlightApiOrderRelMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -25,18 +26,19 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Slf4j
-@Component
-public class NdcFlightOrderDetailHandler {
+@Component(value = "orderDetailHandler1")
+public class NdcFlightOrderDetailHandler implements NdcOrderDetailHandler{
 
     @Resource
     private NdcApiTools ndcApiTools;
 
     @Resource
-    private OrderDetailDelayQueryExecutor detailDelayQueryExecutor;
+    private NdcFlightApiOrderRelMapper orderRelMapper;
 
     @Resource
-    private NdcFlightOrderNotice flightOrderNotice;
+    private ChannelOKHttpService okHttpService;
 
+    @Override
     public NdcOrderDetailData orderDetail(String orderId) {
 
         final Order order = new Order();
@@ -98,25 +100,51 @@ public class NdcFlightOrderDetailHandler {
 
         detailData.setOrderStatus(statusCode);
         detailData.setTicketInfoList(ticketInfoList);
-        detailData.setChannelGroupOrderNumber(orderId);
+        detailData.setChannelOrderNumber(orderId);
 
         return detailData;
     }
 
-    public void orderStatusProcess(String msgBody) {
+    @Override
+    public Boolean checkStatusComplete(NdcOrderDetailData detailData) {
+        return BusinessEnum.OrderItemStatusCode.getCompleteStatusCode().contains(detailData.getOrderStatus());
+    }
 
-        final MsgBody mb = JSONObject.parseObject(msgBody, MsgBody.class);
-        final String msgType = mb.getMsgType();
+    @Override
+    public void statusChangeNotice(NdcOrderDetailData ndcOrderDetailData) {
+        String orderId = ndcOrderDetailData.getChannelOrderNumber();
+        NdcFlightApiOrderRel ndcFlightApiOrderRel = orderRelMapper.selectByOrderId(orderId);
+        String afterTicketUrl = ndcFlightApiOrderRel.getAfterTicketUrl();
+        FlightOrderNoticeData noticeData = new FlightOrderNoticeData();
+        try{
+            // 通知第三方订单状态
+            noticeData.setExternalOrderNumber(ndcFlightApiOrderRel.getExternalOrderNumber());
 
-        NdcOrderDetailData ndcOrderDetailData = this.orderDetail(mb.getPrimaryKey());
+            String orderStatus = ndcOrderDetailData.getOrderStatus();
 
-        log.info("NDC订单明细查询结果={}", JSON.toJSONString(ndcOrderDetailData));
+            if (orderStatus.equals(BusinessEnum.OrderItemStatusCode.OUTINVOICE.name())) {
+                List<OrderTicketInfo> ticketInfoList = ndcOrderDetailData.getTicketInfoList();
+                List<FlightOrderPassengerData> passengerDataList = ticketInfoList.stream().map(ticketInfo -> {
+                    FlightOrderPassengerData passengerData = new FlightOrderPassengerData();
 
-        if (BusinessEnum.OrderItemStatusCode.getIncompleteStatusCode().contains(ndcOrderDetailData.getOrderStatus())) {
+                    passengerData.setName(ticketInfo.getPassengerName());
+                    passengerData.setPnr(ticketInfo.getPnrCode());
+                    passengerData.setIdcardCode(ticketInfo.getIdCardNo());
+                    passengerData.setTicketNumber(ticketInfo.getTicketNumber());
 
-            detailDelayQueryExecutor.submitTask(msgBody, 60*10);
-        }else {
-            flightOrderNotice.notice(msgType, ndcOrderDetailData);
+                    return passengerData;
+                }).collect(Collectors.toList());
+                noticeData.setOrderNumber(orderId);
+                noticeData.setPnr(ticketInfoList.get(0).getPnrCode());
+                noticeData.setPassengerDatas(passengerDataList);
+                noticeData.setIsSuccess(true);
+            }else {
+                noticeData.setIsSuccess(false);
+                noticeData.setMessage(BusinessEnum.OrderItemStatusCode.getLabelByName(orderStatus));
+            }
+            okHttpService.doPost(afterTicketUrl, JSON.toJSONString(noticeData));
+        }catch (Exception e) {
+            log.error("Ndc订单状态推送失败, url="+afterTicketUrl+", params="+JSON.toJSONString(noticeData), e);
         }
     }
 }

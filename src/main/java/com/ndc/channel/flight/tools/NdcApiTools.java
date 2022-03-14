@@ -203,6 +203,28 @@ public class NdcApiTools {
         }
     }
 
+
+    /**
+     * 退票单明细查询
+     * @param rq
+     * @return
+     */
+    public com.ndc.channel.flight.xmlBean.refundOrderDetail.response.bean.IATAOrderViewRS refundOrderDetail(com.ndc.channel.flight.xmlBean.refundOrderDetail.request.bean.IATAOrderRetrieveRQ rq) {
+        try {
+
+            NdcAccountInfoData accountInfo = accountInfoMapper.selectByNdcCode("mu_ndc");
+
+            accountInfo.setNdcApiInfo(BusinessEnum.NdcApiInfo.REFUND_ORDER_DETAIL);
+
+            return remote(accountInfo, rq, com.ndc.channel.flight.xmlBean.refundOrderDetail.request.bean.IATAOrderRetrieveRQ.class, com.ndc.channel.flight.xmlBean.refundOrderDetail.response.bean.IATAOrderViewRS.class);
+        }catch (BusinessException e) {
+            throw e;
+        }catch (Exception e) {
+            log.error("东方航空Ndc退票单查询异常", e);
+            return null;
+        }
+    }
+
     private <T> T remote(NdcAccountInfoData accountInfo, Object rq, Class<?> reqClazz, Class<T> respClazz) throws Exception{
 
         JAXBContext jaxbContext = JAXBContext.newInstance(reqClazz);

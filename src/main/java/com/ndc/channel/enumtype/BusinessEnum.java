@@ -9,6 +9,40 @@ import java.util.*;
 
 public class BusinessEnum {
 
+	public enum RefundAuditingStatus{
+		REFUND_EXCEPTION("109", "退票异常"),
+		REJECT_FIRST("2011", "一审拒绝"),
+		EXCEPTION("309", "生成退票单号异常"),
+		REFUND_SUCCESS("501", "退款成功"),
+		REFUND_COMPLETE("901", "退票完成"),
+		DEL("909", "已删除"),
+		UN_KNOW("9999","未知");
+
+		private String code;
+		private String label;
+
+		RefundAuditingStatus(String code, String label) {
+			this.code = code;
+			this.label = label;
+		}
+
+		public String getCode() {
+			return code;
+		}
+
+		public String getLabel() {
+			return label;
+		}
+
+		public static List<String> allCompleteStatus(){
+			return Arrays.asList(REFUND_SUCCESS.name(), REFUND_COMPLETE.name(), REFUND_EXCEPTION.name(), REJECT_FIRST.name(), EXCEPTION.name(), DEL.name());
+		}
+
+		public static String getLabelByName(String code) {
+			return Arrays.stream(RefundAuditingStatus.values()).filter(s->s.getCode().equals(code)).findFirst().orElse(UN_KNOW).getLabel();
+		}
+	}
+
 	public enum ChangeRefundTypeCode {
 
 		CANCELLATION("Cancellation", "取消（退票）"),
@@ -155,8 +189,8 @@ public class BusinessEnum {
 			return Arrays.stream(OrderItemStatusCode.values()).filter(s->s.name().equals(name)).findFirst().orElse(UNKNOWN).getLabel();
 		}
 
-		public static List<OrderItemStatusCode> getIncompleteStatusCode() {
-			return Arrays.asList(ENTITLED, WAITEPAY, PAYING, WAITEOUTINVOICE, INVOICING, ONREFUND);
+		public static List<String> getCompleteStatusCode() {
+			return Arrays.asList(ENTITLED.name(), WAITEPAY.name(), PAYING.name(), WAITEOUTINVOICE.name(), INVOICING.name(), ONREFUND.name());
 		}
 	}
 
@@ -321,7 +355,9 @@ public class BusinessEnum {
 		ORDER_DETAIL("A0538", "/ndc-flight-order-retrieve/flight/flightOrderRetrieve"),
 		REFUND_MONEY_QUERY("A0540", "/ndc-flight-ticket-refund/refund/flightRefundFee"),
 		REFUND_APPLY("A0539", "/ndc-flight-ticket-refund/refund/flightRefundApply"),
-		REFUND_CONFIRM("A0541", "//ndc-flight-ticket-refund/refund/flightRefundConfirm");
+		REFUND_CONFIRM("A0541", "/ndc-flight-ticket-refund/refund/flightRefundConfirm"),
+		REFUND_ORDER_DETAIL("A0542", "/ndc-flight-ticket-refund/refund/flightRefundNote");
+
 
 
 		private String apiCode;

@@ -1,16 +1,17 @@
 package com.ndc.channel.flight.dto.orderDetail;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public class NdcOrderDetailData {
 
     private String channelOrderNumber;
 
-    private String channelGroupOrderNumber;
-
     private List<OrderTicketInfo> ticketInfoList;
 
     private String orderStatus;
+
+    private BigDecimal refundMoney;
 
     public String getChannelOrderNumber() {
         return channelOrderNumber;
@@ -18,14 +19,6 @@ public class NdcOrderDetailData {
 
     public void setChannelOrderNumber(String channelOrderNumber) {
         this.channelOrderNumber = channelOrderNumber;
-    }
-
-    public String getChannelGroupOrderNumber() {
-        return channelGroupOrderNumber;
-    }
-
-    public void setChannelGroupOrderNumber(String channelGroupOrderNumber) {
-        this.channelGroupOrderNumber = channelGroupOrderNumber;
     }
 
     public List<OrderTicketInfo> getTicketInfoList() {
@@ -42,5 +35,13 @@ public class NdcOrderDetailData {
 
     public void setOrderStatus(String orderStatus) {
         this.orderStatus = orderStatus;
+    }
+
+    public BigDecimal getRefundMoney() {
+        return refundMoney;
+    }
+
+    public void setRefundMoney(BigDecimal refundMoney) {
+        this.refundMoney = refundMoney;
     }
 }

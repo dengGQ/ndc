@@ -4,15 +4,20 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.ndc.channel.entity.NdcFlightApiOrderRel;
+import com.ndc.channel.entity.NdcFlightApiRefundOrderRel;
 import com.ndc.channel.enumtype.BusinessEnum;
 import com.ndc.channel.exception.BusinessException;
 import com.ndc.channel.exception.BusinessExceptionCode;
 import com.ndc.channel.executor.OrderDetailDelayQueryExecutor;
+import com.ndc.channel.flight.dto.MsgBody;
+import com.ndc.channel.flight.dto.orderDetail.NdcOrderDetailData;
+import com.ndc.channel.flight.dto.orderDetail.OrderTicketInfo;
 import com.ndc.channel.flight.dto.refund.RefundApplyParams;
 import com.ndc.channel.flight.dto.refund.RefundApplyPassengerParams;
 import com.ndc.channel.flight.dto.refund.RefundChangeMoneyQueryParams;
 import com.ndc.channel.flight.dto.refund.RefundChangeMoneyQueryResp;
 import com.ndc.channel.flight.tools.NdcApiTools;
+import com.ndc.channel.flight.xmlBean.refundAmountSearch.response.bean.refund.CarrierFee;
 import com.ndc.channel.flight.xmlBean.refundApply.request.bean.IATAOrderRetrieveRQ;
 import com.ndc.channel.flight.xmlBean.refundApply.response.bean.*;
 import com.ndc.channel.flight.xmlBean.refundApply.response.bean.Error;
@@ -23,9 +28,13 @@ import com.ndc.channel.flight.xmlBean.refundAmountSearch.request.bean.Request;
 import com.ndc.channel.flight.xmlBean.refundAmountSearch.response.bean.refund.OrderAmendment;
 import com.ndc.channel.flight.xmlBean.refundAmountSearch.response.bean.refund.PaymentInfo;
 import com.ndc.channel.flight.xmlBean.refundConfirm.request.bean.Media;
+import com.ndc.channel.flight.xmlBean.refundOrderDetail.request.bean.Order;
 import com.ndc.channel.mapper.NdcFlightApiOrderRelMapper;
+import com.ndc.channel.mapper.NdcFlightApiRefundOrderRelMapper;
+import com.ndc.channel.redis.RedisUtils;
 import com.ndc.channel.service.NdcFlightApiRefundOrderRelService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -34,6 +43,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -52,6 +63,9 @@ public class NdcFlightOrderRefundHandler {
     @Resource
     private NdcFlightApiRefundOrderRelService refundOrderRelService;
 
+    @Resource
+    private RedisUtils redisUtils;
+
     /**
      * 退票单提交
      * @param params
@@ -60,6 +74,14 @@ public class NdcFlightOrderRefundHandler {
     public String refundConfirm(RefundApplyParams params) {
 
         final NdcFlightApiOrderRel orderRel = apiOrderRelMapper.selectByOrderId(params.getOrderNumber());
+
+        final List<String> ticketNumberList = params.getRefundPassengerList().stream().map(RefundApplyPassengerParams::getTicketNumber).collect(Collectors.toList());
+
+        final RefundChangeMoneyQueryResp refundChangeMoneyQueryResp = JSONObject.parseObject(redisUtils.getString(getKey(orderRel.getOrderId(), ticketNumberList)), RefundChangeMoneyQueryResp.class);
+
+        if (refundChangeMoneyQueryResp == null) {
+            throw new BusinessException(BusinessExceptionCode.REQUEST_PARAM_ERROR, "您的操作耗时太久了，请刷新页面重试！");
+        }
 
         final Response refundApplyResponse = refundApply(orderRel.getOrderId());
 
@@ -81,9 +103,9 @@ public class NdcFlightOrderRefundHandler {
         final com.ndc.channel.flight.xmlBean.refundConfirm.response.bean.Order order = refundConfirmResponse.getOrder();
         final String refundId = order.getOrderID();
 
-        refundOrderRelService.insertEntity(params, orderRel.getOrderId(), refundId);
+        refundOrderRelService.insertEntity(params, orderRel.getOrderId(), refundId, refundChangeMoneyQueryResp);
 
-        delayQueryExecutor.submitTask(orderRel.getOrderId(), 60L);
+        delayQueryExecutor.submitTask(JSON.toJSONString(new MsgBody(orderRel.getOrderId(), "2")), 60L);
 
         return refundId;
     }
@@ -128,7 +150,14 @@ public class NdcFlightOrderRefundHandler {
 
         resp = getRefundChangeMoneyQueryResp(params.getTicketNumList(), ticketDocInfoList);
 
+
+        redisUtils.setStrExpire(getKey(ndcOrderRel.getOrderId(), params.getTicketNumList()), JSON.toJSONString(resp), 5, TimeUnit.MINUTES);
+
         return resp;
+    }
+
+    private static String getKey(String orderId, List<String> ticketNumber) {
+        return new StringBuilder(orderId).append("-").append(ticketNumber.stream().sorted().collect(Collectors.joining(","))).toString();
     }
 
     /**
@@ -232,12 +261,18 @@ public class NdcFlightOrderRefundHandler {
 
         RefundChangeMoneyQueryResp resp = new RefundChangeMoneyQueryResp();
 
+        BigDecimal refundFee = new BigDecimal("0");
+
+        BigDecimal changeFee = new BigDecimal("0");
+
         BigDecimal refundMoney = new BigDecimal("0");
 
-        BigDecimal changeMoney = new BigDecimal("0");
-
         for (com.ndc.channel.flight.xmlBean.refundAmountSearch.response.bean.refund.TicketDocInfo ticketDocInfo : ticketDocInfoList) {
+
             String ticketNumber = ticketDocInfo.getTicket().getTicketNumber();
+
+            CarrierFee carrierFee = ticketDocInfo.getCarrierFee();
+
             if (ticketNumList.contains(ticketNumber)) {
 
                 Map<String, com.ndc.channel.flight.xmlBean.refundAmountSearch.response.bean.refund.PenaltyAmount> penaltyAmountMap = ticketDocInfo.getPenalty().stream().collect(Collectors.toMap(com.ndc.channel.flight.xmlBean.refundAmountSearch.response.bean.refund.Penalty::getTypeCode, com.ndc.channel.flight.xmlBean.refundAmountSearch.response.bean.refund.Penalty::getPenaltyAmount));
@@ -245,13 +280,16 @@ public class NdcFlightOrderRefundHandler {
                 com.ndc.channel.flight.xmlBean.refundAmountSearch.response.bean.refund.PenaltyAmount penaltyAmountRefund = penaltyAmountMap.get(BusinessEnum.ChangeRefundTypeCode.CANCELLATION.getCode());
                 com.ndc.channel.flight.xmlBean.refundAmountSearch.response.bean.refund.PenaltyAmount penaltyAmountChange = penaltyAmountMap.get(BusinessEnum.ChangeRefundTypeCode.CHANGE.getCode());
 
-                refundMoney = refundMoney.add(new BigDecimal(Optional.ofNullable(penaltyAmountRefund.getValue()).orElse("0")));
-                changeMoney = refundMoney.add(new BigDecimal(Optional.ofNullable(penaltyAmountChange.getValue()).orElse("0")));
+                refundFee = refundFee.add(new BigDecimal(Optional.ofNullable(penaltyAmountRefund.getValue()).orElse("0")));
+                changeFee = changeFee.add(new BigDecimal(Optional.ofNullable(penaltyAmountChange.getValue()).orElse("0")));
+
+                refundMoney = refundMoney.add(new BigDecimal(Optional.ofNullable(carrierFee.getAmount().getValue()).orElse("0")));
             }
         }
 
-        resp.setChangeFee(changeMoney);
-        resp.setRefundFee(refundMoney);
+        resp.setChangeFee(changeFee);
+        resp.setRefundFee(refundFee);
+        resp.setRefundMoney(refundMoney);
 
         return resp;
     }

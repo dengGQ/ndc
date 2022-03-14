@@ -13,6 +13,11 @@ public class RefundChangeMoneyQueryResp {
      */
     private BigDecimal refundFee;
 
+    /**
+     * 退款总金额
+     */
+    private BigDecimal refundMoney;
+
     public BigDecimal getChangeFee() {
         return changeFee;
     }
@@ -27,5 +32,13 @@ public class RefundChangeMoneyQueryResp {
 
     public void setRefundFee(BigDecimal refundFee) {
         this.refundFee = refundFee;
+    }
+
+    public BigDecimal getRefundMoney() {
+        return refundMoney;
+    }
+
+    public void setRefundMoney(BigDecimal refundMoney) {
+        this.refundMoney = refundMoney;
     }
 }

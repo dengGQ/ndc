@@ -1,5 +1,9 @@
 package com.ndc.channel.flight.dto.orderDetail;
 
+import io.swagger.annotations.ApiModelProperty;
+
+import java.math.BigDecimal;
+
 public class OrderTicketInfo {
 
     private String passengerName;
@@ -12,7 +16,11 @@ public class OrderTicketInfo {
 
     private String ticketStatus;
 
-    private String bookingStatus;
+    private String refundAuditingStatus;
+
+    private BigDecimal refundAmount;
+
+    private BigDecimal refundFee;
 
     public String getPassengerName() {
         return passengerName;
@@ -54,11 +62,27 @@ public class OrderTicketInfo {
         this.ticketStatus = ticketStatus;
     }
 
-    public String getBookingStatus() {
-        return bookingStatus;
+    public String getRefundAuditingStatus() {
+        return refundAuditingStatus;
     }
 
-    public void setBookingStatus(String bookingStatus) {
-        this.bookingStatus = bookingStatus;
+    public void setRefundAuditingStatus(String refundAuditingStatus) {
+        this.refundAuditingStatus = refundAuditingStatus;
+    }
+
+    public BigDecimal getRefundAmount() {
+        return refundAmount;
+    }
+
+    public void setRefundAmount(BigDecimal refundAmount) {
+        this.refundAmount = refundAmount;
+    }
+
+    public BigDecimal getRefundFee() {
+        return refundFee;
+    }
+
+    public void setRefundFee(BigDecimal refundFee) {
+        this.refundFee = refundFee;
     }
 }

@@ -1,8 +1,11 @@
 package com.ndc.channel.flight.handler;
 
+import com.alibaba.fastjson.JSON;
 import com.ndc.channel.entity.NdcFlightApiOrderRel;
 import com.ndc.channel.exception.BusinessException;
 import com.ndc.channel.exception.BusinessExceptionCode;
+import com.ndc.channel.executor.OrderDetailDelayQueryExecutor;
+import com.ndc.channel.flight.dto.MsgBody;
 import com.ndc.channel.flight.dto.orderPay.OrderPayReqParams;
 import com.ndc.channel.flight.tools.NdcApiTools;
 import com.ndc.channel.flight.xmlBean.orderPay.request.bean.*;
@@ -31,6 +34,9 @@ public class NdcFlightOrderPayHandler {
 
     @Resource
     private NdcAccountInfoMapper accountInfoMapper;
+
+    @Resource
+    private OrderDetailDelayQueryExecutor detailDelayQueryExecutor;
 
     public Boolean orderPay(OrderPayReqParams orderPayReqParams) {
 
@@ -79,6 +85,9 @@ public class NdcFlightOrderPayHandler {
             log.error("ndc支付失败，channelOrderNumber={}, failReason={}", orderPayReqParams.getOrderNumber(), error.getDescText());
             throw new BusinessException(BusinessExceptionCode.REQUEST_PARAM_ERROR, "支付失败！failReason="+error.getDescText());
         }
+
+        // 发布异步查询订单详情任务
+        detailDelayQueryExecutor.submitTask(JSON.toJSONString(new MsgBody(ndcFlightApiOrderRel.getOrderId(), "1")), 60L);
         return true;
     }
 }

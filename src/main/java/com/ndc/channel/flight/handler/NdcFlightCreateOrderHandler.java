@@ -1,9 +1,11 @@
 package com.ndc.channel.flight.handler;
 
+import com.alibaba.fastjson.JSON;
 import com.ndc.channel.enumtype.BusinessEnum;
 import com.ndc.channel.exception.BusinessException;
 import com.ndc.channel.exception.BusinessExceptionCode;
 import com.ndc.channel.executor.OrderDetailDelayQueryExecutor;
+import com.ndc.channel.flight.dto.MsgBody;
 import com.ndc.channel.flight.dto.createOrder.*;
 import com.ndc.channel.flight.dto.flightSearch.CorpApiFlightListDataV2;
 import com.ndc.channel.flight.dto.flightSearch.CorpApiTicketData;
@@ -41,9 +43,6 @@ public class NdcFlightCreateOrderHandler {
     private RedisUtils redisUtils;
     @Resource
     private NdcFlightApiOrderRelService orderRelService;
-
-    @Resource
-    private OrderDetailDelayQueryExecutor detailDelayQueryExecutor;
 
     @Resource
     private NdcFlightApiOrderRelMapper orderRelMapper;
@@ -94,9 +93,6 @@ public class NdcFlightCreateOrderHandler {
 
         // NDC订单关键信息保存
         orderRelService.insertEntity(orderCreateReq, orderCreateData);
-
-        // 发布异步查询订单详情任务
-        detailDelayQueryExecutor.submitTask(orderID, 60L);
 
         return orderCreateData;
     }

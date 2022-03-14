@@ -1,26 +1,45 @@
 package com.ndc.channel.entity;
 
-import io.swagger.annotations.ApiModelProperty;
-
+import java.math.BigDecimal;
 import java.util.Date;
 
 public class NdcFlightApiRefundOrderRel {
 
     private Long relId;
 
-    @ApiModelProperty(value = "原订单号")
+    /**
+     * 原订单号
+     */
     private String orderId;
 
-    @ApiModelProperty(value = "退票单号")
+    /**
+     * 退票单号
+     */
     private String refundId;
 
-    @ApiModelProperty(value = "外部退票单号", required = true)
+    /**
+     * 外部退票单号
+     */
     private String externalRefundNumber;
 
-    @ApiModelProperty(value = "退票回调通知URL", required = true)
+    /**
+     * 退票回调通知URL
+     */
     private String afterRefundTicketUrl;
 
-    @ApiModelProperty(value = "创建时间", required = true)
+    /**
+     * 退款总额
+     */
+    private BigDecimal refundMoney;
+
+    /**
+     * 退票费
+     */
+    private BigDecimal refundFee;
+
+    /**
+     * 创建时间
+     */
     private Date createTime;
 
     public Long getRelId() {
@@ -69,5 +88,21 @@ public class NdcFlightApiRefundOrderRel {
 
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
+    }
+
+    public BigDecimal getRefundMoney() {
+        return refundMoney;
+    }
+
+    public void setRefundMoney(BigDecimal refundMoney) {
+        this.refundMoney = refundMoney;
+    }
+
+    public BigDecimal getRefundFee() {
+        return refundFee;
+    }
+
+    public void setRefundFee(BigDecimal refundFee) {
+        this.refundFee = refundFee;
     }
 }

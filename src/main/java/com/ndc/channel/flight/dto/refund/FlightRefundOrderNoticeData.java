@@ -22,6 +22,9 @@ public class FlightRefundOrderNoticeData {
     @ApiModelProperty("退款总金额")
     private BigDecimal refundMoney;
 
+    @ApiModelProperty("失败原因")
+    private String message;
+
     public String getRefundNumber() {
         return refundNumber;
     }
@@ -60,5 +63,13 @@ public class FlightRefundOrderNoticeData {
 
     public void setRefundMoney(BigDecimal refundMoney) {
         this.refundMoney = refundMoney;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
     }
 }
