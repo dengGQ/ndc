@@ -134,7 +134,7 @@ public class MuNdcFlightSearchServiceImplTests {
         // 1022030800206118 已退
         // 1022030900206462
         // 1022031000207068
-        final NdcOrderDetailData ndcOrderDetailData = orderDetailHandler.orderDetail("1022031000207068");
+        final NdcOrderDetailData ndcOrderDetailData = orderDetailHandler.orderDetail("1022031400207425");
 
         System.out.println(JSON.toJSONString(ndcOrderDetailData));
     }

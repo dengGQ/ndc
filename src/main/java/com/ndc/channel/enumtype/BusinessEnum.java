@@ -190,7 +190,7 @@ public class BusinessEnum {
 		}
 
 		public static List<String> getCompleteStatusCode() {
-			return Arrays.asList(ENTITLED.name(), WAITEPAY.name(), PAYING.name(), WAITEOUTINVOICE.name(), INVOICING.name(), ONREFUND.name());
+			return Arrays.asList(NOTENTITLED.name(), BOOKCANCEL.name(), BOOKFAIL.name(), OUTINVOICE.name(), FAILUREOUTINVOICE.name(), REFUNDED.name(), REFUNDFAIL.name(), ABNORMAL.name());
 		}
 	}
 

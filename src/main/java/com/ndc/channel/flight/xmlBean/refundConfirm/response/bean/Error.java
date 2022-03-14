@@ -31,7 +31,8 @@ import javax.xml.bind.annotation.XmlType;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
     "code",
-    "descText"
+    "descText",
+    "error"
 })
 @XmlRootElement(name = "Error", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderViewRS")
 public class Error {
@@ -40,6 +41,9 @@ public class Error {
     protected String code;
     @XmlElement(name = "DescText", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderViewRS", required = true)
     protected String descText;
+
+    @XmlElement(name = "Error", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderViewRS", required = true)
+    protected Error error;
 
     /**
      * 获取code属性的值。
@@ -89,4 +93,11 @@ public class Error {
         this.descText = value;
     }
 
+    public Error getError() {
+        return error;
+    }
+
+    public void setError(Error error) {
+        this.error = error;
+    }
 }

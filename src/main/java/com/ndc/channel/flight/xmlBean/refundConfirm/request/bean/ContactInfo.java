@@ -6,6 +6,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import java.util.List;
 
 
 /**
@@ -51,7 +52,7 @@ public class ContactInfo {
     @XmlElement(name = "Individual", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ", required = true)
     protected Individual individual;
     @XmlElement(name = "Phone", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ", required = true)
-    protected Phone phone;
+    protected List<Phone> phone;
 
     /**
      * 获取contactInfoID属性的值。
@@ -157,7 +158,7 @@ public class ContactInfo {
      *     {@link Phone }
      *     
      */
-    public Phone getPhone() {
+    public List<Phone> getPhone() {
         return phone;
     }
 
@@ -169,7 +170,7 @@ public class ContactInfo {
      *     {@link Phone }
      *     
      */
-    public void setPhone(Phone value) {
+    public void setPhone(List<Phone> value) {
         this.phone = value;
     }
 

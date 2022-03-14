@@ -1,17 +1,15 @@
 package com.ndc.channel.flight.handler;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.ndc.channel.entity.NdcFlightApiOrderRel;
-import com.ndc.channel.entity.NdcFlightApiRefundOrderRel;
 import com.ndc.channel.enumtype.BusinessEnum;
 import com.ndc.channel.exception.BusinessException;
 import com.ndc.channel.exception.BusinessExceptionCode;
 import com.ndc.channel.executor.OrderDetailDelayQueryExecutor;
 import com.ndc.channel.flight.dto.MsgBody;
-import com.ndc.channel.flight.dto.orderDetail.NdcOrderDetailData;
-import com.ndc.channel.flight.dto.orderDetail.OrderTicketInfo;
 import com.ndc.channel.flight.dto.refund.RefundApplyParams;
 import com.ndc.channel.flight.dto.refund.RefundApplyPassengerParams;
 import com.ndc.channel.flight.dto.refund.RefundChangeMoneyQueryParams;
@@ -27,22 +25,15 @@ import com.ndc.channel.flight.xmlBean.refundAmountSearch.request.bean.OrderChang
 import com.ndc.channel.flight.xmlBean.refundAmountSearch.request.bean.Request;
 import com.ndc.channel.flight.xmlBean.refundAmountSearch.response.bean.refund.OrderAmendment;
 import com.ndc.channel.flight.xmlBean.refundAmountSearch.response.bean.refund.PaymentInfo;
-import com.ndc.channel.flight.xmlBean.refundConfirm.request.bean.Media;
-import com.ndc.channel.flight.xmlBean.refundOrderDetail.request.bean.Order;
 import com.ndc.channel.mapper.NdcFlightApiOrderRelMapper;
-import com.ndc.channel.mapper.NdcFlightApiRefundOrderRelMapper;
 import com.ndc.channel.redis.RedisUtils;
 import com.ndc.channel.service.NdcFlightApiRefundOrderRelService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -95,7 +86,7 @@ public class NdcFlightOrderRefundHandler {
 
         final com.ndc.channel.flight.xmlBean.refundConfirm.response.bean.Error error = iataOrderViewRS.getError();
         if (error != null) {
-            throw new BusinessException(BusinessExceptionCode.FLIGHT_CHANNEL_ERROR, error.getDescText());
+            throw new BusinessException(BusinessExceptionCode.FLIGHT_CHANNEL_ERROR, error.getError().getDescText());
         }
 
         final com.ndc.channel.flight.xmlBean.refundConfirm.response.bean.Response refundConfirmResponse = iataOrderViewRS.getResponse();
@@ -312,7 +303,13 @@ public class NdcFlightOrderRefundHandler {
         parameters.setReasonCode(BusinessEnum.RefundWay.getReasonCode(params.getRefundWay()));
 
         final com.ndc.channel.flight.xmlBean.refundConfirm.request.bean.Remark remark = new com.ndc.channel.flight.xmlBean.refundConfirm.request.bean.Remark();
-        remark.setRemarkText(params.getMemo());
+
+        final JSONObject remarkJson = new JSONObject();
+        remarkJson.put("orderId", orderRel.getOrderId());
+        remarkJson.put("actionTypeCode", "Add");
+        remarkJson.put("reasonRemarkText", params.getMemo());
+//        remarkJson.put("mediaId", UUID.randomUUID().toString());
+        remark.setRemarkText(remarkJson.toJSONString());
         parameters.setRemark(remark);
         request.setOrderChangeParameters(parameters);
 
@@ -335,8 +332,8 @@ public class NdcFlightOrderRefundHandler {
         final List<com.ndc.channel.flight.xmlBean.refundConfirm.request.bean.ContactInfo> refundConfirmContactInfoList = createRefundConfirmContactInfo(dataLists);
         refundConfirmDataLists.setContactInfoList(refundConfirmContactInfoList);
 
-        Media media = new Media();
-        refundConfirmDataLists.setMediaList(Arrays.asList(media));
+//        Media media = new Media();
+//        refundConfirmDataLists.setMediaList(Arrays.asList(media));
 
         return refundConfirmDataLists;
     }
@@ -349,19 +346,37 @@ public class NdcFlightOrderRefundHandler {
     }
     private List<com.ndc.channel.flight.xmlBean.refundConfirm.request.bean.BookingRef> createRefundConfirmBookingRef(Response refundApplyResponse) {
 
-        final com.ndc.channel.flight.xmlBean.refundApply.response.bean.OrderAmendment orderAmendment = refundApplyResponse.getOrderAmendment();
+        /*final com.ndc.channel.flight.xmlBean.refundApply.response.bean.OrderAmendment orderAmendment = refundApplyResponse.getOrderAmendment();
 
         final TicketDocInfo ticketDocInfo = orderAmendment.getTicketDocInfo();
 
         final List<com.ndc.channel.flight.xmlBean.refundApply.response.bean.BookingRef> bookingRef = ticketDocInfo.getBookingRef();
 
-        return JSONObject.parseObject(JSON.toJSONString(bookingRef), new TypeReference<List<com.ndc.channel.flight.xmlBean.refundConfirm.request.bean.BookingRef>>(){});
+        return JSONObject.parseObject(JSON.toJSONString(bookingRef), new TypeReference<List<com.ndc.channel.flight.xmlBean.refundConfirm.request.bean.BookingRef>>(){});*/
+
+        final List<Pax> paxList = refundApplyResponse.getDataLists().getPaxList();
+        final List<com.ndc.channel.flight.xmlBean.refundConfirm.request.bean.BookingRef> bookingRefList = paxList.stream().map(pax -> {
+            com.ndc.channel.flight.xmlBean.refundConfirm.request.bean.BookingRef br = new com.ndc.channel.flight.xmlBean.refundConfirm.request.bean.BookingRef();
+            br.setBookingID(pax.getPaxID());
+            br.setBookingRefTypeCode("1");
+
+            com.ndc.channel.flight.xmlBean.refundConfirm.request.bean.BookingEntity be = new com.ndc.channel.flight.xmlBean.refundConfirm.request.bean.BookingEntity();
+            com.ndc.channel.flight.xmlBean.refundConfirm.request.bean.Carrier carrier = new com.ndc.channel.flight.xmlBean.refundConfirm.request.bean.Carrier();
+            carrier.setAirlineDesigCode("MU");
+            be.setCarrier(carrier);
+            br.setBookingEntity(be);
+
+            return br;
+        }).collect(Collectors.toList());
+
+        return bookingRefList;
     }
     private List<com.ndc.channel.flight.xmlBean.refundConfirm.request.bean.ContactInfo> createRefundConfirmContactInfo(DataLists dataLists) {
 
         final List<ContactInfo> contactInfoList = dataLists.getContactInfoList();
 
-        final List<com.ndc.channel.flight.xmlBean.refundConfirm.request.bean.ContactInfo> contactInfos = JSONObject.parseObject(JSON.toJSONString(contactInfoList), new TypeReference<List<com.ndc.channel.flight.xmlBean.refundConfirm.request.bean.ContactInfo>>() {});
+        final List<com.ndc.channel.flight.xmlBean.refundConfirm.request.bean.ContactInfo> contactInfos = JSONArray.parseArray(JSON.toJSONString(contactInfoList), com.ndc.channel.flight.xmlBean.refundConfirm.request.bean.ContactInfo.class);
+//        final List<com.ndc.channel.flight.xmlBean.refundConfirm.request.bean.ContactInfo> contactInfos = JSONObject.parseObject(JSON.toJSONString(contactInfoList), new TypeReference<List<com.ndc.channel.flight.xmlBean.refundConfirm.request.bean.ContactInfo>>() {});
         final com.ndc.channel.flight.xmlBean.refundConfirm.request.bean.ContactInfo primaryContact = contactInfos.stream().filter(cf -> cf.getContactTypeText().equals("PRIMARY")).findFirst().get();
         primaryContact.setContactTypeText("APPLICANT");
 
