@@ -248,6 +248,22 @@ public class NdcApiTools {
         }
     }
 
+    public com.ndc.channel.flight.xmlBean.changeBooking.response.bean.IATAOrderViewRS changeBooking(com.ndc.channel.flight.xmlBean.changeBooking.request.bean.IATAOrderChangeRQ rq) {
+        try {
+
+            NdcAccountInfoData accountInfo = accountInfoMapper.selectByNdcCode("mu_ndc");
+
+            accountInfo.setNdcApiInfo(BusinessEnum.NdcApiInfo.CHANGE_BOOKING);
+
+            return remote(accountInfo, rq, com.ndc.channel.flight.xmlBean.changeBooking.request.bean.IATAOrderChangeRQ.class, com.ndc.channel.flight.xmlBean.changeBooking.response.bean.IATAOrderViewRS.class);
+        }catch (BusinessException e) {
+            throw e;
+        }catch (Exception e) {
+            log.error("东方航空Ndc改签航班查询异常", e);
+            return null;
+        }
+    }
+
     private <T> T remote(NdcAccountInfoData accountInfo, Object rq, Class<?> reqClazz, Class<T> respClazz) throws Exception{
 
         JAXBContext jaxbContext = JAXBContext.newInstance(reqClazz);
