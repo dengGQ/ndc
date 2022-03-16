@@ -239,4 +239,20 @@ public class ChannelOKHttpService {
 			throw new BusinessException(BusinessExceptionCode.SYSTEM_SERVICE_TIMEOUT);
 		}
 	}
+
+	public String doGet(String url) {
+		Request request = new Request.Builder().url(url).build();
+		try {
+			Response response = getClient(null,null).newCall(request).execute();
+			if (response.isSuccessful()) {
+				return response.body().string();
+			} else {
+				//抛出业务异常
+				return null;
+			}
+		} catch (IOException e) {
+			//服务调用失败
+			throw new BusinessException(BusinessExceptionCode.SYSTEM_SERVICE_TIMEOUT);
+		}
+	}
 }

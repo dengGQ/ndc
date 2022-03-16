@@ -3,6 +3,7 @@ package com.ndc.channel.flight.controller;
 import com.ndc.channel.exception.BusinessException;
 import com.ndc.channel.flight.dto.BusinessResponseFactory;
 import com.ndc.channel.flight.dto.ResponseData;
+import com.ndc.channel.flight.dto.changeFlightSearch.ChangeFlightQueryReq;
 import com.ndc.channel.flight.dto.createOrder.CorpApiFlightOrderCreateData;
 import com.ndc.channel.flight.dto.createOrder.FlightOrderCreateReq;
 import com.ndc.channel.flight.dto.flightSearch.CorpApiFlightListDataV2;
@@ -43,6 +44,8 @@ public class MuNdcFlightController {
     private NdcFlightOrderDetailHandler orderDetailHandler;
     @Resource
     private NdcFlightOrderRefundHandler orderRefundHandler;
+    @Resource
+    private NdcFlightChangeFlightSearchHandler changeFlightSearchHandler;
 
     @PostMapping("/corpapi/flight/search")
     @ApiOperation(value = "航班查询", notes = "航班查询", httpMethod = "POST", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -142,7 +145,7 @@ public class MuNdcFlightController {
 
     @PostMapping("/corpapi/flight/queryRefundChangeFee")
     @ApiOperation(value = "退改费用查询", httpMethod = "POST", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseData<RefundChangeMoneyQueryResp> refundChangeFeeQuery(@RequestBody RefundChangeMoneyQueryParams params) {
+    public ResponseData<RefundChangeMoneyQueryResp> refundChangeFeeQuery(@RequestBody @RequestParam RefundChangeMoneyQueryParams params) {
 
         try {
 
@@ -156,6 +159,19 @@ public class MuNdcFlightController {
         }
     }
 
+    @PostMapping("/corpapi/flight/change/search")
+    @ApiOperation(value = "航班查询", notes = "航班查询", httpMethod = "POST", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseData<List<CorpApiFlightListDataV2>> changeflightSearch(@RequestBody ChangeFlightQueryReq searchReq) {
+        try {
 
+            final List<CorpApiFlightListDataV2> flightListDataV2List = changeFlightSearchHandler.changeFlightSearch(searchReq);
+
+            return BusinessResponseFactory.createSuccess(flightListDataV2List);
+        }catch (BusinessException exception) {
+
+            log.error("东航NDC改签机票查询失败，失败原因={}", exception.getMessage());
+            return BusinessResponseFactory.createBusinessError(exception);
+        }
+    }
 
 }

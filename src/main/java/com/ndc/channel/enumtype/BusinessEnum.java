@@ -356,7 +356,8 @@ public class BusinessEnum {
 		REFUND_MONEY_QUERY("A0540", "/ndc-flight-ticket-refund/refund/flightRefundFee"),
 		REFUND_APPLY("A0539", "/ndc-flight-ticket-refund/refund/flightRefundApply"),
 		REFUND_CONFIRM("A0541", "/ndc-flight-ticket-refund/refund/flightRefundConfirm"),
-		REFUND_ORDER_DETAIL("A0542", "/ndc-flight-ticket-refund/refund/flightRefundNote");
+		REFUND_ORDER_DETAIL("A0542", "/ndc-flight-ticket-refund/refund/flightRefundNote"),
+		CHANGE_FLIGHT_SEARCH("A0553", "/ndc-flight-order-reshopping/involuntary/involuntaryReShopping");
 
 
 

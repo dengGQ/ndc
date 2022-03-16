@@ -2,6 +2,8 @@ package com.ndc.channel.flight.tools;
 
 import com.ndc.channel.enumtype.BusinessEnum;
 import com.ndc.channel.exception.BusinessException;
+import com.ndc.channel.flight.xmlBean.changeFlightSearch.request.bean.IATAOrderReshopRQ;
+import com.ndc.channel.flight.xmlBean.changeFlightSearch.response.bean.IATAOrderReshopRS;
 import com.ndc.channel.flight.xmlBean.createOrder.request.bean.IATAOrderCreateRQ;
 import com.ndc.channel.flight.xmlBean.createOrder.response.bean.IATAOrderViewRS;
 import com.ndc.channel.flight.xmlBean.flightSearch.request.bean.IATAAirShoppingRQ;
@@ -221,6 +223,27 @@ public class NdcApiTools {
             throw e;
         }catch (Exception e) {
             log.error("东方航空Ndc退票单查询异常", e);
+            return null;
+        }
+    }
+
+    /**
+     * 改签航班查询
+     * @param rq
+     * @return
+     */
+    public IATAOrderReshopRS changeFlightSearch(IATAOrderReshopRQ rq) {
+        try {
+
+            NdcAccountInfoData accountInfo = accountInfoMapper.selectByNdcCode("mu_ndc");
+
+            accountInfo.setNdcApiInfo(BusinessEnum.NdcApiInfo.CHANGE_FLIGHT_SEARCH);
+
+            return remote(accountInfo, rq, IATAOrderReshopRQ.class, IATAOrderReshopRS.class);
+        }catch (BusinessException e) {
+            throw e;
+        }catch (Exception e) {
+            log.error("东方航空Ndc改签航班查询异常", e);
             return null;
         }
     }
