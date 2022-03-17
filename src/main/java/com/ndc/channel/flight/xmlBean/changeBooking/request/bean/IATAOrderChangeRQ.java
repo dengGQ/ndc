@@ -6,6 +6,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import java.util.List;
 
 
 /**
@@ -48,6 +49,15 @@ public class IATAOrderChangeRQ {
     protected PayloadAttributes payloadAttributes;
     @XmlElement(name = "Request", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ", required = true)
     protected Request request;
+
+    public IATAOrderChangeRQ() {
+    }
+
+    public IATAOrderChangeRQ(List<String> contactInfoRefID) {
+        this.messageDoc = new MessageDoc();
+        this.party = new Party(contactInfoRefID);
+        this.payloadAttributes = new PayloadAttributes();
+    }
 
     /**
      * 获取messageDoc属性的值。

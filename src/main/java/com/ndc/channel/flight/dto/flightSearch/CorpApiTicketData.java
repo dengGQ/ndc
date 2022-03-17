@@ -82,6 +82,8 @@ public class CorpApiTicketData {
 	@ApiModelProperty(value = "价格类型, 0: 未知, 1: fdPrice, 2: nfdPrice", required = false)
 	private Byte priceType;
 
+	@ApiModelProperty(value = "改升总金额，改期查询有值")
+	private BigDecimal upgradeTotalAmount;
 
 	private String paxId;
 	private String offerItemId;

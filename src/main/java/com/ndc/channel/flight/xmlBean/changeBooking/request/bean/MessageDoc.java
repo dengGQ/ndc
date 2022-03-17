@@ -41,6 +41,11 @@ public class MessageDoc {
     @XmlElement(name = "RefVersionNumber", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ", required = true)
     protected String refVersionNumber;
 
+    public MessageDoc() {
+        this.name = "NDC_FLIGHT_ORDER_REBOOKING_VOLUNTARY";
+        this.refVersionNumber = "18.2";
+    }
+
     /**
      * 获取name属性的值。
      * 

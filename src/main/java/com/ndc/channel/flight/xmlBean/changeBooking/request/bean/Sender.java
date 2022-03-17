@@ -6,6 +6,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import java.util.List;
 
 
 /**
@@ -40,6 +41,13 @@ public class Sender {
     protected Aggregator aggregator;
     @XmlElement(name = "TravelAgency", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ", required = true)
     protected TravelAgency travelAgency;
+
+    public Sender() {
+    }
+
+    public Sender(List<String> contactInfoRefID) {
+        this.travelAgency = new TravelAgency(contactInfoRefID);
+    }
 
     /**
      * 获取aggregator属性的值。

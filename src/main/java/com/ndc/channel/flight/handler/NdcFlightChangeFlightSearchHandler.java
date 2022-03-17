@@ -16,6 +16,7 @@ import com.ndc.channel.flight.xmlBean.changeFlightSearch.response.bean.Error;
 import com.ndc.channel.flight.xmlBean.flightSearch.response.RemarkText;
 import com.ndc.channel.mapper.NdcFlightApiOrderRelMapper;
 import com.ndc.channel.redis.RedisKeyConstants;
+import com.ndc.channel.redis.RedisUtils;
 import com.ndc.channel.util.FlightKeyUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
@@ -40,6 +41,9 @@ public class NdcFlightChangeFlightSearchHandler {
 
     @Resource
     private NdcApiTools ndcApiTools;
+
+    @Resource
+    private RedisUtils redisUtils;
 
     @Resource
     private NdcFlightApiOrderRelMapper orderRelMapper;
@@ -127,7 +131,7 @@ public class NdcFlightChangeFlightSearchHandler {
         final Map<String, Map<String, String>> persistenceTicketDataMap = new HashMap<>(32);
         for (CorpApiFlightListDataV2 flightData : flightDataList) {
 
-            persistenceFlightDataMap.put(RedisKeyConstants.getRedisFlightDataCacheKey(flightData.getFlightId()), JSON.toJSONString(flightData));
+            persistenceFlightDataMap.put(RedisKeyConstants.getRedisFlightChangeDataCacheKey(flightData.getFlightId()), JSON.toJSONString(flightData));
 
             final Map<String, CorpApiTicketData> corpApiTicketMap = new HashMap<>();
 
@@ -193,11 +197,11 @@ public class NdcFlightChangeFlightSearchHandler {
             flightData.setTickets(ticketDataList);
 
             final Map<String, String> ticketStrMap = corpApiTicketMap.values().stream().collect(Collectors.toMap(CorpApiTicketData::getTicketId, v -> JSON.toJSONString(v)));
-            persistenceTicketDataMap.put(RedisKeyConstants.getRedisTicketDataCacheKey(flightData.getFlightId()), ticketStrMap);
+            persistenceTicketDataMap.put(RedisKeyConstants.getRedisTicketChangeDataCacheKey(flightData.getFlightId()), ticketStrMap);
         }
 
-//        redisUtils.multiSetAndExpire(persistenceFlightDataMap, TimeUnit.DAYS, 1);
-//        redisUtils.hPutAndExpireAt(persistenceTicketDataMap, TimeUnit.DAYS, 1);
+        redisUtils.multiSetAndExpire(persistenceFlightDataMap, TimeUnit.DAYS, 1);
+        redisUtils.hPutAndExpireAt(persistenceTicketDataMap, TimeUnit.DAYS, 1);
 
         return flightDataList;
     }
@@ -287,6 +291,9 @@ public class NdcFlightChangeFlightSearchHandler {
 
         final String offerItemID = offerItem.getOfferItemID();
 
+        final Price diffPrice = offerItem.getPrice();
+        final String upgradeTotalAmount = diffPrice.getTotalAmount().getValue();
+
         final ServiceDefinition seatSaleSd = serviceDefinitionList.stream().filter(sd -> sd.getName().equals("SEAT_SALE")).findFirst().orElse(null);
 
         final FareDetail fareDetail = offerItem.getFareDetail();
@@ -322,6 +329,7 @@ public class NdcFlightChangeFlightSearchHandler {
         CorpApiTicketPolicy corpApiTicketPolicy = parseTicketPolicy(fareRule);
         corpApiTicketPolicy.setFlightBaggageInfoData(baggageInfoData);
         ticketData.setPolicy(corpApiTicketPolicy);
+        ticketData.setUpgradeTotalAmount(new BigDecimal(upgradeTotalAmount));
 
         return ticketData;
     }

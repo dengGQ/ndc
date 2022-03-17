@@ -87,7 +87,7 @@ public class NdcFlightOrderPayHandler {
         }
 
         // 发布异步查询订单详情任务
-        detailDelayQueryExecutor.submitTask(JSON.toJSONString(new MsgBody(ndcFlightApiOrderRel.getOrderId(), "1")), 60L);
+        detailDelayQueryExecutor.submitTask(JSON.toJSONString(new MsgBody(ndcFlightApiOrderRel.getOrderId(), orderPayReqParams.getPayType())), 60L);
         return true;
     }
 }

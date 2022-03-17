@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ndc.channel.mapper.NdcFlightApiChangeOrderRelMapper" >
+  <resultMap id="BaseResultMap" type="com.ndc.channel.entity.NdcFlightApiChangeOrderRel" >
+    <id column="rel_id" property="relId" jdbcType="BIGINT" />
+    <result column="order_id" property="orderId" jdbcType="VARCHAR" />
+    <result column="order_item_id" property="orderItemId" jdbcType="VARCHAR" />
+    <result column="change_id" property="changeId" jdbcType="VARCHAR" />
+    <result column="owner_code" property="ownerCode" jdbcType="VARCHAR" />
+    <result column="owner_type_code" property="ownerTypeCode" jdbcType="VARCHAR" />
+    <result column="external_change_number" property="externalChangeNumber" jdbcType="VARCHAR" />
+    <result column="after_endorse_url" property="afterEndorseUrl" jdbcType="VARCHAR" />
+    <result column="upgrade_total_amount" property="upgradeTotalAmount" jdbcType="DECIMAL" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    rel_id, order_id, order_item_id, change_id, owner_code, owner_type_code, external_change_number, 
+    after_endorse_url, upgrade_total_amount, create_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from ndc_flight_api_change_order_rel
+    where rel_id = #{relId,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from ndc_flight_api_change_order_rel
+    where rel_id = #{relId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.ndc.channel.entity.NdcFlightApiChangeOrderRel" >
+    insert into ndc_flight_api_change_order_rel (rel_id, order_id, order_item_id, 
+      change_id, owner_code, owner_type_code, 
+      external_change_number, after_endorse_url, 
+      upgrade_total_amount, create_time)
+    values (#{relId,jdbcType=BIGINT}, #{orderId,jdbcType=VARCHAR}, #{orderItemId,jdbcType=VARCHAR}, 
+      #{changeId,jdbcType=VARCHAR}, #{ownerCode,jdbcType=VARCHAR}, #{ownerTypeCode,jdbcType=VARCHAR}, 
+      #{externalChangeNumber,jdbcType=VARCHAR}, #{afterEndorseUrl,jdbcType=VARCHAR}, 
+      #{upgradeTotalAmount,jdbcType=DECIMAL}, #{createTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ndc.channel.entity.NdcFlightApiChangeOrderRel" >
+    insert into ndc_flight_api_change_order_rel
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="relId != null" >
+        rel_id,
+      </if>
+      <if test="orderId != null" >
+        order_id,
+      </if>
+      <if test="orderItemId != null" >
+        order_item_id,
+      </if>
+      <if test="changeId != null" >
+        change_id,
+      </if>
+      <if test="ownerCode != null" >
+        owner_code,
+      </if>
+      <if test="ownerTypeCode != null" >
+        owner_type_code,
+      </if>
+      <if test="externalChangeNumber != null" >
+        external_change_number,
+      </if>
+      <if test="afterEndorseUrl != null" >
+        after_endorse_url,
+      </if>
+      <if test="upgradeTotalAmount != null" >
+        upgrade_total_amount,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="relId != null" >
+        #{relId,jdbcType=BIGINT},
+      </if>
+      <if test="orderId != null" >
+        #{orderId,jdbcType=VARCHAR},
+      </if>
+      <if test="orderItemId != null" >
+        #{orderItemId,jdbcType=VARCHAR},
+      </if>
+      <if test="changeId != null" >
+        #{changeId,jdbcType=VARCHAR},
+      </if>
+      <if test="ownerCode != null" >
+        #{ownerCode,jdbcType=VARCHAR},
+      </if>
+      <if test="ownerTypeCode != null" >
+        #{ownerTypeCode,jdbcType=VARCHAR},
+      </if>
+      <if test="externalChangeNumber != null" >
+        #{externalChangeNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="afterEndorseUrl != null" >
+        #{afterEndorseUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="upgradeTotalAmount != null" >
+        #{upgradeTotalAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ndc.channel.entity.NdcFlightApiChangeOrderRel" >
+    update ndc_flight_api_change_order_rel
+    <set >
+      <if test="orderId != null" >
+        order_id = #{orderId,jdbcType=VARCHAR},
+      </if>
+      <if test="orderItemId != null" >
+        order_item_id = #{orderItemId,jdbcType=VARCHAR},
+      </if>
+      <if test="changeId != null" >
+        change_id = #{changeId,jdbcType=VARCHAR},
+      </if>
+      <if test="ownerCode != null" >
+        owner_code = #{ownerCode,jdbcType=VARCHAR},
+      </if>
+      <if test="ownerTypeCode != null" >
+        owner_type_code = #{ownerTypeCode,jdbcType=VARCHAR},
+      </if>
+      <if test="externalChangeNumber != null" >
+        external_change_number = #{externalChangeNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="afterEndorseUrl != null" >
+        after_endorse_url = #{afterEndorseUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="upgradeTotalAmount != null" >
+        upgrade_total_amount = #{upgradeTotalAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where rel_id = #{relId,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ndc.channel.entity.NdcFlightApiChangeOrderRel" >
+    update ndc_flight_api_change_order_rel
+    set order_id = #{orderId,jdbcType=VARCHAR},
+      order_item_id = #{orderItemId,jdbcType=VARCHAR},
+      change_id = #{changeId,jdbcType=VARCHAR},
+      owner_code = #{ownerCode,jdbcType=VARCHAR},
+      owner_type_code = #{ownerTypeCode,jdbcType=VARCHAR},
+      external_change_number = #{externalChangeNumber,jdbcType=VARCHAR},
+      after_endorse_url = #{afterEndorseUrl,jdbcType=VARCHAR},
+      upgrade_total_amount = #{upgradeTotalAmount,jdbcType=DECIMAL},
+      create_time = #{createTime,jdbcType=TIMESTAMP}
+    where rel_id = #{relId,jdbcType=BIGINT}
+  </update>
+</mapper>

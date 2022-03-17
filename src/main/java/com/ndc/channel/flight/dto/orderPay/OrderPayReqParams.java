@@ -15,4 +15,7 @@ public class OrderPayReqParams {
 
     @ApiModelProperty(value = "订单号", required = true)
     private String orderNumber;
+
+    @ApiModelProperty(value = "支付类型，1-预定，2-改签", required = false, hidden = true)
+    private String payType;
 }

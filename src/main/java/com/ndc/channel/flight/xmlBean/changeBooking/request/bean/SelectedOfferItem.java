@@ -6,6 +6,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import java.util.List;
 
 
 /**
@@ -43,7 +44,7 @@ public class SelectedOfferItem {
     @XmlElement(name = "OfferItemRefID", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ", required = true)
     protected String offerItemRefID;
     @XmlElement(name = "PaxRefID", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ", required = true)
-    protected String paxRefID;
+    protected List<String> paxRefID;
     @XmlElement(name = "SelectedALaCarteOfferItem", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ", required = true)
     protected SelectedALaCarteOfferItem selectedALaCarteOfferItem;
     @XmlElement(name = "SelectedBundleServices", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderChangeRQ", required = true)
@@ -73,28 +74,12 @@ public class SelectedOfferItem {
         this.offerItemRefID = value;
     }
 
-    /**
-     * 获取paxRefID属性的值。
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getPaxRefID() {
+    public List<String> getPaxRefID() {
         return paxRefID;
     }
 
-    /**
-     * 设置paxRefID属性的值。
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setPaxRefID(String value) {
-        this.paxRefID = value;
+    public void setPaxRefID(List<String> paxRefID) {
+        this.paxRefID = paxRefID;
     }
 
     /**

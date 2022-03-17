@@ -3,6 +3,7 @@ package com.ndc.channel.flight.controller;
 import com.ndc.channel.exception.BusinessException;
 import com.ndc.channel.flight.dto.BusinessResponseFactory;
 import com.ndc.channel.flight.dto.ResponseData;
+import com.ndc.channel.flight.dto.changeBooking.ChangeBookingReqParams;
 import com.ndc.channel.flight.dto.changeFlightSearch.ChangeFlightQueryReq;
 import com.ndc.channel.flight.dto.createOrder.CorpApiFlightOrderCreateData;
 import com.ndc.channel.flight.dto.createOrder.FlightOrderCreateReq;
@@ -46,6 +47,8 @@ public class MuNdcFlightController {
     private NdcFlightOrderRefundHandler orderRefundHandler;
     @Resource
     private NdcFlightChangeFlightSearchHandler changeFlightSearchHandler;
+    @Resource
+    private NdcFlightChangeBooingHandler changeBooingHandler;
 
     @PostMapping("/corpapi/flight/search")
     @ApiOperation(value = "航班查询", notes = "航班查询", httpMethod = "POST", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -99,7 +102,7 @@ public class MuNdcFlightController {
     public ResponseData<Boolean> orderPay(@RequestBody OrderPayReqParams payReqParams) {
 
         try {
-
+            payReqParams.setPayType("1");
             final Boolean result = orderPayHandler.orderPay(payReqParams);
 
             return BusinessResponseFactory.createSuccess(result);
@@ -160,8 +163,8 @@ public class MuNdcFlightController {
     }
 
     @PostMapping("/corpapi/flight/change/search")
-    @ApiOperation(value = "航班查询", notes = "航班查询", httpMethod = "POST", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseData<List<CorpApiFlightListDataV2>> changeflightSearch(@RequestBody ChangeFlightQueryReq searchReq) {
+    @ApiOperation(value = "改签航班查询", notes = "改签航班查询", httpMethod = "POST", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseData<List<CorpApiFlightListDataV2>> changeFlightSearch(@RequestBody ChangeFlightQueryReq searchReq) {
         try {
 
             final List<CorpApiFlightListDataV2> flightListDataV2List = changeFlightSearchHandler.changeFlightSearch(searchReq);
@@ -174,4 +177,34 @@ public class MuNdcFlightController {
         }
     }
 
+    @PostMapping("/corpapi/flight/change/create")
+    @ApiOperation(value = "改签预定", httpMethod = "POST", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseData<String> changeBooking(@RequestBody ChangeBookingReqParams params) {
+        try {
+
+            final String changeOrderId = changeBooingHandler.changeBooking(params);
+
+            return BusinessResponseFactory.createSuccess(changeOrderId);
+        }catch (BusinessException exception) {
+
+            log.error("东航NDC改签预定失败，失败原因={}", exception.getMessage());
+            return BusinessResponseFactory.createBusinessError(exception);
+        }
+    }
+
+    @PostMapping("/corpapi/flight/change/confirm")
+    @ApiOperation(value = "改签支付", httpMethod = "POST", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseData<Boolean> changePay(@RequestBody OrderPayReqParams payReqParams) {
+        try {
+
+            payReqParams.setPayType("2");
+            final Boolean result = orderPayHandler.orderPay(payReqParams);
+
+            return BusinessResponseFactory.createSuccess(result);
+        }catch (BusinessException exception) {
+
+            log.error("东航NDC改签支付失败，失败原因={}", exception.getMessage());
+            return BusinessResponseFactory.createBusinessError(exception);
+        }
+    }
 }
