@@ -86,8 +86,8 @@ public class NdcFlightRefundOrderDetailHandler implements NdcOrderDetailHandler{
 
             Map<String, PenaltyAmount> penaltyAmountMap = ticketDocInfo.getPenalty().stream().collect(Collectors.toMap(Penalty::getTypeCode, Penalty::getPenaltyAmount));
 
-            PenaltyAmount penaltyAmountRefund = penaltyAmountMap.get(BusinessEnum.ChangeRefundTypeCode.CANCELLATION.getCode());
-            PenaltyAmount penaltyAmountChange = penaltyAmountMap.get(BusinessEnum.ChangeRefundTypeCode.CHANGE.getCode());
+            PenaltyAmount penaltyAmountRefund = Optional.ofNullable(penaltyAmountMap.get(BusinessEnum.ChangeRefundTypeCode.CANCELLATION.getCode())).orElseGet(PenaltyAmount::new);
+            PenaltyAmount penaltyAmountChange = Optional.ofNullable(penaltyAmountMap.get(BusinessEnum.ChangeRefundTypeCode.CHANGE.getCode())).orElseGet(PenaltyAmount::new);
 
             BigDecimal refundFee = new BigDecimal(Optional.ofNullable(penaltyAmountRefund.getValue()).orElse("0"));
             BigDecimal changeFee = new BigDecimal(Optional.ofNullable(penaltyAmountChange.getValue()).orElse("0"));

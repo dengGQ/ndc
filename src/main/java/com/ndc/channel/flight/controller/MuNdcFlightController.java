@@ -148,7 +148,7 @@ public class MuNdcFlightController {
 
     @PostMapping("/corpapi/flight/queryRefundChangeFee")
     @ApiOperation(value = "退改费用查询", httpMethod = "POST", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseData<RefundChangeMoneyQueryResp> refundChangeFeeQuery(@RequestBody @RequestParam RefundChangeMoneyQueryParams params) {
+    public ResponseData<RefundChangeMoneyQueryResp> refundChangeFeeQuery(@RequestBody RefundChangeMoneyQueryParams params) {
 
         try {
 

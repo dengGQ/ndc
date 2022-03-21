@@ -12,8 +12,6 @@ import com.ndc.channel.flight.xmlBean.flightSearch.common.Error;
 import com.ndc.channel.flight.xmlBean.flightSearch.request.bean.*;
 import com.ndc.channel.flight.xmlBean.flightSearch.response.RemarkText;
 import com.ndc.channel.flight.xmlBean.flightSearch.response.bean.*;
-import com.ndc.channel.mapper.NdcAccountInfoMapper;
-import com.ndc.channel.model.NdcAccountInfoData;
 import com.ndc.channel.redis.RedisKeyConstants;
 import com.ndc.channel.redis.RedisUtils;
 import com.ndc.channel.util.FlightKeyUtils;
@@ -26,10 +24,9 @@ import javax.annotation.Resource;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.Duration;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -174,11 +171,12 @@ public class NdcFlightSearchHandler {
                     ticketData.setPriceClassDesc(priceClass.getDesc().getDescText());
                     ticketData.setFareTypeCode(fareTypeCode);
 
-                    List<TaxSummary> taxSummary = offerItem.getPrice().getTaxSummary();
+                    TaxSummary taxSummary = offerItem.getPrice().getTaxSummary();
+                    final Map<String, Tax> taxMap = taxSummary.getTax().stream().collect(Collectors.toMap(Tax::getTaxCode, Function.identity()));
 
+                    ticketData.setBuildFee(Optional.ofNullable(taxMap.get("CN").getAmount().getValue()).orElse(BigDecimal.ZERO));
+                    ticketData.setOilFee(Optional.ofNullable(taxMap.get("YQ").getAmount().getValue()).orElse(BigDecimal.ZERO));
                     corpApiTicketMap.put(ticketData.getTicketId(), ticketData);
-                    BigDecimal BuildFee = taxSummary.stream().map(t->new BigDecimal(t.getTotalTaxAmount().getValue())).reduce(BigDecimal::add).orElse(BigDecimal.ZERO);
-                    flightData.setBuildFee(BuildFee);
                 }
             }
 
@@ -188,6 +186,8 @@ public class NdcFlightSearchHandler {
             flightData.setOilFee(BigDecimal.ZERO);
             List<CorpApiTicketData> ticketDataList = corpApiTicketMap.values().stream().collect(Collectors.toList());
 
+            flightData.setBuildFee(ticketDataList.get(0).getBuildFee());
+            flightData.setOilFee(ticketDataList.get(0).getOilFee());
             final boolean isPresent = ticketDataList.get(0).getServiceDefinitionList().stream().filter(serviceDef -> BusinessEnum.ServiceName.MEAL.name().equals(serviceDef.getName())).findFirst().isPresent();
             flightData.setMealType(isPresent ? "1" : "0");
             flightData.setTickets(ticketDataList);
@@ -303,15 +303,20 @@ public class NdcFlightSearchHandler {
         ticketData.setMainClassCode(cabinType.getCabinTypeCode());
         ticketData.setMainClassName(cabinType.getCabinTypeName());
         ticketData.setIsWebSite("1");
+
         ticketData.setSeatClassName(ticketData.getMainClassName());
         ticketData.setProductType(BusinessEnum.ProductType.WEBSITE.getCode());
         ticketData.setQuantity(seatSaleSd.getServiceDefinitionAssociation().getServiceBundle().getMaximumServiceQty());
         ticketData.setTicketPrice(new BigDecimal(baseAmount.getValue()));
         ticketData.setPrice(ticketData.getTicketPrice());
         ticketData.setPurchasePrice(ticketData.getTicketPrice());
-//        ticketData.setDiscount(ticketData.getTicketPrice().divide(ticketData.getFdPrice(),2, RoundingMode.HALF_UP));
         ticketData.setTicketId(FlightKeyUtils.getTicketId(flightId, ticketData.getProductType(), ticketData.getSeatClassCode(), offerItemID));
-
+        if (discount != null) {
+            ticketData.setFdPrice(discount.getDiscountAmount().getValue());
+        }else {
+            ticketData.setFdPrice(ticketData.getTicketPrice());
+        }
+        ticketData.setDiscount(ticketData.getTicketPrice().divide(ticketData.getFdPrice(),2, RoundingMode.HALF_UP));
         ticketData.setOfferItemId(offerItemID);
 
         FlightBaggageInfoData baggageInfoData = new FlightBaggageInfoData();
@@ -487,9 +492,9 @@ public class NdcFlightSearchHandler {
         AffinityDepRequest affinityDepRequest = new AffinityDepRequest();
 
         CountrySubDivision countrySubDivisionDep = new CountrySubDivision();
-        countrySubDivisionDep.setCountrySubDivisionCode("");
+        countrySubDivisionDep.setCountrySubDivisionCode(depCityCode);
         Station stationDep = new Station();
-        stationDep.setIATALocationCode(depCityCode);
+        stationDep.setIATALocationCode("");
         affinityDepRequest.setStation(stationDep);
         affinityDepRequest.setCountrySubDivision(countrySubDivisionDep);
         affinityDepRequest.setDate(flightDate);
@@ -497,9 +502,9 @@ public class NdcFlightSearchHandler {
 
         AffinityArrivalRequest affinityArrivalRequest = new AffinityArrivalRequest();
         CountrySubDivision countrySubDivision = new CountrySubDivision();
-        countrySubDivision.setCountrySubDivisionCode("");
+        countrySubDivision.setCountrySubDivisionCode(destCityCode);
         Station station = new Station();
-        station.setIATALocationCode(destCityCode);
+        station.setIATALocationCode("");
         affinityArrivalRequest.setCountrySubDivision(countrySubDivision);
         affinityArrivalRequest.setStation(station);
         affinityOriginDest.setAffinityArrivalRequest(affinityArrivalRequest);

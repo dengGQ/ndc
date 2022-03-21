@@ -2,15 +2,10 @@ package com.ndc.channel.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.ndc.channel.entity.NdcFlightApiChangeOrderRel;
-import com.ndc.channel.entity.NdcFlightApiRefundOrderRel;
 import com.ndc.channel.flight.dto.changeBooking.ChangeBookingReqParams;
-import com.ndc.channel.flight.dto.refund.RefundApplyParams;
-import com.ndc.channel.flight.dto.refund.RefundChangeMoneyQueryResp;
 import com.ndc.channel.flight.xmlBean.changeBooking.response.bean.Order;
 import com.ndc.channel.mapper.NdcFlightApiChangeOrderRelMapper;
-import com.ndc.channel.mapper.NdcFlightApiRefundOrderRelMapper;
 import com.ndc.channel.service.NdcFlightApiChangeOrderRelService;
-import com.ndc.channel.service.NdcFlightApiRefundOrderRelService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 

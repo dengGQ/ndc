@@ -1,11 +1,8 @@
 package com.ndc.channel.flight.handler;
 
-import com.alibaba.fastjson.JSON;
 import com.ndc.channel.enumtype.BusinessEnum;
 import com.ndc.channel.exception.BusinessException;
 import com.ndc.channel.exception.BusinessExceptionCode;
-import com.ndc.channel.executor.OrderDetailDelayQueryExecutor;
-import com.ndc.channel.flight.dto.MsgBody;
 import com.ndc.channel.flight.dto.createOrder.*;
 import com.ndc.channel.flight.dto.flightSearch.CorpApiFlightListDataV2;
 import com.ndc.channel.flight.dto.flightSearch.CorpApiTicketData;
@@ -29,7 +26,6 @@ import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 

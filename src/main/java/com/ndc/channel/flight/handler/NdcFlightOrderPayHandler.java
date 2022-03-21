@@ -14,10 +14,8 @@ import com.ndc.channel.flight.xmlBean.orderPay.response.bean.IATAOrderViewRS;
 import com.ndc.channel.mapper.NdcAccountInfoMapper;
 import com.ndc.channel.mapper.NdcFlightApiOrderRelMapper;
 import com.ndc.channel.model.NdcAccountInfoData;
-import com.ndc.channel.redis.RedisUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
 
 import javax.annotation.Resource;
 import java.util.UUID;

@@ -1,11 +1,13 @@
 
 package com.ndc.channel.flight.xmlBean.flightSearch.response.bean;
 
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import java.util.List;
 
 
 /**
@@ -31,7 +33,8 @@ import javax.xml.bind.annotation.XmlType;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
     "approximateInd",
-    "totalTaxAmount"
+    "totalTaxAmount",
+    "tax"
 })
 @XmlRootElement(name = "TaxSummary", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_AirShoppingRS")
 public class TaxSummary {
@@ -40,6 +43,10 @@ public class TaxSummary {
     protected String approximateInd;
     @XmlElement(name = "TotalTaxAmount", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_AirShoppingRS", required = true)
     protected TotalTaxAmount totalTaxAmount;
+
+    @XmlElement(name = "Tax", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_AirShoppingRS", required = true)
+    protected List<Tax> tax;
+
 
     /**
      * 获取approximateInd属性的值。
@@ -89,4 +96,11 @@ public class TaxSummary {
         this.totalTaxAmount = value;
     }
 
+    public List<Tax> getTax() {
+        return tax;
+    }
+
+    public void setTax(List<Tax> tax) {
+        this.tax = tax;
+    }
 }

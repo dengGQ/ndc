@@ -46,7 +46,7 @@ public class Price {
     @XmlElement(name = "Discount", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_AirShoppingRS")
     protected Discount discount;
     @XmlElement(name = "TaxSummary", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_AirShoppingRS")
-    protected List<TaxSummary> taxSummary;
+    protected TaxSummary taxSummary;
     @XmlElement(name = "TotalAmount", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_AirShoppingRS", required = true)
     protected TotalAmount totalAmount;
 
@@ -66,11 +66,11 @@ public class Price {
         this.discount = discount;
     }
 
-    public List<TaxSummary> getTaxSummary() {
+    public TaxSummary getTaxSummary() {
         return taxSummary;
     }
 
-    public void setTaxSummary(List<TaxSummary> taxSummary) {
+    public void setTaxSummary(TaxSummary taxSummary) {
         this.taxSummary = taxSummary;
     }
 

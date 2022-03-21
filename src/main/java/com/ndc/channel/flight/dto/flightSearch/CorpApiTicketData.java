@@ -82,6 +82,12 @@ public class CorpApiTicketData {
 	@ApiModelProperty(value = "价格类型, 0: 未知, 1: fdPrice, 2: nfdPrice", required = false)
 	private Byte priceType;
 
+	@ApiModelProperty(value = "机建费")
+	private BigDecimal buildFee;
+
+	@ApiModelProperty(value = "燃油费")
+	private BigDecimal oilFee;
+
 	@ApiModelProperty(value = "改升总金额，改期查询有值")
 	private BigDecimal upgradeTotalAmount;
 

@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.util.Map;
 import java.util.Set;
@@ -40,15 +41,19 @@ public class OrderDetailDelayQueryExecutor {
 
     private DelayTask delayTask = new DelayTask();
 
+    @PostConstruct
+    public void initWorker() {
+        th = new Thread(delayTask);
+        th.setDaemon(true);
+        th.start();
+    }
+
     public void submitTask(String msgBody, long delaySecond) {
 
         redisUtils.zsetAddWithScore(orderStatusQueryKey, msgBody, System.currentTimeMillis() / 1000 + delaySecond);
 
         if (th == null || th.getState() == Thread.State.TERMINATED) {
-
-            th = new Thread(delayTask);
-            th.setDaemon(true);
-            th.start();
+            initWorker();
         }
     }
 

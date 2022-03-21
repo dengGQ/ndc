@@ -1,12 +1,7 @@
 
 package com.ndc.channel.flight.xmlBean.flightSearch.response.bean;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.XmlValue;
+import javax.xml.bind.annotation.*;
 import java.math.BigDecimal;
 
 
@@ -31,8 +26,8 @@ import java.math.BigDecimal;
 @XmlType(name = "", propOrder = {
     "value"
 })
-@XmlRootElement(name = "DiscountAmount", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_AirShoppingRS")
-public class DiscountAmount {
+@XmlRootElement(name = "Amount", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_AirShoppingRS")
+public class Amount {
 
     @XmlValue
     protected BigDecimal value;
