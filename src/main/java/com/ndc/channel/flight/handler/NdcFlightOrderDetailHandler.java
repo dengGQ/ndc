@@ -78,7 +78,7 @@ public class NdcFlightOrderDetailHandler implements NdcOrderDetailHandler{
             final Pax pax = paxMap.get(paxRefID);
             final IdentityDoc identityDoc = pax.getIdentityDoc();
 
-            final BookingRef bookingRef = tf.getBookingRef();
+            final BookingRef bookingRef = tf.getBookingRef().stream().filter(bf->bf.getBookingRefTypeCode().equals("6")).findFirst().get();
             final String pnrCode = bookingRef.getBookingID();
 
             final Ticket ticket = tf.getTicket();

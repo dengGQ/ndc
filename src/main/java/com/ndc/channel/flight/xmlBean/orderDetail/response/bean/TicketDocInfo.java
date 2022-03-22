@@ -47,7 +47,7 @@ import javax.xml.bind.annotation.XmlType;
 public class TicketDocInfo {
 
     @XmlElement(name = "BookingRef", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderViewRS", required = true)
-    protected BookingRef bookingRef;
+    protected List<BookingRef> bookingRef;
     @XmlElement(name = "FareDetail", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderViewRS", required = true)
     protected FareDetail fareDetail;
     @XmlElement(name = "PaxRefID", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderViewRS", required = true)
@@ -67,7 +67,7 @@ public class TicketDocInfo {
      *     {@link BookingRef }
      *     
      */
-    public BookingRef getBookingRef() {
+    public List<BookingRef> getBookingRef() {
         return bookingRef;
     }
 
@@ -79,7 +79,7 @@ public class TicketDocInfo {
      *     {@link BookingRef }
      *     
      */
-    public void setBookingRef(BookingRef value) {
+    public void setBookingRef(List<BookingRef> value) {
         this.bookingRef = value;
     }
 

@@ -223,7 +223,8 @@ public class NdcFlightSearchHandler {
         Map<String, List<DatedOperatingLeg>> legMapping = paxSegment.getDatedOperatingLeg().stream().collect(Collectors.groupingBy(leg -> StringUtils.isEmpty(leg.getOnGroundDuration()) ? "0" : "1"));
         CarrierAircraftType carrierAircraftType = legMapping.get("0").get(0).getCarrierAircraftType();
 
-        String flightNumber = marketingCarrierInfo.getCarrierDesigCode() + marketingCarrierInfo.getMarketingCarrierFlightNumberText();
+        final String carrierDesigCode = marketingCarrierInfo.getCarrierDesigCode();
+        String flightNumber = carrierDesigCode + marketingCarrierInfo.getMarketingCarrierFlightNumberText();
         // T: 共享航班 F：非共享航班
         final String operationalSuffixText = marketingCarrierInfo.getOperationalSuffixText();
 
@@ -231,11 +232,11 @@ public class NdcFlightSearchHandler {
 
         corpApiFlight.setFlightDate(flightDate);
         corpApiFlight.setFlightNumber(flightNumber);
-        corpApiFlight.setAirlineCode(marketingCarrierInfo.getCarrierDesigCode());
-        corpApiFlight.setAirlineShortName("东方航空");
 
+        corpApiFlight.setAirlineCode(carrierDesigCode);
+        corpApiFlight.setAirlineShortName(carrierDesigCode.equals("MU")?"东方航空":"上海航空");
 
-        corpApiFlight.setTpm(null);
+//        corpApiFlight.setTpm(null);
         corpApiFlight.setPlaneType(carrierAircraftType.getCarrierAircraftTypeName());
 //        corpApiFlight.setMealType(null);
 
@@ -275,7 +276,7 @@ public class NdcFlightSearchHandler {
         corpApiFlight.setMainAirlineCode(operatingCarrierInfo.getCarrierDesigCode());
 
         corpApiFlight.setMainFlightNumber(operationCarrierFlightNumber);
-        corpApiFlight.setMainAirlineShortName("东方航空");
+        corpApiFlight.setMainAirlineShortName(operatingCarrierInfo.getCarrierDesigCode().equals("MU")?"东方航空":"上海航空");
 
         corpApiFlight.setFlightId(FlightKeyUtils.getFlightId(flightDate, departureTime, arriveTime, flightNumber, corpApiFlight.getDepartureAirportCode(), corpApiFlight.getDestinationAirportCode()));
         return corpApiFlight;

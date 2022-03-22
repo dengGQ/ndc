@@ -3,6 +3,7 @@ package com.ndc.channel.executor;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.ndc.channel.enumtype.BusinessEnum;
+import com.ndc.channel.exception.BusinessException;
 import com.ndc.channel.flight.dto.MsgBody;
 import com.ndc.channel.flight.dto.orderDetail.NdcOrderDetailData;
 import com.ndc.channel.flight.handler.NdcFlightOrderDetailHandler;
@@ -67,14 +68,17 @@ public class OrderDetailDelayQueryExecutor {
 
         NdcOrderDetailHandler detailHandler = orderDetailHandlerMap.get( ORDER_DETAIL_HANDLER_NAME_PREFIX + msgType);
 
-        NdcOrderDetailData ndcOrderDetailData = detailHandler.orderDetail(businessNumber);
-        log.info("NDC订单明细查询结果={}", JSON.toJSONString(ndcOrderDetailData));
+        try {
+            NdcOrderDetailData ndcOrderDetailData = detailHandler.orderDetail(businessNumber);
+            log.info("NDC订单明细查询结果={}", JSON.toJSONString(ndcOrderDetailData));
+            if (detailHandler.checkStatusComplete(ndcOrderDetailData)) {
 
-        if (detailHandler.checkStatusComplete(ndcOrderDetailData)) {
+                detailHandler.statusChangeNotice(ndcOrderDetailData);
+            }else {
 
-            detailHandler.statusChangeNotice(ndcOrderDetailData);
-        }else {
-
+                this.submitTask(msgBody, 60*10);
+            }
+        }catch (BusinessException e) {
             this.submitTask(msgBody, 60*10);
         }
     }
