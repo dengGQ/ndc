@@ -37,6 +37,9 @@ public class NdcApiTools {
     @Resource
     private NdcAccountInfoMapper accountInfoMapper;
 
+    @Resource
+    private ChannelOKHttpService channelOKHttpService;
+
     /**
      * 航班查询
      * @param rq
@@ -275,8 +278,7 @@ public class NdcApiTools {
         marshaller.marshal(rq, stringWriter);
 
         String url = accountInfo.getApiUrl()+accountInfo.getNdcApiInfo().getApiPath();
-        String xmlParams1 = stringWriter.toString();
-        ChannelOKHttpService channelOKHttpService = new ChannelOKHttpService();
+        String xmlParams = stringWriter.toString();
         Map<String, String> headers = new HashMap<>();
         headers.put("timeStamp", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
         headers.put("requestId", UUID.randomUUID().toString());
@@ -284,13 +286,13 @@ public class NdcApiTools {
         headers.put("chnlCode", accountInfo.getChnlCode());
         headers.put("Authorization", accountInfo.getAuthorization());
         headers.put("apiCode", accountInfo.getNdcApiInfo().getApiCode());
-        String resp = channelOKHttpService.doPostXml(url, xmlParams1, headers);
+        String resp = channelOKHttpService.doPostXml(url, xmlParams, headers);
 
         String respLog = resp;
         if (accountInfo.getNdcApiInfo().getApiCode().equals("A0534")) {
             respLog = "内容太大隐藏";
         }
-        log.info("url={}, req={}, rep={}", url, xmlParams1, respLog);
+        log.info("url={}, req={}, rep={}", url, xmlParams, respLog);
 
         JAXBContext jaxbContext1 = JAXBContext.newInstance(respClazz);
         final Unmarshaller unmarshaller = jaxbContext1.createUnmarshaller();
