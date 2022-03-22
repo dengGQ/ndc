@@ -36,6 +36,7 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Slf4j
 @Component
@@ -65,15 +66,8 @@ public class NdcFlightOrderRefundHandler {
 
         final NdcFlightApiOrderRel orderRel = apiOrderRelMapper.selectByOrderId(params.getOrderNumber());
 
-        final List<String> ticketNumberList = params.getRefundPassengerList().stream().map(RefundApplyPassengerParams::getTicketNumber).collect(Collectors.toList());
-
-        final RefundChangeMoneyQueryResp refundChangeMoneyQueryResp = JSONObject.parseObject(redisUtils.getString(getKey(orderRel.getOrderId(), ticketNumberList)), RefundChangeMoneyQueryResp.class);
-
-        if (refundChangeMoneyQueryResp == null) {
-            throw new BusinessException(BusinessExceptionCode.REQUEST_PARAM_ERROR, "您的操作耗时太久了，请刷新页面重试！");
-        }
-
-        final Response refundApplyResponse = refundApply(orderRel.getOrderId());
+        List<String> ticketNumberListRefund = params.getRefundPassengerList().stream().map(RefundApplyPassengerParams::getTicketNumber).collect(Collectors.toList());
+        Response refundApplyResponse = refundApply(orderRel.getOrderId(), ticketNumberListRefund);
 
         com.ndc.channel.flight.xmlBean.refundConfirm.request.bean.Request request = getRefundConfirmReqData(params, refundApplyResponse, orderRel);
 
@@ -93,7 +87,7 @@ public class NdcFlightOrderRefundHandler {
         final com.ndc.channel.flight.xmlBean.refundConfirm.response.bean.Order order = refundConfirmResponse.getOrder();
         final String refundId = order.getOrderID();
 
-        refundOrderRelService.insertEntity(params, orderRel.getOrderId(), refundId, refundChangeMoneyQueryResp);
+        refundOrderRelService.insertEntity(params, orderRel.getOrderId(), refundId);
 
         delayQueryExecutor.submitTask(JSON.toJSONString(new MsgBody(orderRel.getOrderId(), "2")), 60L);
 
@@ -109,7 +103,7 @@ public class NdcFlightOrderRefundHandler {
 
         NdcFlightApiOrderRel ndcOrderRel = apiOrderRelMapper.selectByOrderId(params.getChannelOrderNumber());
 
-        final Response refundApplyResp = refundApply(params.getChannelOrderNumber());
+        final Response refundApplyResp = refundApply(params.getChannelOrderNumber(), params.getTicketNumList());
 
         final DataLists dataLists = refundApplyResp.getDataLists();
 
@@ -141,21 +135,21 @@ public class NdcFlightOrderRefundHandler {
         resp = getRefundChangeMoneyQueryResp(params.getTicketNumList(), ticketDocInfoList);
 
 
-        redisUtils.setStrExpire(getKey(ndcOrderRel.getOrderId(), params.getTicketNumList()), JSON.toJSONString(resp), 5, TimeUnit.MINUTES);
+//        redisUtils.setStrExpire(getKey(ndcOrderRel.getOrderId(), params.getTicketNumList()), JSON.toJSONString(resp), 5, TimeUnit.MINUTES);
 
         return resp;
     }
 
-    private static String getKey(String orderId, List<String> ticketNumber) {
+    /*private static String getKey(String orderId, List<String> ticketNumber) {
         return new StringBuilder(orderId).append("-").append(ticketNumber.stream().sorted().collect(Collectors.joining(","))).toString();
-    }
+    }*/
 
     /**
      * 机票退票申请
      * @param orderId
      * @return
      */
-    private Response refundApply(String orderId) {
+    private Response refundApply(String orderId, List<String> ticketNumberList) {
 
         NdcFlightApiOrderRel ndcFlightApiOrderRel = apiOrderRelMapper.selectByOrderId(orderId);
 
@@ -170,17 +164,23 @@ public class NdcFlightOrderRefundHandler {
 
         Response response = refundApplyResult.getResponse();
 
-        Ticket ticket = response.getOrderAmendment().getTicketDocInfo().getTicket();
-        Coupon coupon = ticket.getCoupon();
-        //客票状态
-        String couponStatusCode = coupon.getCouponStatusCode();
 
-        // 不可退标识，true不可退，false可退
-        Boolean nonRefundableInd = coupon.getNonRefundableInd();
+        for (TicketDocInfo ticketDocInfo : response.getOrderAmendment().getTicketDocInfo()) {
+            Ticket ticket = ticketDocInfo.getTicket();
+            Coupon coupon = ticket.getCoupon();
+            //客票状态
+            String couponStatusCode = coupon.getCouponStatusCode();
 
-        if (nonRefundableInd) {
-            throw new BusinessException(BusinessExceptionCode.REQUEST_PARAM_ERROR, "不可退，客票状态（"+BusinessEnum.TicketStatus.getLabelByCode(couponStatusCode)+")");
+            // 不可退标识，true不可退，false可退
+            Boolean nonRefundableInd = coupon.getNonRefundableInd();
+
+            // 客票状态描述
+            String labelByCode = BusinessEnum.TicketStatus.getLabelByCode(couponStatusCode);
+            if (nonRefundableInd && ticketNumberList.contains(ticket.getTicketNumber())) {
+                throw new BusinessException(BusinessExceptionCode.REQUEST_PARAM_ERROR, "票号（"+ticket.getTicketNumber()+"）不可退，客票状态（"+labelByCode+")");
+            }
         }
+
         return response;
 
     }

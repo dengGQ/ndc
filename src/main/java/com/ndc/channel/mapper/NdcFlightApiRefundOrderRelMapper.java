@@ -1,6 +1,5 @@
 package com.ndc.channel.mapper;
 
-import com.ndc.channel.entity.NdcFlightApiOrderRel;
 import com.ndc.channel.entity.NdcFlightApiRefundOrderRel;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;

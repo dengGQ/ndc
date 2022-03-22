@@ -6,6 +6,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import java.util.List;
 
 
 /**
@@ -53,9 +54,9 @@ public class OrderAmendment {
     @XmlElement(name = "OwnerTypeCode", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderViewRS", required = true)
     protected String ownerTypeCode;
     @XmlElement(name = "PaxRefID", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderViewRS", required = true)
-    protected String paxRefID;
+    protected List<String> paxRefID;
     @XmlElement(name = "TicketDocInfo", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderViewRS", required = true)
-    protected TicketDocInfo ticketDocInfo;
+    protected List<TicketDocInfo> ticketDocInfo;
 
     /**
      * 获取actionTypeCode属性的值。
@@ -153,52 +154,19 @@ public class OrderAmendment {
         this.ownerTypeCode = value;
     }
 
-    /**
-     * 获取paxRefID属性的值。
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getPaxRefID() {
+    public List<String> getPaxRefID() {
         return paxRefID;
     }
 
-    /**
-     * 设置paxRefID属性的值。
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setPaxRefID(String value) {
-        this.paxRefID = value;
+    public void setPaxRefID(List<String> paxRefID) {
+        this.paxRefID = paxRefID;
     }
 
-    /**
-     * 获取ticketDocInfo属性的值。
-     * 
-     * @return
-     *     possible object is
-     *     {@link TicketDocInfo }
-     *     
-     */
-    public TicketDocInfo getTicketDocInfo() {
+    public List<TicketDocInfo> getTicketDocInfo() {
         return ticketDocInfo;
     }
 
-    /**
-     * 设置ticketDocInfo属性的值。
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link TicketDocInfo }
-     *     
-     */
-    public void setTicketDocInfo(TicketDocInfo value) {
-        this.ticketDocInfo = value;
+    public void setTicketDocInfo(List<TicketDocInfo> ticketDocInfo) {
+        this.ticketDocInfo = ticketDocInfo;
     }
-
 }

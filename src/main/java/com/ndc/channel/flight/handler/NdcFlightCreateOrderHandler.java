@@ -65,6 +65,8 @@ public class NdcFlightCreateOrderHandler {
 
         final Response response = orderViewRS.getResponse();
         final Order order = response.getOrder();
+        final TicketDocInfo ticketDocInfo = response.getTicketDocInfo();
+
         final OrderItem orderItem = order.getOrderItem();
 
         // 交易订单号
@@ -86,6 +88,10 @@ public class NdcFlightCreateOrderHandler {
         orderCreateData.setTktl(paymentTimeLimitDateTime);
         orderCreateData.setOwnerCode(order.getOwnerCode());
         orderCreateData.setOwnerTypeCode(order.getOwnerTypeCode());
+
+        BookingRef bookingRef = ticketDocInfo.getBookingRef().stream().filter(bf->bf.getBookingRefTypeCode().equals("6")).findFirst().get();
+        String pnrCode = bookingRef.getBookingID();
+        orderCreateData.setPnrNo(pnrCode);
 
         // NDC订单关键信息保存
         orderRelService.insertEntity(orderCreateReq, orderCreateData);

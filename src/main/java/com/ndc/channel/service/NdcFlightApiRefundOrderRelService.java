@@ -9,5 +9,5 @@ import java.math.BigDecimal;
 
 public interface NdcFlightApiRefundOrderRelService {
 
-    void insertEntity(RefundApplyParams params, String orderId, String refundId, RefundChangeMoneyQueryResp refundMoneyData);
+    void insertEntity(RefundApplyParams params, String orderId, String refundId);
 }

@@ -21,7 +21,7 @@ public class NdcFlightApiRefundOrderRelServiceImpl implements NdcFlightApiRefund
     private NdcFlightApiRefundOrderRelMapper apiRefundOrderRelMapper;
 
     @Override
-    public void insertEntity(RefundApplyParams params, String orderId, String refundId, RefundChangeMoneyQueryResp refundMoneyData) {
+    public void insertEntity(RefundApplyParams params, String orderId, String refundId) {
 
         try {
             NdcFlightApiRefundOrderRel rel = new NdcFlightApiRefundOrderRel();
@@ -31,8 +31,8 @@ public class NdcFlightApiRefundOrderRelServiceImpl implements NdcFlightApiRefund
             rel.setExternalRefundNumber(params.getExternalRefundNumber());
             rel.setAfterRefundTicketUrl(params.getAfterRefundTicketUrl());
             rel.setCreateTime(new Date());
-            rel.setRefundFee(refundMoneyData.getRefundFee());
-            rel.setRefundMoney(refundMoneyData.getRefundMoney());
+//            rel.setRefundFee(refundMoneyData.getRefundFee());
+//            rel.setRefundMoney(refundMoneyData.getRefundMoney());
 
             apiRefundOrderRelMapper.insertSelective(rel);
         }catch (Exception e) {

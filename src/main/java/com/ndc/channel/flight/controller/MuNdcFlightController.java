@@ -50,6 +50,12 @@ public class MuNdcFlightController {
     @Resource
     private NdcFlightChangeBooingHandler changeBooingHandler;
 
+    @PostMapping("/corpapi/flight/V2/search")
+    @ApiOperation(value = "航班查询", notes = "航班查询", httpMethod = "POST", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseData<List<CorpApiFlightListDataV2>> flightSearchV2(@RequestBody FlightSearchReq searchReq) {
+        return this.flightSearch(searchReq);
+    }
+
     @PostMapping("/corpapi/flight/search")
     @ApiOperation(value = "航班查询", notes = "航班查询", httpMethod = "POST", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseData<List<CorpApiFlightListDataV2>> flightSearch(@RequestBody FlightSearchReq searchReq) {

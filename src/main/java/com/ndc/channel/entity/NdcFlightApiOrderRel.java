@@ -24,10 +24,6 @@ public class NdcFlightApiOrderRel implements Serializable {
 
     private BigDecimal ticketPrice;
 
-    private BigDecimal oilFee;
-
-    private BigDecimal buildFee;
-
     private Date createTime;
 
     private static final long serialVersionUID = 1L;
@@ -104,22 +100,6 @@ public class NdcFlightApiOrderRel implements Serializable {
         this.ticketPrice = ticketPrice;
     }
 
-    public BigDecimal getOilFee() {
-        return oilFee;
-    }
-
-    public void setOilFee(BigDecimal oilFee) {
-        this.oilFee = oilFee;
-    }
-
-    public BigDecimal getBuildFee() {
-        return buildFee;
-    }
-
-    public void setBuildFee(BigDecimal buildFee) {
-        this.buildFee = buildFee;
-    }
-
     public Date getCreateTime() {
         return createTime;
     }
@@ -141,8 +121,6 @@ public class NdcFlightApiOrderRel implements Serializable {
         sb.append(", afterTicketUrl=").append(afterTicketUrl);
         sb.append(", totalAmount=").append(totalAmount);
         sb.append(", ticketPrice=").append(ticketPrice);
-        sb.append(", oilFee=").append(oilFee);
-        sb.append(", buildFee=").append(buildFee);
         sb.append(", createTime=").append(createTime);
         sb.append(", serialVersionUID=").append(serialVersionUID);
         sb.append("]");
