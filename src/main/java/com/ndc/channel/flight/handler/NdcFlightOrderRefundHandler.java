@@ -25,14 +25,21 @@ import com.ndc.channel.flight.xmlBean.refundAmountSearch.request.bean.OrderChang
 import com.ndc.channel.flight.xmlBean.refundAmountSearch.request.bean.Request;
 import com.ndc.channel.flight.xmlBean.refundAmountSearch.response.bean.refund.OrderAmendment;
 import com.ndc.channel.flight.xmlBean.refundAmountSearch.response.bean.refund.PaymentInfo;
+import com.ndc.channel.flight.xmlBean.refundConfirm.request.bean.BinaryObject;
+import com.ndc.channel.flight.xmlBean.refundConfirm.request.bean.Media;
 import com.ndc.channel.mapper.NdcFlightApiOrderRelMapper;
 import com.ndc.channel.redis.RedisUtils;
 import com.ndc.channel.service.NdcFlightApiRefundOrderRelService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.io.*;
 import java.math.BigDecimal;
+import java.net.URI;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -307,7 +314,9 @@ public class NdcFlightOrderRefundHandler {
         remarkJson.put("orderId", orderRel.getOrderId());
         remarkJson.put("actionTypeCode", "Add");
         remarkJson.put("reasonRemarkText", params.getMemo());
-//        remarkJson.put("mediaId", UUID.randomUUID().toString());
+        if (CollectionUtils.isNotEmpty(refundConfirmDataLists.getMediaList())) {
+            remarkJson.put("mediaId", refundConfirmDataLists.getMediaList().stream().map(Media::getMediaID).collect(Collectors.toList()));
+        }
         remark.setRemarkText(remarkJson.toJSONString());
         parameters.setRemark(remark);
         request.setOrderChangeParameters(parameters);
@@ -331,11 +340,82 @@ public class NdcFlightOrderRefundHandler {
         final List<com.ndc.channel.flight.xmlBean.refundConfirm.request.bean.ContactInfo> refundConfirmContactInfoList = createRefundConfirmContactInfo(dataLists);
         refundConfirmDataLists.setContactInfoList(refundConfirmContactInfoList);
 
-//        Media media = new Media();
-//        refundConfirmDataLists.setMediaList(Arrays.asList(media));
+        if (CollectionUtils.isNotEmpty(refundAttachmentUrl)) {
+
+            List<Media> mediaList = refundAttachmentUrl.stream().map(attachUrl -> {
+                Media media = new Media();
+                media.setMediaID(UUID.randomUUID().toString());
+                media.setBinaryObject(getFileBase64Str(attachUrl));
+                media.setDescText("退票申请证明文件");
+
+                return media;
+            }).collect(Collectors.toList());
+            refundConfirmDataLists.setMediaList(mediaList);
+        }
 
         return refundConfirmDataLists;
     }
+
+    private static BinaryObject getFileBase64Str(String url) {
+
+        BinaryObject binaryObject = new BinaryObject();
+        try {
+            URLConnection connection = new URL(url).openConnection();
+
+            InputStream inStream = connection.getInputStream();
+
+            byte[] bytes = readFileInputStream(inStream);
+
+            final String fileStr = Base64.getEncoder().encodeToString(bytes);
+
+            final File file = new File(url);
+            binaryObject.setFileName(file.getName());
+            binaryObject.setFormat(connection.getContentType());
+            binaryObject.setValue(fileStr);
+            return binaryObject;
+        }catch (Exception e) {
+            log.error("附件下载失败，url={}", url);
+        }
+
+        return null;
+    }
+
+    public static void main(String[] args) {
+
+        try{
+            String s = "https://www.appzyw.net/upfiles/image/201909/20190930104220747.jpg";
+
+            final BinaryObject binaryObject = getFileBase64Str(s);
+//            System.out.println(JSON.toJSONString(binaryObject));
+
+            final Media media = new Media();
+
+            media.setBinaryObject(binaryObject);
+            media.setMediaID(UUID.randomUUID().toString());
+
+            final JSONObject remarkJson = new JSONObject();
+            remarkJson.put("actionTypeCode", "Add");
+            remarkJson.put("mediaId", Arrays.asList(media).stream().map(Media::getMediaID).collect(Collectors.toList()));
+
+            System.out.println(remarkJson.toJSONString());
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    private static byte[] readFileInputStream(InputStream inputStream) throws IOException {
+        ByteArrayOutputStream outStream= new ByteArrayOutputStream();
+        byte[] buffer = new byte[1024];
+        int len = 0;
+        while( (len=inputStream.read(buffer)) != -1){
+            outStream.write(buffer,0, len);
+
+        }
+        inputStream.close();
+
+        return outStream.toByteArray();
+    }
+
     private List<com.ndc.channel.flight.xmlBean.refundConfirm.request.bean.Pax> createRefundConfirmPaxList(DataLists dataLists, List<String> idCardListRefundPassenger) {
         final List<Pax> paxList = dataLists.getPaxList().stream().filter(pax -> {
             final IdentityDoc identityDoc = pax.getIdentityDoc();

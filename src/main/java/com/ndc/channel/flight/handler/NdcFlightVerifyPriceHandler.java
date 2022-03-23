@@ -140,6 +140,12 @@ public class NdcFlightVerifyPriceHandler {
         verifyRespData.setSeatClassCode(ticketData.getSeatClassCode());
         verifyRespData.setSuccess(true);
 
+        final ServiceDefinition seatSale = serviceDefinitionList.stream().filter(serviceDefinition -> serviceDefinition.getName().equals("SEAT_SALE")).findFirst().orElse(null);
+        if (seatSale != null){
+            String maximumServiceQty = seatSale.getServiceDefinitionAssociation().getServiceBundle().getMaximumServiceQty();
+            verifyRespData.setSeatCount(maximumServiceQty);
+        }
+
         FlightBaggageInfoData baggageInfoData = new FlightBaggageInfoData();
         verifyRespData.setServiceDefinitionList(getServiceDefinitionList(serviceDefinitionList, baggageAllowanceMap, baggageInfoData));
 
