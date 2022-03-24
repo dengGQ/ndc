@@ -56,6 +56,9 @@ public class NdcFlightRefundOrderDetailHandler implements NdcOrderDetailHandler{
 
         IATAOrderViewRS refundOrderResp = ndcApiTools.refundOrderDetail(rq);
 
+        if (refundOrderResp == null) {
+            throw new BusinessException(BusinessExceptionCode.FLIGHT_CHANNEL_ERROR, "渠道接口异常");
+        }
         Error error = refundOrderResp.getError();
         if (error != null) {
             log.error("退票单明细查询失败，orderId={}", orderRel.getOrderId());
@@ -82,18 +85,25 @@ public class NdcFlightRefundOrderDetailHandler implements NdcOrderDetailHandler{
             Ticket ticket = ticketDocInfo.getTicket();
             Coupon coupon = ticket.getCoupon();
 
+            BigDecimal refundFee = null;
+            BigDecimal changeFee = null;
+            if (ticketDocInfo.getPenalty() != null) {
+                Map<String, PenaltyAmount> penaltyAmountMap = ticketDocInfo.getPenalty().stream().collect(Collectors.toMap(Penalty::getTypeCode, Penalty::getPenaltyAmount));
+
+                PenaltyAmount penaltyAmountRefund = Optional.ofNullable(penaltyAmountMap.get(BusinessEnum.ChangeRefundTypeCode.CANCELLATION.getCode())).orElseGet(PenaltyAmount::new);
+                PenaltyAmount penaltyAmountChange = Optional.ofNullable(penaltyAmountMap.get(BusinessEnum.ChangeRefundTypeCode.CHANGE.getCode())).orElseGet(PenaltyAmount::new);
+
+                refundFee = new BigDecimal(Optional.ofNullable(penaltyAmountRefund.getValue()).orElse("0"));
+                changeFee = new BigDecimal(Optional.ofNullable(penaltyAmountChange.getValue()).orElse("0"));
+            }
+
             CarrierFee carrierFee = ticketDocInfo.getCarrierFee();
+            BigDecimal refundMoneyPax = null;
+            if (carrierFee != null) {
 
-            Map<String, PenaltyAmount> penaltyAmountMap = ticketDocInfo.getPenalty().stream().collect(Collectors.toMap(Penalty::getTypeCode, Penalty::getPenaltyAmount));
-
-            PenaltyAmount penaltyAmountRefund = Optional.ofNullable(penaltyAmountMap.get(BusinessEnum.ChangeRefundTypeCode.CANCELLATION.getCode())).orElseGet(PenaltyAmount::new);
-            PenaltyAmount penaltyAmountChange = Optional.ofNullable(penaltyAmountMap.get(BusinessEnum.ChangeRefundTypeCode.CHANGE.getCode())).orElseGet(PenaltyAmount::new);
-
-            BigDecimal refundFee = new BigDecimal(Optional.ofNullable(penaltyAmountRefund.getValue()).orElse("0"));
-            BigDecimal changeFee = new BigDecimal(Optional.ofNullable(penaltyAmountChange.getValue()).orElse("0"));
-
-            Amount amount = carrierFee.getAmount();
-            final BigDecimal refundMoneyPax = new BigDecimal(Optional.ofNullable(amount.getValue()).orElse("0"));
+                Amount amount = carrierFee.getAmount();
+                refundMoneyPax = new BigDecimal(Optional.ofNullable(amount.getValue()).orElse("0"));
+            }
 
             JSONObject jsonObject = JSONObject.parseObject(ticket.getRemarkText());
             String auditingStatus = jsonObject.getString("auditingStatus");
@@ -113,7 +123,7 @@ public class NdcFlightRefundOrderDetailHandler implements NdcOrderDetailHandler{
 
         detailData.setTicketInfoList(ticketInfoList);
         detailData.setOrderStatus(ticketInfoList.get(0).getTicketStatus());
-        detailData.setRefundMoney(ticketInfoList.stream().map(OrderTicketInfo::getRefundAmount).reduce(BigDecimal::add).get());
+        detailData.setRefundMoney(ticketInfoList.stream().map(ot->Optional.ofNullable(ot.getRefundAmount()).orElse(BigDecimal.ZERO)).reduce(BigDecimal::add).get());
         detailData.setChannelOrderNumber(apiRefundOrderRel.getRefundId());
 
         return detailData;

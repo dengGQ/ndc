@@ -91,6 +91,15 @@ public class CorpApiTicketData {
 	@ApiModelProperty(value = "改升总金额，改期查询有值")
 	private BigDecimal upgradeTotalAmount;
 
+	@ApiModelProperty(value = "产品名称")
+	private String productName;
+
+	@ApiModelProperty(value = "产品权益列表")
+	private List<String> rightsList;
+
+	@ApiModelProperty(value = "产品提示")
+	private String productNotice;
+
 	private String paxId;
 	private String offerItemId;
 	private String pricingSystemCodeText;

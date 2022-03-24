@@ -38,7 +38,7 @@ public class NdcFlightApiOrderRelServiceImpl implements NdcFlightApiOrderRelServ
 
             apiOrderRelMapper.insertSelective(rel);
         }catch (Exception e) {
-            log.error("ndc机票订单保存失败，req={}, resp={}", JSON.toJSONString(orderCreateReq), JSON.toJSONString(orderCreateData));
+            log.error("ndc机票订单保存失败，req="+JSON.toJSONString(orderCreateReq)+", resp="+JSON.toJSONString(orderCreateData), e);
         }
     }
 }

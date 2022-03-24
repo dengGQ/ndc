@@ -3,6 +3,7 @@ package com.ndc.channel.flight.handler;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.ndc.channel.enumtype.BusinessEnum;
+import com.ndc.channel.enumtype.ProductRightUtil;
 import com.ndc.channel.exception.BusinessException;
 import com.ndc.channel.exception.BusinessExceptionCode;
 import com.ndc.channel.flight.dto.flightSearch.*;
@@ -170,6 +171,10 @@ public class NdcFlightSearchHandler {
                     ticketData.setPriceClassName(priceClass.getName());
                     ticketData.setPriceClassDesc(priceClass.getDesc().getDescText());
                     ticketData.setFareTypeCode(fareTypeCode);
+                    ticketData.setProductName(priceClass.getName());
+                    ProductRightDefinition definition = JSONObject.parseObject(priceClass.getDesc().getDescText(), ProductRightDefinition.class);
+                    ticketData.setRightsList(parseProductRights(definition));
+                    ticketData.setProductNotice(definition.getProductDefinition().getProductNotice());
 
                     TaxSummary taxSummary = offerItem.getPrice().getTaxSummary();
                     final Map<String, Tax> taxMap = taxSummary.getTax().stream().collect(Collectors.toMap(Tax::getTaxCode, Function.identity()));
@@ -200,6 +205,23 @@ public class NdcFlightSearchHandler {
         redisUtils.hPutAndExpireAt(persistenceTicketDataMap, TimeUnit.DAYS, 1);
 
         return flightDataList;
+    }
+
+    private List<String> parseProductRights(ProductRightDefinition definition) {
+
+        List<RightDefinition> rightDefinitionList = definition.getRightDefinitionList();
+
+        List<String> rightList = rightDefinitionList.stream().map(rightDefinition -> {
+            final String rightDesc = ProductRightUtil.getRightDesc(rightDefinition.getRightCode(), rightDefinition.getRightLevel());
+            if (StringUtils.isEmpty(rightDesc)) {
+                return "T";
+            }
+            return rightDesc;
+        }).collect(Collectors.toList());
+
+        rightList.remove("T");
+
+        return rightList;
     }
 
     private CorpApiFlightListDataV2 flightDataConvertFromPaxSegment(OriginDest originDest, PaxJourney paxJourney, PaxSegment paxSegment, String flightDate, String depCityCode, String destCityCode) {
