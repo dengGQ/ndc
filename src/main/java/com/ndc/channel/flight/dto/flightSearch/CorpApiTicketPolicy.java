@@ -3,6 +3,8 @@ package com.ndc.channel.flight.dto.flightSearch;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * 退改签政策
  * 
@@ -29,4 +31,10 @@ public class CorpApiTicketPolicy {
 
 	@ApiModelProperty(value = "行李额信息")
 	private FlightBaggageInfoData flightBaggageInfoData;
+
+	/**
+	 * 页面政策展示用
+	 */
+	@ApiModelProperty(value = "退改签政策，页面展示用")
+	private List<TgqPointChargeInfo> tgqPointChargeInfoList;
 }

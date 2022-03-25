@@ -5,10 +5,10 @@ public class RemarkText {
     private String comment;
     private String ei;
     private String eiComment;
-    private String maxTime;
+    private Long maxTime;
     private String maxTimeFlag;
     private String maxTimeUnit;
-    private String minTime;
+    private Long minTime;
     private String minTimeFlag;
     private String minTimeUnit;
     private String noShowFlag;
@@ -54,14 +54,6 @@ public class RemarkText {
         this.eiComment = eiComment;
     }
 
-    public String getMaxTime() {
-        return maxTime;
-    }
-
-    public void setMaxTime(String maxTime) {
-        this.maxTime = maxTime;
-    }
-
     public String getMaxTimeFlag() {
         return maxTimeFlag;
     }
@@ -78,11 +70,19 @@ public class RemarkText {
         this.maxTimeUnit = maxTimeUnit;
     }
 
-    public String getMinTime() {
+    public Long getMaxTime() {
+        return maxTime;
+    }
+
+    public void setMaxTime(Long maxTime) {
+        this.maxTime = maxTime;
+    }
+
+    public Long getMinTime() {
         return minTime;
     }
 
-    public void setMinTime(String minTime) {
+    public void setMinTime(Long minTime) {
         this.minTime = minTime;
     }
 

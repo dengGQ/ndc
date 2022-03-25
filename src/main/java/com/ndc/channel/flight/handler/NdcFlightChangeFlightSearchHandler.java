@@ -405,11 +405,11 @@ public class NdcFlightChangeFlightSearchHandler {
 
             final String maxTimeUnit = remarkText.getMaxTimeUnit(); //单位，D(天),N(分钟),H(小时),M(月)
             final String maxTimeFlag = remarkText.getMaxTimeFlag(); //是否包含,0不包含1包含
-            final String maxTime = remarkText.getMaxTime(); //时间
+            final Long maxTime = remarkText.getMaxTime(); //时间
 
             final String minTimeUnit = remarkText.getMinTimeUnit();
             final String minTimeFlag = remarkText.getMinTimeFlag();
-            final String minTime = remarkText.getMinTime();
+            final Long minTime = remarkText.getMinTime();
 
 
             for (Penalty penalty : rule.getPenalty()) {
