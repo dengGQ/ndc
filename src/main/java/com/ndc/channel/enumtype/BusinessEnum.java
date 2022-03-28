@@ -35,7 +35,7 @@ public class BusinessEnum {
 		}
 
 		public static List<String> allCompleteStatus(){
-			return Arrays.asList(REFUND_SUCCESS.name(), REFUND_COMPLETE.name(), REFUND_EXCEPTION.name(), REJECT_FIRST.name(), EXCEPTION.name(), DEL.name());
+			return Arrays.asList(REFUND_SUCCESS.getCode(), REFUND_COMPLETE.getCode(), REFUND_EXCEPTION.getCode(), REJECT_FIRST.getCode(), EXCEPTION.getCode(), DEL.getCode());
 		}
 
 		public static String getLabelByName(String code) {

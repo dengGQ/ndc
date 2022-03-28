@@ -51,7 +51,7 @@ public class NdcApiTools {
             NdcAccountInfoData accountInfo = accountInfoMapper.selectByNdcCode("mu_ndc");
 
             accountInfo.setNdcApiInfo(BusinessEnum.NdcApiInfo.FLIGHT_SEARCH);
-
+            accountInfo.setRequestId(rq.getPayloadAttributes().getEchoTokenText());
             return remote(accountInfo, rq, IATAAirShoppingRQ.class, IATAAirShoppingRS.class);
         }catch (BusinessException e){
             throw e;
@@ -72,7 +72,7 @@ public class NdcApiTools {
             NdcAccountInfoData accountInfo = accountInfoMapper.selectByNdcCode("mu_ndc");
 
             accountInfo.setNdcApiInfo(BusinessEnum.NdcApiInfo.OFFER_PRICE);
-
+            accountInfo.setRequestId(rq.getPayloadAttributes().getEchoTokenText());
             return remote(accountInfo, rq, IATAOfferPriceRQ.class, IATAOfferPriceRS.class);
         }catch (BusinessException e){
             throw e;
@@ -94,7 +94,7 @@ public class NdcApiTools {
             NdcAccountInfoData accountInfo = accountInfoMapper.selectByNdcCode("mu_ndc");
 
             accountInfo.setNdcApiInfo(BusinessEnum.NdcApiInfo.CREATE_ORDER);
-
+            accountInfo.setRequestId(rq.getPayloadAttributes().getEchoTokenText());
             return remote(accountInfo, rq, IATAOrderCreateRQ.class, IATAOrderViewRS.class);
         }catch (BusinessException e){
             throw e;
@@ -113,7 +113,7 @@ public class NdcApiTools {
         try{
 
             accountInfo.setNdcApiInfo(BusinessEnum.NdcApiInfo.ORDER_PAY);
-
+            accountInfo.setRequestId(rq.getPayloadAttributes().getEchoTokenText());
             return remote(accountInfo, rq, IATAOrderChangeRQ.class, com.ndc.channel.flight.xmlBean.orderPay.response.bean.IATAOrderViewRS.class);
         }catch (BusinessException e){
             throw e;
@@ -134,7 +134,7 @@ public class NdcApiTools {
             NdcAccountInfoData accountInfo = accountInfoMapper.selectByNdcCode("mu_ndc");
 
             accountInfo.setNdcApiInfo(BusinessEnum.NdcApiInfo.ORDER_DETAIL);
-
+            accountInfo.setRequestId(rq.getPayloadAttributes().getEchoTokenText());
             return remote(accountInfo, rq, IATAOrderRetrieveRQ.class, com.ndc.channel.flight.xmlBean.orderDetail.response.bean.IATAOrderViewRS.class);
         }catch (BusinessException e){
             throw e;
@@ -155,7 +155,7 @@ public class NdcApiTools {
             NdcAccountInfoData accountInfo = accountInfoMapper.selectByNdcCode("mu_ndc");
 
             accountInfo.setNdcApiInfo(BusinessEnum.NdcApiInfo.REFUND_APPLY);
-
+            accountInfo.setRequestId(rq.getPayloadAttributes().getEchoTokenText());
             return remote(accountInfo, rq, com.ndc.channel.flight.xmlBean.refundApply.request.bean.IATAOrderRetrieveRQ.class, com.ndc.channel.flight.xmlBean.refundApply.response.bean.IATAOrderViewRS.class);
         }catch (BusinessException e){
             throw e;
@@ -177,7 +177,7 @@ public class NdcApiTools {
             NdcAccountInfoData accountInfo = accountInfoMapper.selectByNdcCode("mu_ndc");
 
             accountInfo.setNdcApiInfo(BusinessEnum.NdcApiInfo.REFUND_MONEY_QUERY);
-
+            accountInfo.setRequestId(rq.getPayloadAttributes().getEchoTokenText());
             return remote(accountInfo, rq, com.ndc.channel.flight.xmlBean.refundAmountSearch.request.bean.IATAOrderChangeRQ.class, com.ndc.channel.flight.xmlBean.refundAmountSearch.response.bean.refund.IATAOrderViewRS.class);
         }catch (BusinessException e) {
             throw e;
@@ -198,7 +198,7 @@ public class NdcApiTools {
             NdcAccountInfoData accountInfo = accountInfoMapper.selectByNdcCode("mu_ndc");
 
             accountInfo.setNdcApiInfo(BusinessEnum.NdcApiInfo.REFUND_CONFIRM);
-
+            accountInfo.setRequestId(rq.getPayloadAttributes().getEchoTokenText());
             return remote(accountInfo, rq, com.ndc.channel.flight.xmlBean.refundConfirm.request.bean.IATAOrderChangeRQ.class, com.ndc.channel.flight.xmlBean.refundConfirm.response.bean.IATAOrderViewRS.class);
         }catch (BusinessException e) {
             throw e;
@@ -220,7 +220,7 @@ public class NdcApiTools {
             NdcAccountInfoData accountInfo = accountInfoMapper.selectByNdcCode("mu_ndc");
 
             accountInfo.setNdcApiInfo(BusinessEnum.NdcApiInfo.REFUND_ORDER_DETAIL);
-
+            accountInfo.setRequestId(rq.getPayloadAttributes().getEchoTokenText());
             return remote(accountInfo, rq, com.ndc.channel.flight.xmlBean.refundOrderDetail.request.bean.IATAOrderRetrieveRQ.class, com.ndc.channel.flight.xmlBean.refundOrderDetail.response.bean.IATAOrderViewRS.class);
         }catch (BusinessException e) {
             throw e;
@@ -241,7 +241,7 @@ public class NdcApiTools {
             NdcAccountInfoData accountInfo = accountInfoMapper.selectByNdcCode("mu_ndc");
 
             accountInfo.setNdcApiInfo(BusinessEnum.NdcApiInfo.CHANGE_FLIGHT_SEARCH);
-
+            accountInfo.setRequestId(rq.getPayloadAttributes().getEchoTokenText());
             return remote(accountInfo, rq, IATAOrderReshopRQ.class, IATAOrderReshopRS.class);
         }catch (BusinessException e) {
             throw e;
@@ -257,7 +257,7 @@ public class NdcApiTools {
             NdcAccountInfoData accountInfo = accountInfoMapper.selectByNdcCode("mu_ndc");
 
             accountInfo.setNdcApiInfo(BusinessEnum.NdcApiInfo.CHANGE_BOOKING);
-
+            accountInfo.setRequestId(rq.getPayloadAttributes().getEchoTokenText());
             return remote(accountInfo, rq, com.ndc.channel.flight.xmlBean.changeBooking.request.bean.IATAOrderChangeRQ.class, com.ndc.channel.flight.xmlBean.changeBooking.response.bean.IATAOrderViewRS.class);
         }catch (BusinessException e) {
             throw e;
@@ -286,7 +286,7 @@ public class NdcApiTools {
         headers.put("chnlCode", accountInfo.getChnlCode());
         headers.put("Authorization", accountInfo.getAuthorization());
         headers.put("apiCode", accountInfo.getNdcApiInfo().getApiCode());
-        String resp = channelOKHttpService.doPostXml(url, xmlParams, headers);
+        String resp = channelOKHttpService.doPostXml(url, xmlParams, headers, accountInfo.getRequestId());
 
         String respLog = resp;
         if (accountInfo.getNdcApiInfo().getApiCode().equals("A0534")) {

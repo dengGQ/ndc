@@ -36,4 +36,8 @@ public class CommonRQ {
     public void setPayloadAttributes(PayloadAttributes payloadAttributes) {
         this.payloadAttributes = payloadAttributes;
     }
+
+    public PayloadAttributes getPayloadAttributes() {
+        return payloadAttributes;
+    }
 }

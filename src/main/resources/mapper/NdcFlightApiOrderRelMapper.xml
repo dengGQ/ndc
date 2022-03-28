@@ -11,11 +11,12 @@
     <result column="after_ticket_url" property="afterTicketUrl" jdbcType="VARCHAR" />
     <result column="total_amount" property="totalAmount" jdbcType="DECIMAL" />
     <result column="ticket_price" property="ticketPrice" jdbcType="DECIMAL" />
+    <result column="request_id" property="requestId" jdbcType="VARCHAR" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
   </resultMap>
   <sql id="Base_Column_List" >
     rel_id, order_id, order_item_id, owner_code, owner_type_code, external_order_number,
-    after_ticket_url, total_amount, ticket_price, create_time
+    after_ticket_url, total_amount, ticket_price, request_id, create_time
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
     select
@@ -30,11 +31,11 @@
   <insert id="insert" parameterType="com.ndc.channel.entity.NdcFlightApiOrderRel" >
     insert into ndc_flight_api_order_rel (rel_id, order_id, order_item_id,
                                           owner_code, owner_type_code, external_order_number,
-                                          after_ticket_url, total_amount, ticket_price, create_time
+                                          after_ticket_url, total_amount, ticket_price, request_id, create_time
     )
     values (#{relId,jdbcType=BIGINT}, #{orderId,jdbcType=VARCHAR}, #{orderItemId,jdbcType=VARCHAR},
             #{ownerCode,jdbcType=VARCHAR}, #{ownerTypeCode,jdbcType=VARCHAR}, #{externalOrderNumber,jdbcType=VARCHAR},
-            #{afterTicketUrl,jdbcType=VARCHAR}, #{totalAmount,jdbcType=DECIMAL}, #{ticketPrice,jdbcType=DECIMAL}, #{createTime,jdbcType=TIMESTAMP}
+            #{afterTicketUrl,jdbcType=VARCHAR}, #{totalAmount,jdbcType=DECIMAL}, #{ticketPrice,jdbcType=DECIMAL}, #{requestId,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}
            )
   </insert>
   <insert id="insertSelective" parameterType="com.ndc.channel.entity.NdcFlightApiOrderRel" >
@@ -67,6 +68,9 @@
       <if test="ticketPrice != null" >
         ticket_price,
       </if>
+      <if test="requestId != null" >
+        request_id,
+      </if>
       <if test="createTime != null" >
         create_time,
       </if>
@@ -98,6 +102,9 @@
       </if>
       <if test="ticketPrice != null" >
         #{ticketPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="requestId != null" >
+        #{requestId,jdbcType=VARCHAR},
       </if>
       <if test="createTime != null" >
         #{createTime,jdbcType=TIMESTAMP},

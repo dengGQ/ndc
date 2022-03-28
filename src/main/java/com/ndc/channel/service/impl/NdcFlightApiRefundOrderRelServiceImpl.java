@@ -21,7 +21,7 @@ public class NdcFlightApiRefundOrderRelServiceImpl implements NdcFlightApiRefund
     private NdcFlightApiRefundOrderRelMapper apiRefundOrderRelMapper;
 
     @Override
-    public void insertEntity(RefundApplyParams params, String orderId, String refundId) {
+    public void insertEntity(RefundApplyParams params, String orderId, String refundId, String requestId) {
 
         try {
             NdcFlightApiRefundOrderRel rel = new NdcFlightApiRefundOrderRel();
@@ -31,9 +31,7 @@ public class NdcFlightApiRefundOrderRelServiceImpl implements NdcFlightApiRefund
             rel.setExternalRefundNumber(params.getExternalRefundNumber());
             rel.setAfterRefundTicketUrl(params.getAfterRefundTicketUrl());
             rel.setCreateTime(new Date());
-//            rel.setRefundFee(refundMoneyData.getRefundFee());
-//            rel.setRefundMoney(refundMoneyData.getRefundMoney());
-
+            rel.setRequestId(requestId);
             apiRefundOrderRelMapper.insertSelective(rel);
         }catch (Exception e) {
             log.error("ndc退票单订单保存失败，refundApplyParams={}, orderId={}, refundId={}", JSON.toJSONString(params), orderId, refundId);

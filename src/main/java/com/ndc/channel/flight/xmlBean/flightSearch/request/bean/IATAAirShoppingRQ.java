@@ -2,6 +2,9 @@
 package com.ndc.channel.flight.xmlBean.flightSearch.request.bean;
 
 import com.ndc.channel.flight.xmlBean.flightSearch.common.CommonRQ;
+import com.ndc.channel.flight.xmlBean.flightSearch.common.MessageDoc;
+import com.ndc.channel.flight.xmlBean.flightSearch.common.Party;
+import com.ndc.channel.flight.xmlBean.flightSearch.common.PayloadAttributes;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -33,11 +36,22 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "IATA_AirShoppingRQ", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_AirShoppingRQ")
-public class IATAAirShoppingRQ extends CommonRQ {
-
+public class IATAAirShoppingRQ {
 
     @XmlElement(name = "Request", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_AirShoppingRQ", required = true)
     protected Request request;
+    @XmlElement(name = "MessageDoc", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_AirShoppingRQ", required = true)
+    protected MessageDoc messageDoc;
+    @XmlElement(name = "Party", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_AirShoppingRQ", required = true)
+    protected Party party;
+    @XmlElement(name = "PayloadAttributes", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_AirShoppingRQ", required = true)
+    protected PayloadAttributes payloadAttributes;
+
+    public IATAAirShoppingRQ() {
+        this.messageDoc = new MessageDoc();
+        this.party = new Party();
+        this.payloadAttributes = new PayloadAttributes();
+    }
 
     public Request getRequest() {
         return request;
@@ -45,5 +59,29 @@ public class IATAAirShoppingRQ extends CommonRQ {
 
     public void setRequest(Request value) {
         this.request = value;
+    }
+
+    public MessageDoc getMessageDoc() {
+        return messageDoc;
+    }
+
+    public void setMessageDoc(MessageDoc messageDoc) {
+        this.messageDoc = messageDoc;
+    }
+
+    public Party getParty() {
+        return party;
+    }
+
+    public void setParty(Party party) {
+        this.party = party;
+    }
+
+    public PayloadAttributes getPayloadAttributes() {
+        return payloadAttributes;
+    }
+
+    public void setPayloadAttributes(PayloadAttributes payloadAttributes) {
+        this.payloadAttributes = payloadAttributes;
     }
 }

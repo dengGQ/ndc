@@ -1,5 +1,6 @@
 package com.ndc.channel.flight.handler;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.ndc.channel.entity.NdcFlightApiOrderRel;
 import com.ndc.channel.entity.NdcFlightApiRefundOrderRel;
@@ -15,6 +16,7 @@ import com.ndc.channel.flight.xmlBean.refundOrderDetail.request.bean.IATAOrderRe
 import com.ndc.channel.flight.xmlBean.refundOrderDetail.request.bean.Order;
 import com.ndc.channel.flight.xmlBean.refundOrderDetail.response.bean.*;
 import com.ndc.channel.flight.xmlBean.refundOrderDetail.response.bean.Error;
+import com.ndc.channel.http.ChannelOKHttpService;
 import com.ndc.channel.mapper.NdcFlightApiOrderRelMapper;
 import com.ndc.channel.mapper.NdcFlightApiRefundOrderRelMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -40,6 +42,9 @@ public class NdcFlightRefundOrderDetailHandler implements NdcOrderDetailHandler{
 
     @Resource
     private NdcApiTools ndcApiTools;
+
+    @Resource
+    private ChannelOKHttpService okHttpService;
 
     @Override
     public NdcOrderDetailData orderDetail(String refundId) {
@@ -137,37 +142,42 @@ public class NdcFlightRefundOrderDetailHandler implements NdcOrderDetailHandler{
 
     @Override
     public void statusChangeNotice(NdcOrderDetailData ndcOrderDetailData) {
-
         FlightRefundOrderNoticeData noticeData = new FlightRefundOrderNoticeData();
         String refundId = ndcOrderDetailData.getChannelOrderNumber();
 
         NdcFlightApiRefundOrderRel refundOrderRel = refundOrderRelMapper.selectByRefundId(refundId);
-
         noticeData.setExternalRefundNumber(refundOrderRel.getExternalRefundNumber());
+        String refundAuditingStatus = ndcOrderDetailData.getTicketInfoList().get(0).getRefundAuditingStatus();
 
-        final String refundAuditingStatus = ndcOrderDetailData.getTicketInfoList().get(0).getRefundAuditingStatus();
-        if (BusinessEnum.RefundAuditingStatus.REFUND_SUCCESS.getCode().equals(refundAuditingStatus)
-                || BusinessEnum.RefundAuditingStatus.REFUND_COMPLETE.getCode().equals(refundAuditingStatus)) {
+        try{
 
-            List<FlightOrderPassengerData> passengerDataList = ndcOrderDetailData.getTicketInfoList().stream().map(ticketInfo -> {
-                FlightOrderPassengerData passengerData = new FlightOrderPassengerData();
+            if (BusinessEnum.RefundAuditingStatus.REFUND_SUCCESS.getCode().equals(refundAuditingStatus)
+                    || BusinessEnum.RefundAuditingStatus.REFUND_COMPLETE.getCode().equals(refundAuditingStatus)) {
 
-                passengerData.setName(ticketInfo.getPassengerName());
-                passengerData.setIdcardCode(ticketInfo.getIdCardNo());
-                passengerData.setTicketNumber(ticketInfo.getTicketNumber());
-                passengerData.setRefundFee(ticketInfo.getRefundFee());
-                passengerData.setRefundAmount(ticketInfo.getRefundAmount());
+                List<FlightOrderPassengerData> passengerDataList = ndcOrderDetailData.getTicketInfoList().stream().map(ticketInfo -> {
+                    FlightOrderPassengerData passengerData = new FlightOrderPassengerData();
 
-                return passengerData;
-            }).collect(Collectors.toList());
+                    passengerData.setName(ticketInfo.getPassengerName());
+                    passengerData.setIdcardCode(ticketInfo.getIdCardNo());
+                    passengerData.setTicketNumber(ticketInfo.getTicketNumber());
+                    passengerData.setRefundFee(ticketInfo.getRefundFee());
+                    passengerData.setRefundAmount(ticketInfo.getRefundAmount());
 
-            noticeData.setRefundMoney(passengerDataList.stream().map(FlightOrderPassengerData::getRefundAmount).reduce(BigDecimal::add).get());
-            noticeData.setRefundNumber(refundId);
-            noticeData.setPassengerDatas(passengerDataList);
-            noticeData.setSuccess(true);
-        }else {
-            noticeData.setSuccess(false);
-            noticeData.setMessage(BusinessEnum.RefundAuditingStatus.getLabelByName(refundAuditingStatus));
+                    return passengerData;
+                }).collect(Collectors.toList());
+
+                noticeData.setRefundMoney(passengerDataList.stream().map(FlightOrderPassengerData::getRefundAmount).reduce(BigDecimal::add).get());
+                noticeData.setRefundNumber(refundId);
+                noticeData.setPassengerDatas(passengerDataList);
+                noticeData.setSuccess(true);
+            }else {
+                noticeData.setSuccess(false);
+                noticeData.setMessage(BusinessEnum.RefundAuditingStatus.getLabelByName(refundAuditingStatus));
+            }
+
+            okHttpService.doPost(refundOrderRel.getAfterRefundTicketUrl(), JSON.toJSONString(noticeData));
+        }catch (Exception e) {
+            log.error("Ndc退票单状态推送失败, url="+refundOrderRel.getAfterRefundTicketUrl()+", params="+JSON.toJSONString(noticeData), e);
         }
     }
 }

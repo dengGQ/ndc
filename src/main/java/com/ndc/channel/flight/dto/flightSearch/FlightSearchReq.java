@@ -18,6 +18,8 @@ public class FlightSearchReq {
 	 */
 	private String toCity;
 
+	private String requestId;
+
 	public String getFlightDate() {
 		return flightDate;
 	}
@@ -42,4 +44,11 @@ public class FlightSearchReq {
 		this.toCity = toCity;
 	}
 
+	public String getRequestId() {
+		return requestId;
+	}
+
+	public void setRequestId(String requestId) {
+		this.requestId = requestId;
+	}
 }

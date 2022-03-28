@@ -1,10 +1,14 @@
-package com.ndc.channel.entity;
+package com.ndc.channel.model;
+
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.io.Serializable;
 import java.util.Date;
 
+@Document(collection = "ndc_channel_api_log")
 public class NdcChannelApiLog implements Serializable {
-    private Long logId;
+
+    private String requestId;
 
     private String ndcAccountCode;
 
@@ -28,12 +32,12 @@ public class NdcChannelApiLog implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    public Long getLogId() {
-        return logId;
+    public String getRequestId() {
+        return requestId;
     }
 
-    public void setLogId(Long logId) {
-        this.logId = logId;
+    public void setRequestId(String requestId) {
+        this.requestId = requestId;
     }
 
     public String getNdcAccountCode() {
@@ -122,7 +126,6 @@ public class NdcChannelApiLog implements Serializable {
         sb.append(getClass().getSimpleName());
         sb.append(" [");
         sb.append("Hash = ").append(hashCode());
-        sb.append(", logId=").append(logId);
         sb.append(", ndcAccountCode=").append(ndcAccountCode);
         sb.append(", ndcAccountName=").append(ndcAccountName);
         sb.append(", type=").append(type);

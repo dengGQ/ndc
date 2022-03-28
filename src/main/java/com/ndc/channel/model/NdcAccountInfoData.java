@@ -24,6 +24,8 @@ public class NdcAccountInfoData {
 
     private BusinessEnum.NdcApiInfo ndcApiInfo;
 
+    private String requestId;
+
     public String getApiUrl() {
         return apiUrl;
     }
@@ -73,5 +75,13 @@ public class NdcAccountInfoData {
 
     public void setParams(String params) {
         this.params = params;
+    }
+
+    public String getRequestId() {
+        return requestId;
+    }
+
+    public void setRequestId(String requestId) {
+        this.requestId = requestId;
     }
 }

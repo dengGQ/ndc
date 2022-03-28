@@ -28,12 +28,7 @@ public class CorpApiFlightOrderCreateData {
 
 	private String ownerTypeCode;
 
-
-
-
-
-
-
+	private String requestId;
 
 	public String getOrderNumber() {
 		return orderNumber;
@@ -97,5 +92,13 @@ public class CorpApiFlightOrderCreateData {
 
 	public void setOwnerTypeCode(String ownerTypeCode) {
 		this.ownerTypeCode = ownerTypeCode;
+	}
+
+	public String getRequestId() {
+		return requestId;
+	}
+
+	public void setRequestId(String requestId) {
+		this.requestId = requestId;
 	}
 }

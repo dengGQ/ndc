@@ -24,6 +24,8 @@ public class NdcFlightApiOrderRel implements Serializable {
 
     private BigDecimal ticketPrice;
 
+    private String requestId;
+
     private Date createTime;
 
     private static final long serialVersionUID = 1L;
@@ -98,6 +100,14 @@ public class NdcFlightApiOrderRel implements Serializable {
 
     public void setTicketPrice(BigDecimal ticketPrice) {
         this.ticketPrice = ticketPrice;
+    }
+
+    public String getRequestId() {
+        return requestId;
+    }
+
+    public void setRequestId(String requestId) {
+        this.requestId = requestId;
     }
 
     public Date getCreateTime() {

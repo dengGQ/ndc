@@ -28,6 +28,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Slf4j
 @Component
@@ -48,9 +49,7 @@ public class NdcFlightCreateOrderHandler {
 
         final Request request = getCreateOrderRequest(orderCreateReq);
 
-        final List<String> contactIdList = request.getDataLists().getContactInfoList().stream().filter(contactInfo -> {
-            return !contactInfo.getContactTypeText().equals("PAX");
-        }).map(ContactInfo::getContactInfoID).collect(Collectors.toList());
+        final List<String> contactIdList = request.getDataLists().getContactInfoList().stream().filter(contactInfo -> !contactInfo.getContactTypeText().equals("PAX")).map(ContactInfo::getContactInfoID).collect(Collectors.toList());
 
         IATAOrderCreateRQ createRQ = new IATAOrderCreateRQ(contactIdList);
         createRQ.setRequest(request);
@@ -74,7 +73,7 @@ public class NdcFlightCreateOrderHandler {
         // 机票订单号
         final String orderItemID = orderItem.getOrderItemID();
 
-        String statusCode = orderItem.getStatusCode();
+//        String statusCode = orderItem.getStatusCode();
         String paymentTimeLimitDateTime = orderItem.getPaymentTimeLimitDateTime();
         TotalPrice totalPrice = order.getTotalPrice();
         TotalAmount totalAmount = totalPrice.getTotalAmount();
@@ -89,9 +88,9 @@ public class NdcFlightCreateOrderHandler {
         orderCreateData.setOwnerCode(order.getOwnerCode());
         orderCreateData.setOwnerTypeCode(order.getOwnerTypeCode());
 
-        BookingRef bookingRef = ticketDocInfo.getBookingRef().stream().filter(bf->bf.getBookingRefTypeCode().equals("6")).findFirst().get();
-        String pnrCode = bookingRef.getBookingID();
+        String pnrCode = ticketDocInfo.getBookingRef().stream().filter(bf->bf.getBookingRefTypeCode().equals("6")).map(BookingRef::getBookingID).findFirst().orElse(null);
         orderCreateData.setPnrNo(pnrCode);
+        orderCreateData.setRequestId(createRQ.getPayloadAttributes().getEchoTokenText());
 
         // NDC订单关键信息保存
         orderRelService.insertEntity(orderCreateReq, orderCreateData);
@@ -106,8 +105,8 @@ public class NdcFlightCreateOrderHandler {
         final List<ContactInfo> contactInfoList = getContactInfoList(req);
         dataLists.setContactInfoList(contactInfoList);
 
-        final ContactInfo paxContactInfo = contactInfoList.stream().filter(cf -> cf.getContactTypeText().equals("PAX")).findFirst().get();
-        final List<Pax> paxList = getPaxList(req, paxContactInfo);
+        String contactInfoID = contactInfoList.stream().filter(cf -> cf.getContactTypeText().equals("PAX")).map(ContactInfo::getContactInfoID).findFirst().orElse(null);
+        final List<Pax> paxList = getPaxList(req, contactInfoID);
         dataLists.setPaxList(paxList);
         request.setDataLists(dataLists);
 
@@ -121,9 +120,7 @@ public class NdcFlightCreateOrderHandler {
             CorpApiFlightListDataV2 flightData = redisUtils.get(RedisKeyConstants.getRedisFlightDataCacheKey(flightId), CorpApiFlightListDataV2.class);
             CorpApiTicketData ticketData = redisUtils.hGet(RedisKeyConstants.getRedisTicketDataCacheKey(flightId), ticketId, CorpApiTicketData.class);
 
-            SelectedOffer selectedOffer = getSelectedOffer(flightData, ticketData, paxIdList);
-
-            return selectedOffer;
+            return getSelectedOffer(flightData, ticketData, paxIdList);
         }).collect(Collectors.toList());
         createOrder.setSelectedOffer(selectedOfferList);
         request.setCreateOrder(createOrder);
@@ -152,7 +149,7 @@ public class NdcFlightCreateOrderHandler {
         travelAgentOrderContact.setPhone(primaryContactStr[1]);
         travelAgentOrderContact.setContactType("TRAVEL_AGENCY");
 
-        final List<ContactInfo> contactInfoList = Arrays.asList(primaryContact, passengerContact, travelAgentOrderContact).stream().map(contactParams -> {
+        return Stream.of(primaryContact, passengerContact, travelAgentOrderContact).map(contactParams -> {
             final ContactInfo contactInfo = new ContactInfo();
             contactInfo.setContactInfoID(UUID.randomUUID().toString());
             contactInfo.setContactTypeText(contactParams.getContactType());
@@ -170,11 +167,9 @@ public class NdcFlightCreateOrderHandler {
 
             return contactInfo;
         }).collect(Collectors.toList());
-
-        return contactInfoList;
     }
 
-    private List<Pax> getPaxList(FlightOrderCreateReq req,  ContactInfo contactInfo) {
+    private List<Pax> getPaxList(FlightOrderCreateReq req,  String contactInfoID) {
         List<Pax> paxList = req.getPassengers().stream().map(passenger -> {
             final Pax pax = new Pax();
 
@@ -193,7 +188,7 @@ public class NdcFlightCreateOrderHandler {
             identityDoc.setBirthdate(passenger.getBirthday());
             pax.setIdentityDoc(identityDoc);
 
-            pax.setContactInfoRefID(contactInfo.getContactInfoID());
+            pax.setContactInfoRefID(contactInfoID);
             pax.setPTC("ADT");
             return pax;
         }).collect(Collectors.toList());

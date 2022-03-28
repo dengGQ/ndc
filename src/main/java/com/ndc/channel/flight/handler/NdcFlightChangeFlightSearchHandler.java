@@ -20,10 +20,13 @@ import com.ndc.channel.redis.RedisUtils;
 import com.ndc.channel.util.FlightKeyUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.text.MessageFormat;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -75,7 +78,7 @@ public class NdcFlightChangeFlightSearchHandler {
         Pax pax = dataLists.getPaxList().stream()
                 .filter(p -> p.getPTC().equals("ADT")).findFirst()
                 .orElseGet(()->{
-                    log.error("NDC航班未查到成人航班, everyFlightDateKey=", everyFlightDateKey);
+                    log.error("NDC航班未查到成人航班, everyFlightDateKey={}", everyFlightDateKey);
                     throw new BusinessException(BusinessExceptionCode.REQUEST_PARAM_ERROR, "NDC航班未查到成人航班！");
                 });
 
@@ -170,7 +173,7 @@ public class NdcFlightChangeFlightSearchHandler {
                     }
                     List<ServiceDefinition> paxServiceDefinitionList = serviceDefinitionList.stream().filter(sd -> serviceDefinitionIdList.contains(sd.getServiceDefinitionID())).collect(Collectors.toList());
 
-                    CorpApiTicketData ticketData = ticketDataConvertFromCarrierOffer(flightData.getFlightId(), offerItem, paxServiceDefinitionList, baggageAllowanceMap, priceClass);
+                    CorpApiTicketData ticketData = ticketDataConvertFromCarrierOffer(flightData, offerItem, paxServiceDefinitionList, baggageAllowanceMap, priceClass);
                     ticketData.setPaxId(pax.getPaxID());
                     ticketData.setPricingSystemCodeText(pricingSystemCodeText);
                     ticketData.setPriceClassID(priceClass.getPriceClassID());
@@ -192,11 +195,11 @@ public class NdcFlightChangeFlightSearchHandler {
             flightData.setOilFee(BigDecimal.ZERO);
             List<CorpApiTicketData> ticketDataList = corpApiTicketMap.values().stream().collect(Collectors.toList());
 
-            final boolean isPresent = ticketDataList.get(0).getServiceDefinitionList().stream().filter(serviceDef -> BusinessEnum.ServiceName.MEAL.name().equals(serviceDef.getName())).findFirst().isPresent();
+            final boolean isPresent = ticketDataList.get(0).getServiceDefinitionList().stream().anyMatch(serviceDef -> BusinessEnum.ServiceName.MEAL.name().equals(serviceDef.getName()));
             flightData.setMealType(isPresent ? "1" : "0");
             flightData.setTickets(ticketDataList);
 
-            final Map<String, String> ticketStrMap = corpApiTicketMap.values().stream().collect(Collectors.toMap(CorpApiTicketData::getTicketId, v -> JSON.toJSONString(v)));
+            final Map<String, String> ticketStrMap = corpApiTicketMap.values().stream().collect(Collectors.toMap(CorpApiTicketData::getTicketId, JSON::toJSONString));
             persistenceTicketDataMap.put(RedisKeyConstants.getRedisTicketChangeDataCacheKey(flightData.getFlightId()), ticketStrMap);
         }
 
@@ -212,9 +215,9 @@ public class NdcFlightChangeFlightSearchHandler {
 
         // 渠道信息
         corpApiFlight.setOriginDestID(originDest.getOriginDestID());
-        corpApiFlight.setPaxJourneyRefID(Arrays.asList(originDest.getPaxJourneyRefID()));
+        corpApiFlight.setPaxJourneyRefID(Collections.singletonList(originDest.getPaxJourneyRefID()));
         corpApiFlight.setPaxJourneyID(paxJourney.getPaxJourneyID());
-        corpApiFlight.setPaxSegmentRefID(Arrays.asList(paxJourney.getPaxSegmentRefID()));
+        corpApiFlight.setPaxSegmentRefID(Collections.singletonList(paxJourney.getPaxSegmentRefID()));
         corpApiFlight.setPaxSegmentID(paxSegment.getPaxSegmentID());
 
         // 航班信息
@@ -286,7 +289,7 @@ public class NdcFlightChangeFlightSearchHandler {
     }
 
 
-    private CorpApiTicketData ticketDataConvertFromCarrierOffer(String flightId, AddOfferItem offerItem, List<ServiceDefinition> serviceDefinitionList, Map<String, BaggageAllowance> baggageAllowanceMap, PriceClass priceClass) {
+    private CorpApiTicketData ticketDataConvertFromCarrierOffer(CorpApiFlightListDataV2 flightData, AddOfferItem offerItem, List<ServiceDefinition> serviceDefinitionList, Map<String, BaggageAllowance> baggageAllowanceMap, PriceClass priceClass) {
         CorpApiTicketData ticketData = new CorpApiTicketData();
 
         final String offerItemID = offerItem.getOfferItemID();
@@ -294,11 +297,11 @@ public class NdcFlightChangeFlightSearchHandler {
         final Price diffPrice = offerItem.getPrice();
         final String upgradeTotalAmount = diffPrice.getTotalAmount().getValue();
 
-        final ServiceDefinition seatSaleSd = serviceDefinitionList.stream().filter(sd -> sd.getName().equals("SEAT_SALE")).findFirst().orElse(null);
+        final ServiceDefinition seatSaleSd = serviceDefinitionList.stream().filter(sd -> sd.getName().equals("SEAT_SALE")).findFirst().orElseGet(ServiceDefinition::new);
 
         final FareDetail fareDetail = offerItem.getFareDetail();
         final FarePriceType farePriceType = fareDetail.getFarePriceType();
-        final String farePriceTypeCode = farePriceType.getFarePriceTypeCode();
+//        final String farePriceTypeCode = farePriceType.getFarePriceTypeCode();
         final Price price = farePriceType.getPrice();
 
         final FareComponent fareComponent = fareDetail.getFareComponent();
@@ -308,17 +311,22 @@ public class NdcFlightChangeFlightSearchHandler {
         final BaseAmount baseAmount = price.getBaseAmount();
 
         ticketData.setSeatClassCode(seatClassCode);
-        ticketData.setFlightId(flightId);
+        ticketData.setFlightId(flightData.getFlightId());
         ticketData.setMainClassCode(cabinType.getCabinTypeCode());
         ticketData.setMainClassName(priceClass.getName());
         ticketData.setIsWebSite(BusinessEnum.ProductType.WEBSITE.getCode());
         ticketData.setSeatClassName(ticketData.getMainClassName());
         ticketData.setProductType(BusinessEnum.ProductType.WEBSITE.getCode());
-        ticketData.setQuantity(seatSaleSd.getServiceDefinitionAssociation().getServiceBundle().getMaximumServiceQty());
+
+        final ServiceDefinitionAssociation serviceDefinitionAssociation = seatSaleSd.getServiceDefinitionAssociation();
+        final ServiceBundle serviceBundle;
+        if (serviceDefinitionAssociation != null && (serviceBundle = serviceDefinitionAssociation.getServiceBundle()) != null){
+            ticketData.setQuantity(serviceBundle.getMaximumServiceQty());
+        }
         ticketData.setTicketPrice(new BigDecimal(baseAmount.getValue()));
         ticketData.setPrice(ticketData.getTicketPrice());
         ticketData.setPurchasePrice(ticketData.getTicketPrice());
-        ticketData.setTicketId(FlightKeyUtils.getTicketId(flightId, ticketData.getProductType(), ticketData.getSeatClassCode(), offerItemID));
+        ticketData.setTicketId(FlightKeyUtils.getTicketId(flightData.getFlightId(), ticketData.getProductType(), ticketData.getSeatClassCode(), offerItemID));
 
         ticketData.setOfferItemId(offerItemID);
 
@@ -326,8 +334,10 @@ public class NdcFlightChangeFlightSearchHandler {
         ticketData.setServiceDefinitionList(getServiceDefinitionList(serviceDefinitionList, baggageAllowanceMap, baggageInfoData));
 
         List<FareRule> fareRule = fareComponent.getFareRule();
-        CorpApiTicketPolicy corpApiTicketPolicy = parseTicketPolicy(fareRule);
+        CorpApiTicketPolicy corpApiTicketPolicy = parseTicketPolicy(fareRule, flightData.getFlightDate()+" "+flightData.getDepartureTime(), ticketData.getTicketPrice());
         corpApiTicketPolicy.setFlightBaggageInfoData(baggageInfoData);
+        corpApiTicketPolicy.setBaggageInfo(parseBaggageInfoStr(baggageInfoData));
+
         ticketData.setPolicy(corpApiTicketPolicy);
         ticketData.setUpgradeTotalAmount(new BigDecimal(upgradeTotalAmount));
 
@@ -335,7 +345,7 @@ public class NdcFlightChangeFlightSearchHandler {
     }
 
     public List<TicketServiceDefinition> getServiceDefinitionList(List<ServiceDefinition> serviceDefinitionList, Map<String, BaggageAllowance> baggageAllowanceMap, FlightBaggageInfoData baggageInfoData) {
-        final List<TicketServiceDefinition> ticketServiceDefinitionList = Optional.ofNullable(serviceDefinitionList).orElseGet(Arrays::asList).stream().map(serviceDefinition -> {
+        return Optional.ofNullable(serviceDefinitionList).orElseGet(Arrays::asList).stream().map(serviceDefinition -> {
             final TicketServiceDefinition definition = new TicketServiceDefinition();
 
             definition.setServiceDefinitionID(serviceDefinition.getServiceDefinitionID());
@@ -344,7 +354,7 @@ public class NdcFlightChangeFlightSearchHandler {
             definition.setName(serviceDefinition.getName());
             final ServiceDefinitionAssociation serviceDefinitionAssociation = serviceDefinition.getServiceDefinitionAssociation();
 
-            BaggageAllowance baggageAllowance = null;
+            BaggageAllowance baggageAllowance;
             if (serviceDefinitionAssociation != null && (baggageAllowance = baggageAllowanceMap.get(serviceDefinitionAssociation.getBaggageAllowanceRefID())) != null) {
                 // 行李额携带类型
                 String typeCode = baggageAllowance.getTypeCode();
@@ -374,11 +384,149 @@ public class NdcFlightChangeFlightSearchHandler {
 
             return definition;
         }).collect(Collectors.toList());
-
-        return ticketServiceDefinitionList;
     }
 
     public static final String refundPolicyBeginStr = "航班规定离站时间%s%s（%s）之前，收取%s退票费 ；";
+    public static final String refundPolicyStr = "航班规定离站时间前%s%s（%s）至航班规定离站时间前%s%s（%s），收取%s退票费；";
+    public static final String refundPolicyEndStr = "航班规定离站时间前%s%s（%s）至航班起飞后，收取%s退票费；";
+
+    public static final String changePolicyBeginStr = "航班规定离站时间%s%s（%s）之前，收取%s的改期费；";
+    public static final String changePolicyStr = "航班规定离站时间前%s%s（%s）至航班规定离站时间前%s%s（%s），收取%s的改期费；";
+    public static final String changePolicyEndStr = "航班规定离站时间前%s%s（%s）至航班起飞后，收取%s的改期费；";
+
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern(DateTimeUtils.PATTEN_YYYY_MM_DD_HHMM);
+    private static final DateTimeFormatter DATE_TIME_FORMATTER_CHINESE = DateTimeFormatter.ofPattern(DateTimeUtils.PATTEN_YYYY_年_MM_月_DD_日_HH_MM);
+
+    private static CorpApiTicketPolicy parseTicketPolicy(List<FareRule> fareRule, String flightDate, BigDecimal ticketPrice) {
+        CorpApiTicketPolicy policy = new CorpApiTicketPolicy();
+        List<TgqPointChargeInfo> tgqPointChargeInfoList = new ArrayList<>();
+
+        StringBuilder refundPolicy = new StringBuilder();
+        StringBuilder changePolicy = new StringBuilder();
+
+        LocalDateTime flyDate = LocalDateTime.parse(flightDate, DATE_TIME_FORMATTER);
+
+        for (int i = fareRule.size()-1; i >=0; i--){
+
+            FareRule rule = fareRule.get(i);
+            Remark remark = rule.getRemark();
+
+            RemarkText remarkText = JSONObject.parseObject(remark.getRemarkText(), RemarkText.class);
+            final String useFlag = remarkText.getUseFlag(); // 0使用前 1使用后
+            if (useFlag.equals("1")){
+                continue;
+            }
+
+//            String timeFlag = remarkText.getTimeFlag(); //0 航前 1 航后
+            Long maxTime = remarkText.getMaxTime(), minTime = remarkText.getMinTime(); //时间
+            String maxTimeUnit = remarkText.getMaxTimeUnit(), minTimeUnit = remarkText.getMinTimeUnit(); //单位，D(天),N(分钟),H(小时),M(月)
+
+            TgqPointChargeInfo chargeInfo = new TgqPointChargeInfo();
+            for (Penalty penalty : rule.getPenalty()) {
+
+                final String penaltyPercent = penalty.getPenaltyAmount().getValue();
+                // 起飞前
+                if (penaltyPercent == null || !penalty.getAppCode().equals("PDE")) {
+                    continue;
+                }
+
+                BigDecimal penaltyAmount = new BigDecimal(penaltyPercent).divide(new BigDecimal("100"), 2, RoundingMode.HALF_UP).multiply(ticketPrice).setScale(0, BigDecimal.ROUND_HALF_UP);
+                // 退票
+                if ("Cancellation".equals(penalty.getTypeCode())) {
+
+                    chargeInfo.setReturnFee(penaltyAmount);
+                    parseDate(flyDate, minTime, minTimeUnit, maxTime, maxTimeUnit, chargeInfo);
+
+                    refundPolicyParse(refundPolicy, remarkText, penaltyPercent);
+                }
+
+                // 改签
+                if ("Upgrade".equals(penalty.getTypeCode())){
+
+                    chargeInfo.setChangeFee(penaltyAmount);
+
+                    parseDate(flyDate, minTime, minTimeUnit, maxTime, maxTimeUnit, chargeInfo);
+
+                    changePolicyParse(changePolicy, remarkText, penaltyPercent);
+                }
+            }
+            tgqPointChargeInfoList.add(chargeInfo);
+        }
+
+        policy.setChangePolicy(changePolicy.toString());
+        policy.setRefundPolicy(refundPolicy.toString());
+        policy.setTgqPointChargeInfoList(tgqPointChargeInfoList);
+
+        return policy;
+    }
+
+    private static void refundPolicyParse(StringBuilder refundPolicy, RemarkText remarkText, String penaltyPercent){
+        policyParse(refundPolicy, remarkText, penaltyPercent, refundPolicyEndStr, refundPolicyBeginStr, refundPolicyStr);
+    }
+
+    private static void changePolicyParse(StringBuilder changePolicy, RemarkText remarkText, String penaltyPercent){
+
+        policyParse(changePolicy, remarkText, penaltyPercent, changePolicyEndStr, changePolicyBeginStr, changePolicyStr);
+    }
+
+    private static void policyParse(StringBuilder refundPolicy, RemarkText remarkText, String penaltyPercent, String refundPolicyEndStr, String refundPolicyBeginStr, String refundPolicyStr) {
+        Long maxTime = remarkText.getMaxTime(), minTime = remarkText.getMinTime();
+        String maxTimeUnit = remarkText.getMaxTimeUnit(), minTimeUnit = remarkText.getMinTimeUnit();
+        String maxTimeFlag = remarkText.getMaxTimeFlag(), minTimeFlag = remarkText.getMinTimeFlag(); //是否包含,0不包含1包含
+
+        if (maxTime == 0) {
+            refundPolicy.append(String.format(refundPolicyEndStr, minTime, BusinessEnum.DateType.getDateMsgByCode(minTimeUnit), BusinessEnum.MaxTimeFlag.getMaxTimeFlagByCode(minTimeFlag), penaltyPercent+"%"));
+        }else if (minTime == 12) {
+            refundPolicy.append(String.format(refundPolicyBeginStr, maxTime, BusinessEnum.DateType.getDateMsgByCode(maxTimeUnit), BusinessEnum.MaxTimeFlag.getMaxTimeFlagByCode(maxTimeFlag), penaltyPercent+"%"));
+        }else {
+            refundPolicy.append(String.format(refundPolicyStr, minTime, BusinessEnum.DateType.getDateMsgByCode(minTimeUnit), BusinessEnum.MaxTimeFlag.getMaxTimeFlagByCode(minTimeFlag)
+                    , maxTime, BusinessEnum.DateType.getDateMsgByCode(maxTimeUnit), BusinessEnum.MaxTimeFlag.getMaxTimeFlagByCode(maxTimeFlag)
+                    , penaltyPercent+"%"));
+        }
+    }
+
+    private static void parseDate(LocalDateTime flyDate, Long minTime, String minTimeUnit, Long maxTime, String maxTimeUnit, TgqPointChargeInfo chargeInfo) {
+        if (maxTime == 0) {
+            switch (minTimeUnit) {
+                case "D":
+                    chargeInfo.setTimeText(flyDate.minusDays(minTime).format(DATE_TIME_FORMATTER_CHINESE) + "后");
+                    break;
+                case "N":
+                    chargeInfo.setTimeText(flyDate.minusMinutes(minTime).format(DATE_TIME_FORMATTER_CHINESE) + "后");
+                    break;
+                case "H":
+                    chargeInfo.setTimeText(flyDate.minusHours(minTime).format(DATE_TIME_FORMATTER_CHINESE) + "后");
+                    break;
+                case "M":
+                    chargeInfo.setTimeText(flyDate.minusMonths(minTime).format(DATE_TIME_FORMATTER_CHINESE) + "后");
+                    break;
+            }
+        }else {
+            switch (maxTimeUnit) {
+                case "D":
+                    chargeInfo.setTimeText(flyDate.minusDays(maxTime).format(DATE_TIME_FORMATTER_CHINESE) + "前");
+                    break;
+                case "N":
+                    chargeInfo.setTimeText(flyDate.minusMinutes(maxTime).format(DATE_TIME_FORMATTER_CHINESE) + "前");
+                    break;
+                case "H":
+                    chargeInfo.setTimeText(flyDate.minusHours(maxTime).format(DATE_TIME_FORMATTER_CHINESE) + "前");
+                    break;
+                case "M":
+                    chargeInfo.setTimeText(flyDate.minusMonths(maxTime).format(DATE_TIME_FORMATTER_CHINESE) + "前");
+                    break;
+            }
+        }
+    }
+
+    public static String parseBaggageInfoStr(FlightBaggageInfoData baggageInfoData) {
+        if (StringUtils.isEmpty(baggageInfoData.getFreeBaggageWeight()) || baggageInfoData.getFreeBaggageWeight().equals("0")) {
+            return MessageFormat.format("无免费行李额；随身行李额：{0},限带{1}件", baggageInfoData.getCarryOnBaggageWeight(), baggageInfoData.getCarryOnBaggageAmount());
+        }
+        return MessageFormat.format("免费行李额：{0}；随身行李额：{1},限带{2}件", baggageInfoData.getFreeBaggageWeight(), baggageInfoData.getCarryOnBaggageWeight(), baggageInfoData.getCarryOnBaggageAmount());
+    }
+
+    /*public static final String refundPolicyBeginStr = "航班规定离站时间%s%s（%s）之前，收取%s退票费 ；";
     public static final String refundPolicyStr = "航班规定离站时间前%s%s（%s）至航班规定离站时间前%s%s（%s），收取%s退票费 ；";
     public static final String refundPolicyEndStr = "航班规定离站时间前%s%s（%s）至航班起飞后，收取%s退票费；";
 
@@ -401,8 +549,7 @@ public class NdcFlightChangeFlightSearchHandler {
                 continue;
             }
 
-            final String timeFlag = remarkText.getTimeFlag(); //0 航前 1 航后
-
+//            final String timeFlag = remarkText.getTimeFlag(); //0 航前 1 航后
             final String maxTimeUnit = remarkText.getMaxTimeUnit(); //单位，D(天),N(分钟),H(小时),M(月)
             final String maxTimeFlag = remarkText.getMaxTimeFlag(); //是否包含,0不包含1包含
             final Long maxTime = remarkText.getMaxTime(); //时间
@@ -417,9 +564,6 @@ public class NdcFlightChangeFlightSearchHandler {
 
                 if (penaltyPercent == null) {
                     continue;
-                }
-                // 起飞后
-                if (penalty.getAppCode().equals("ADE")) {
                 }
 
                 // 起飞前
@@ -458,7 +602,7 @@ public class NdcFlightChangeFlightSearchHandler {
         policy.setChangePolicy(changePolicy.toString());
         policy.setRefundPolicy(refundPolicy.toString());
         return policy;
-    }
+    }*/
     
     public static String getFlyTime(String depTime, String arrTime, String dateFormat) {
 

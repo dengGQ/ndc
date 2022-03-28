@@ -28,22 +28,19 @@ import com.ndc.channel.flight.xmlBean.refundAmountSearch.response.bean.refund.Pa
 import com.ndc.channel.flight.xmlBean.refundConfirm.request.bean.BinaryObject;
 import com.ndc.channel.flight.xmlBean.refundConfirm.request.bean.Media;
 import com.ndc.channel.mapper.NdcFlightApiOrderRelMapper;
-import com.ndc.channel.redis.RedisUtils;
 import com.ndc.channel.service.NdcFlightApiRefundOrderRelService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.io.*;
 import java.math.BigDecimal;
-import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Slf4j
 @Component
@@ -60,9 +57,6 @@ public class NdcFlightOrderRefundHandler {
 
     @Resource
     private NdcFlightApiRefundOrderRelService refundOrderRelService;
-
-    @Resource
-    private RedisUtils redisUtils;
 
     /**
      * 退票单提交
@@ -94,7 +88,7 @@ public class NdcFlightOrderRefundHandler {
         final com.ndc.channel.flight.xmlBean.refundConfirm.response.bean.Order order = refundConfirmResponse.getOrder();
         final String refundId = order.getOrderID();
 
-        refundOrderRelService.insertEntity(params, orderRel.getOrderId(), refundId);
+        refundOrderRelService.insertEntity(params, orderRel.getOrderId(), refundId, rq.getPayloadAttributes().getEchoTokenText());
 
         delayQueryExecutor.submitTask(JSON.toJSONString(new MsgBody(orderRel.getOrderId(), "2")), 60L);
 
@@ -342,7 +336,7 @@ public class NdcFlightOrderRefundHandler {
 
         if (CollectionUtils.isNotEmpty(refundAttachmentUrl)) {
 
-            List<Media> mediaList = refundAttachmentUrl.stream().map(attachUrl -> {
+            List<Media> mediaList = refundAttachmentUrl.stream().filter(s-> StringUtils.isNoneBlank(s)).map(attachUrl -> {
                 Media media = new Media();
                 media.setMediaID(UUID.randomUUID().toString());
                 media.setBinaryObject(getFileBase64Str(attachUrl));
@@ -350,7 +344,10 @@ public class NdcFlightOrderRefundHandler {
 
                 return media;
             }).collect(Collectors.toList());
-            refundConfirmDataLists.setMediaList(mediaList);
+
+            if (mediaList.size() != 0) {
+                refundConfirmDataLists.setMediaList(mediaList);
+            }
         }
 
         return refundConfirmDataLists;

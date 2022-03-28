@@ -35,6 +35,7 @@ public class NdcFlightApiOrderRelServiceImpl implements NdcFlightApiOrderRelServ
 
             rel.setOwnerCode(orderCreateData.getOwnerCode());
             rel.setOwnerTypeCode(orderCreateData.getOwnerTypeCode());
+            rel.setRequestId(orderCreateData.getRequestId());
 
             apiOrderRelMapper.insertSelective(rel);
         }catch (Exception e) {

@@ -27,15 +27,8 @@ public class NdcFlightApiRefundOrderRel {
      */
     private String afterRefundTicketUrl;
 
-    /**
-     * 退款总额
-     */
-    private BigDecimal refundMoney;
 
-    /**
-     * 退票费
-     */
-    private BigDecimal refundFee;
+    private String requestId;
 
     /**
      * 创建时间
@@ -90,19 +83,11 @@ public class NdcFlightApiRefundOrderRel {
         this.createTime = createTime;
     }
 
-    public BigDecimal getRefundMoney() {
-        return refundMoney;
+    public String getRequestId() {
+        return requestId;
     }
 
-    public void setRefundMoney(BigDecimal refundMoney) {
-        this.refundMoney = refundMoney;
-    }
-
-    public BigDecimal getRefundFee() {
-        return refundFee;
-    }
-
-    public void setRefundFee(BigDecimal refundFee) {
-        this.refundFee = refundFee;
+    public void setRequestId(String requestId) {
+        this.requestId = requestId;
     }
 }
