@@ -2,7 +2,6 @@ package com.ndc.channel.executor;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.ndc.channel.exception.BusinessException;
 import com.ndc.channel.flight.dto.MsgBody;
 import com.ndc.channel.flight.dto.orderDetail.NdcOrderDetailData;
 import com.ndc.channel.flight.handler.NdcOrderDetailHandler;
@@ -15,7 +14,6 @@ import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * NDC订单明细延迟查询
@@ -24,7 +22,8 @@ import java.util.stream.Collectors;
 @Component
 public class OrderDetailDelayQueryExecutor {
 
-    public static final String orderStatusQueryKey = "order_status_query_key";
+    public static final String orderStatusQueryKey1 = "order_status_query_key";
+    public static final String orderStatusQueryKey = "orderStatusQueryKey1";
 
     @Resource
     private RedisUtils redisUtils;
@@ -34,7 +33,7 @@ public class OrderDetailDelayQueryExecutor {
 
     private static Thread th = null;
 
-    private DelayTask delayTask = new DelayTask();
+    private final DelayTask delayTask = new DelayTask();
 
     @PostConstruct
     public void initWorker() {
@@ -45,7 +44,7 @@ public class OrderDetailDelayQueryExecutor {
 
     public void submitTask(String msgBody, long delaySecond) {
 
-        redisUtils.zsetAddWithScore(orderStatusQueryKey, msgBody, System.currentTimeMillis() / 1000 + delaySecond);
+        redisUtils.zsetAddWithScore(orderStatusQueryKey, msgBody, System.currentTimeMillis() + delaySecond*1000);
 
         if (th == null || th.getState() == Thread.State.TERMINATED) {
             initWorker();
@@ -80,37 +79,58 @@ public class OrderDetailDelayQueryExecutor {
     class DelayTask implements Runnable {
         @Override
         public void run() {
+
             while (true) {
-                try {
-                    Set<ZSetOperations.TypedTuple> tupleSet = redisUtils.rangeWithScores(orderStatusQueryKey, 0, 1);
+                Set<ZSetOperations.TypedTuple> tupleSet = redisUtils.rangeWithScores(orderStatusQueryKey, 0, 4);
 
-                    if (tupleSet == null || tupleSet.size() ==0) {
-                        log.info("没任务休息会.............");
-                        break;
-                    }
+                if (tupleSet == null || tupleSet.size() ==0) {
+                    log.info("没任务休息会.............");
+                    break;
+                }
 
-                    ZSetOperations.TypedTuple typedTuple = tupleSet.stream().collect(Collectors.toList()).get(0);
-                    long score = typedTuple.getScore().longValue();
+                doJob(tupleSet);
+            }
+        }
+
+        private void doJob(Set<ZSetOperations.TypedTuple> tupleSet) {
+            try {
+
+                long currentScore = System.currentTimeMillis();
+
+                // 本次任务中未到期的最小等待时间
+                long minWaitTime = 0;
+
+                // 到期任务处理
+                for (ZSetOperations.TypedTuple typedTuple : tupleSet) {
+
+                    long timeDiff = typedTuple.getScore().longValue() - currentScore;
+
                     String msgBody = typedTuple.getValue().toString();
-                    long currentV = System.currentTimeMillis()/1000;
 
-                    if ((currentV - score) >= 0) {
+                    if ( timeDiff <= 0 ) {
 
                         if (redisUtils.zsetRem(orderStatusQueryKey, msgBody) > 0) {
-
-                            log.info("开始干活, msgBody={}, score={}, current={}", msgBody, score, currentV);
+                            log.info("开始干活............msgBody={}", msgBody);
                             orderStatusProcess(msgBody);
+                        }else {
+                            log.info("有任务到期，但是被其他兄弟抢去了..................");
                         }
-                        log.info("有任务，但其他兄弟抢去了，直接抢下一个任务.............");
-                    }else {
-                        log.info("有任务，但未到工作时间，休息1秒再看看.............");
-                        Thread.sleep(1000l);
+                    }else if (minWaitTime == 0) { // tupleSet本身就是按分值递增的有序集合
+
+                        minWaitTime = timeDiff;
                     }
-                } catch (InterruptedException e) {
-                    log.error("线程中断异常", e);
-                } catch (Exception e) {
-                    log.error("订单状态刷新异常", e);
                 }
+
+                // 本次提取任务中有未到期的
+                if (minWaitTime > 0) {
+
+                    log.info("有任务未到期，休息{}毫秒再看看.............", minWaitTime);
+                    Thread.sleep(minWaitTime);
+                }
+            } catch (InterruptedException e) {
+                log.error("线程中断异常", e);
+            } catch (Exception e) {
+                log.error("订单状态刷新异常", e);
             }
         }
     }

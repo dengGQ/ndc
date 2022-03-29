@@ -2,7 +2,6 @@ package com.ndc.channel.flight;
 
 import com.alibaba.fastjson.JSON;
 import com.ndc.channel.ChannelApplication;
-import com.ndc.channel.entity.NdcFlightApiOrderRel;
 import com.ndc.channel.executor.OrderDetailDelayQueryExecutor;
 import com.ndc.channel.flight.dto.MsgBody;
 import com.ndc.channel.flight.dto.createOrder.CorpApiOrderFlightTicketParams;
@@ -180,7 +179,6 @@ public class MuNdcFlightSearchServiceImplTests {
         final NdcOrderDetailData detailData = JSON.parseObject(str, NdcOrderDetailData.class);
         detailHandler.statusChangeNotice(detailData);
     }
-
 
     static class BitMap{
 

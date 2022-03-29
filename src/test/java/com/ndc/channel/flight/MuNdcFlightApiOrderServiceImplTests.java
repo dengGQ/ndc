@@ -1,11 +1,10 @@
 package com.ndc.channel.flight;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.ndc.channel.ChannelApplication;
-import com.ndc.channel.executor.OrderDetailDelayQueryExecutor;
 import com.ndc.channel.flight.dto.createOrder.CorpApiFlightOrderCreateData;
 import com.ndc.channel.flight.dto.createOrder.FlightOrderCreateReq;
+import com.ndc.channel.redis.RedisUtils;
 import com.ndc.channel.service.NdcFlightApiOrderRelService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
@@ -15,6 +14,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.annotation.Resource;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.stream.IntStream;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = ChannelApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -25,6 +27,8 @@ public class MuNdcFlightApiOrderServiceImplTests {
     @Resource
     NdcFlightApiOrderRelService orderRelService;
 
+    @Resource
+    RedisUtils redisUtils;
 
     @Test
     public void insertEntity() {
@@ -40,30 +44,44 @@ public class MuNdcFlightApiOrderServiceImplTests {
         orderRelService.insertEntity(orderCreateReq, orderCreateData);
     }
 
-    public static void main(String[] args) throws InterruptedException {
+    @Test
+    public void zaddSet(){
 
-        Thread th = null;
 
-        while (true) {
-            if (th == null || th.getState() == Thread.State.TERMINATED) {
-                th = new Thread(new ExecutorTask());
-                th.start();
-            }
+        ExecutorService executorService = Executors.newFixedThreadPool(10);
+        IntStream.range(5, 25).forEach(i -> {
 
-            Thread.sleep(500l);
-        }
-    }
+            final ExecutorTask executorTask = new ExecutorTask(String.valueOf(i));
 
-    static class ExecutorTask implements Runnable{
-        @Override
-        public void run() {
+            executorService.submit(executorTask);
+        });
+
+        executorService.shutdown();
+
+        while (!executorService.isTerminated()) {
             try {
-                System.out.println("----------threadName="+Thread.currentThread().getName());
-                Thread.sleep(5000l);
-                System.out.println("----------============threadName="+Thread.currentThread().getName());
+                Thread.sleep(300);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    class ExecutorTask implements Runnable{
+
+        private String member;
+
+        public ExecutorTask(String member) {
+            this.member = member;
+        }
+
+        @Override
+        public void run() {
+//            synchronized (ExecutorTask.class){
+                final long score = System.currentTimeMillis()+Long.valueOf(member)*1000;
+                log.info(score+"");
+                redisUtils.zsetAddWithScore("orderStatusQueryKey1", "weeee-"+member, score);
+//            }
         }
     }
 }
