@@ -169,9 +169,9 @@ public class NdcFlightRefundOrderDetailHandler implements NdcOrderDetailHandler{
                 noticeData.setRefundMoney(passengerDataList.stream().map(FlightOrderPassengerData::getRefundAmount).reduce(BigDecimal::add).get());
                 noticeData.setRefundNumber(refundId);
                 noticeData.setPassengerDatas(passengerDataList);
-                noticeData.setSuccess(true);
+                noticeData.setIsSuccess(true);
             }else {
-                noticeData.setSuccess(false);
+                noticeData.setIsSuccess(false);
                 noticeData.setMessage(BusinessEnum.RefundAuditingStatus.getLabelByName(refundAuditingStatus));
             }
 

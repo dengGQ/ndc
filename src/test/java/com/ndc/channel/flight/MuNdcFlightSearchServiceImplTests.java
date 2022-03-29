@@ -173,6 +173,14 @@ public class MuNdcFlightSearchServiceImplTests {
         while (true){}
     }
 
+    @Test
+    public void refundNotice() {
+        String str = "{\"channelOrderNumber\":\"1022032500211472\",\"orderStatus\":\"RF\",\"refundMoney\":1870.0,\"ticketInfoList\":[{\"idCardNo\":\"42080219910522033X\",\"passengerName\":\"测试\",\"refundAmount\":1870.0,\"refundAuditingStatus\":\"501\",\"refundFee\":0.0,\"ticketNumber\":\"7811157642985\",\"ticketStatus\":\"RF\"}]}";
+
+        final NdcOrderDetailData detailData = JSON.parseObject(str, NdcOrderDetailData.class);
+        detailHandler.statusChangeNotice(detailData);
+    }
+
 
     static class BitMap{
 

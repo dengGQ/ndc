@@ -41,11 +41,11 @@ public class FlightRefundOrderNoticeData {
         this.externalRefundNumber = externalRefundNumber;
     }
 
-    public Boolean getSuccess() {
+    public Boolean getIsSuccess() {
         return isSuccess;
     }
 
-    public void setSuccess(Boolean success) {
+    public void setIsSuccess(Boolean success) {
         isSuccess = success;
     }
 
