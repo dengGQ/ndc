@@ -2,6 +2,7 @@ package com.ndc.channel.flight.handler;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.ndc.channel.entity.NdcChannelProductConfig;
 import com.ndc.channel.enumtype.BusinessEnum;
 import com.ndc.channel.enumtype.ProductRightUtil;
 import com.ndc.channel.exception.BusinessException;
@@ -13,11 +14,13 @@ import com.ndc.channel.flight.xmlBean.flightSearch.common.Error;
 import com.ndc.channel.flight.xmlBean.flightSearch.request.bean.*;
 import com.ndc.channel.flight.xmlBean.flightSearch.response.RemarkText;
 import com.ndc.channel.flight.xmlBean.flightSearch.response.bean.*;
+import com.ndc.channel.mapper.NdcChannelProductConfigMapper;
 import com.ndc.channel.redis.RedisKeyConstants;
 import com.ndc.channel.redis.RedisUtils;
 import com.ndc.channel.util.FlightKeyUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
@@ -43,6 +46,9 @@ public class NdcFlightSearchHandler {
     @Resource
     private RedisUtils redisUtils;
 
+    @Resource
+    private NdcChannelProductConfigMapper productConfigMapper;
+
     public List<CorpApiFlightListDataV2> flightSearch(String flightDate, String depCityCode, String destCityCode) {
 
         IATAAirShoppingRQ flightSearchParams = getFlightSearchParams(flightDate, depCityCode, destCityCode);
@@ -57,6 +63,12 @@ public class NdcFlightSearchHandler {
     }
 
     private List<CorpApiFlightListDataV2> convertFlightData(Response response, String flightDate, String depCityCode, String destCityCode) {
+
+        List<NdcChannelProductConfig> productList = productConfigMapper.queryEnableProductByNdcAccountCode("mu_ndc");
+        Map<String, NdcChannelProductConfig> productConfigMap = productList.stream().collect(Collectors.toMap(NdcChannelProductConfig::getProductCode, Function.identity()));
+        if (MapUtils.isEmpty(productConfigMap)) {
+            return Arrays.asList();
+        }
 
         String everyFlightDateKey=flightDate+depCityCode+destCityCode;
         final DataLists dataLists = response.getDataLists();
@@ -144,6 +156,11 @@ public class NdcFlightSearchHandler {
 
                 final PriceClass priceClass = priceClassMap.get(priceClassRefID);
 
+                NdcChannelProductConfig ndcChannelProductConfig = productConfigMap.get(priceClass.getCode());
+                if (ndcChannelProductConfig == null) {
+                    continue;
+                }
+
                 // 价格来源
                 final String pricingSystemCodeText = fareDetail.getPricingSystemCodeText();
 
@@ -170,10 +187,20 @@ public class NdcFlightSearchHandler {
                     ticketData.setPriceClassName(priceClass.getName());
                     ticketData.setPriceClassDesc(priceClass.getDesc().getDescText());
                     ticketData.setFareTypeCode(fareTypeCode);
+                    ticketData.setProductCode(priceClass.getCode());
                     ticketData.setProductName(priceClass.getName());
                     ProductRightDefinition definition = JSONObject.parseObject(priceClass.getDesc().getDescText(), ProductRightDefinition.class);
-                    ticketData.setRightsList(parseProductRights(definition));
-                    ticketData.setProductNotice(definition.getProductDefinition().getProductNotice());
+                    List<String> productRights = parseProductRights(definition);
+                    if (CollectionUtils.isEmpty(productRights) && StringUtils.isNotEmpty(ndcChannelProductConfig.getProductRights())) {
+                        productRights = Arrays.asList(ndcChannelProductConfig.getProductRights().split("[,，]"));
+                    }
+                    ticketData.setRightsList(productRights);
+
+                    String productNotice = definition.getProductDefinition().getProductNotice();
+                    if (StringUtils.isEmpty(productNotice)) {
+                        productNotice = ndcChannelProductConfig.getProductConstraint();
+                    }
+                    ticketData.setProductNotice(productNotice);
 
                     TaxSummary taxSummary = offerItem.getPrice().getTaxSummary();
                     final Map<String, Tax> taxMap = taxSummary.getTax().stream().collect(Collectors.toMap(Tax::getTaxCode, Function.identity()));
