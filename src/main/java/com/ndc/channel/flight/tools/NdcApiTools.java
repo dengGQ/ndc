@@ -286,8 +286,8 @@ public class NdcApiTools {
         headers.put("chnlCode", accountInfo.getChnlCode());
         headers.put("Authorization", accountInfo.getAuthorization());
         headers.put("apiCode", accountInfo.getNdcApiInfo().getApiCode());
-        String resp = channelOKHttpService.doPostXml(url, xmlParams, headers, accountInfo.getRequestId());
 
+        final String resp = doRequest(url, xmlParams, headers, accountInfo);
         String respLog = resp;
         if (accountInfo.getNdcApiInfo().getApiCode().equals("A0534")) {
             respLog = "内容太大隐藏";
@@ -302,4 +302,7 @@ public class NdcApiTools {
         return rs;
     }
 
+    public String doRequest(String url, String xmlParams, Map<String,String> headers, NdcAccountInfoData accountInfo) throws Exception {
+        return channelOKHttpService.doPostXml(url, xmlParams, headers);
+    }
 }

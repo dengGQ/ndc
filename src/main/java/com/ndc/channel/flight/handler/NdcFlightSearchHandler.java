@@ -475,7 +475,7 @@ public class NdcFlightSearchHandler {
 
         policy.setChangePolicy(changePolicy.toString());
         policy.setRefundPolicy(refundPolicy.toString());
-        policy.setTgqPointChargeInfoList(tgqPointChargeInfoList);
+        policy.setTgqPointChargeInfoList(tgqPointChargeInfoList.stream().sorted(Comparator.comparing(TgqPointChargeInfo::getTimeText)).collect(Collectors.toList()));
 
         return policy;
     }

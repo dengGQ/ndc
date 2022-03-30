@@ -2,6 +2,7 @@ package com.ndc.channel.model;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.ndc.channel.entity.NdcAccountInfo;
 import com.ndc.channel.enumtype.BusinessEnum;
 
 import java.time.LocalDateTime;
@@ -9,6 +10,10 @@ import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
 public class NdcAccountInfoData {
+
+    private String accountCode;
+
+    private String accountName;
 
     private String merCode;
     private String chnlCode;
@@ -83,5 +88,21 @@ public class NdcAccountInfoData {
 
     public void setRequestId(String requestId) {
         this.requestId = requestId;
+    }
+
+    public String getAccountCode() {
+        return accountCode;
+    }
+
+    public void setAccountCode(String accountCode) {
+        this.accountCode = accountCode;
+    }
+
+    public String getAccountName() {
+        return accountName;
+    }
+
+    public void setAccountName(String accountName) {
+        this.accountName = accountName;
     }
 }

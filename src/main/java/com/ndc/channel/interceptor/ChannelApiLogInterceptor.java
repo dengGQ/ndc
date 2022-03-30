@@ -2,6 +2,7 @@ package com.ndc.channel.interceptor;
 
 import com.alibaba.fastjson.JSONObject;
 import com.ndc.channel.flight.xmlBean.flightSearch.common.CommonRQ;
+import com.ndc.channel.model.NdcAccountInfoData;
 import com.ndc.channel.model.NdcChannelApiLog;
 import com.ndc.channel.exception.BusinessException;
 import com.ndc.channel.mongodb.ICommonService;
@@ -14,10 +15,7 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Unmarshaller;
 import java.io.PrintWriter;
-import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.Date;
 
@@ -29,10 +27,10 @@ public class ChannelApiLogInterceptor {
     @Resource
     private ICommonService commonService;
 
-    @Pointcut("execution(public * com.ndc.channel.http.ChannelOKHttpService.*(..))")
-    public void ndcApiToolsAspect(){}
+    @Pointcut("execution(public String com.ndc.channel.flight.tools.NdcApiTools.doRequest(String, String, java.util.Map<String,String>, com.ndc.channel.model.NdcAccountInfoData))")
+    public void ndcChannelCallAspect(){}
 
-    @Around("ndcApiToolsAspect()")
+    @Around("ndcChannelCallAspect()")
     public Object aroundLogger(ProceedingJoinPoint jp) throws Throwable{
 
         Signature signature = jp.getSignature();
@@ -41,11 +39,11 @@ public class ChannelApiLogInterceptor {
         final Object[] args = jp.getArgs();
         String url= null;
         String params = null;
-        String requestId = null;
+        NdcAccountInfoData accountInfo = null;
         try{
             url = (String) args[0];
             params = (String) args[1];
-            requestId = args.length == 4 ? (String) args[3] : null;
+            accountInfo = (NdcAccountInfoData) args[3];
         }catch (Exception e){
             log.error("参数解析失败", e);
         }
@@ -67,7 +65,7 @@ public class ChannelApiLogInterceptor {
             throw e;
         }finally {
             long et = System.currentTimeMillis();
-            createChannelApiLog(params, methodName, url, result, status, requestTime, et-st, requestId);
+            createChannelApiLog(params, methodName, url, result, status, requestTime, et-st, accountInfo);
         }
         return result;
     }
@@ -87,12 +85,14 @@ public class ChannelApiLogInterceptor {
     /**
      * 接口调用日志表数据
      */
-    private void createChannelApiLog(String params, String methodName, String url, Object result, Byte status, Date requestTime, long duration, String requestId){
+    private void createChannelApiLog(String params, String methodName, String url, Object result, Byte status, Date requestTime, long duration, NdcAccountInfoData accountInfo){
         try {
 
             //参数
             NdcChannelApiLog apiLog = new NdcChannelApiLog();
-            apiLog.setRequestId(requestId);
+            apiLog.setNdcAccountCode(accountInfo.getAccountCode());
+            apiLog.setNdcAccountName(accountInfo.getAccountName());
+            apiLog.setRequestId(accountInfo.getRequestId());
             apiLog.setRequestTime(requestTime);
             apiLog.setDuration(duration);
             apiLog.setUrl(url);
@@ -100,8 +100,6 @@ public class ChannelApiLogInterceptor {
             apiLog.setStatus(status);
             apiLog.setMethodName(methodName);
             apiLog.setResult(result == null ? null : JSONObject.toJSONString(result));
-            apiLog.setNdcAccountCode("mu_ndc");
-            apiLog.setNdcAccountName("东航NDC");
 
             commonService.insert(apiLog);
         }catch (Exception e) {

@@ -141,7 +141,7 @@ public class ChannelOKHttpService {
 	public String doPostXml(String url, String paramXml) throws Exception {
 		return doPostXml(url, paramXml);
 	}
-	public String doPostXml(String url, String paramXml, Map<String,String> headers, String requestId) throws Exception {
+	public String doPostXml(String url, String paramXml, Map<String,String> headers) throws Exception {
 		try {
 			RequestBody body = RequestBody.create(MEDIA_TYPE_XML, paramXml);
 			Request.Builder builder = new Request.Builder().url(url);
