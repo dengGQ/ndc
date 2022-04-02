@@ -25,6 +25,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -45,9 +46,23 @@ public class NdcFlightCreateOrderHandler {
     private NdcFlightApiOrderRelMapper orderRelMapper;
 
     public CorpApiFlightOrderCreateData createOrder(FlightOrderCreateReq orderCreateReq) {
+        if (orderCreateReq.getTickets().size() > 1) {
+            throw new BusinessException(BusinessExceptionCode.REQUEST_PARAM_ERROR, "仅支持单程");
+        }
+        if (orderCreateReq.getTickets().size() == 0) {
+            throw new BusinessException(BusinessExceptionCode.REQUEST_PARAM_ERROR, "下单至少需要选择一个航班");
+        }
+
         CorpApiFlightOrderCreateData orderCreateData = new CorpApiFlightOrderCreateData();
 
-        final Request request = getCreateOrderRequest(orderCreateReq);
+        final CorpApiOrderFlightTicketParams ticketParams = orderCreateReq.getTickets().get(0);
+        final String flightId = ticketParams.getFlightId();
+        final String ticketId = ticketParams.getTicketId();
+
+        CorpApiFlightListDataV2 flightData = redisUtils.get(RedisKeyConstants.getRedisFlightDataCacheKey(flightId), CorpApiFlightListDataV2.class);
+        CorpApiTicketData ticketData = redisUtils.hGet(RedisKeyConstants.getRedisTicketDataCacheKey(flightId), ticketId, CorpApiTicketData.class);
+
+        final Request request = getCreateOrderRequest(orderCreateReq, flightData, ticketData);
 
         final List<String> contactIdList = request.getDataLists().getContactInfoList().stream().filter(contactInfo -> !contactInfo.getContactTypeText().equals("PAX")).map(ContactInfo::getContactInfoID).collect(Collectors.toList());
 
@@ -93,12 +108,12 @@ public class NdcFlightCreateOrderHandler {
         orderCreateData.setRequestId(createRQ.getPayloadAttributes().getEchoTokenText());
 
         // NDC订单关键信息保存
-        orderRelService.insertEntity(orderCreateReq, orderCreateData);
+        orderRelService.insertEntity(orderCreateReq, orderCreateData, ticketData);
 
         return orderCreateData;
     }
 
-    private Request getCreateOrderRequest(FlightOrderCreateReq req) {
+    private Request getCreateOrderRequest(FlightOrderCreateReq req, CorpApiFlightListDataV2 flightData, CorpApiTicketData ticketData) {
         Request request = new Request();
 
         DataLists dataLists = new DataLists();
@@ -113,16 +128,10 @@ public class NdcFlightCreateOrderHandler {
 
         CreateOrder createOrder = new CreateOrder();
         final List<String> paxIdList = paxList.stream().map(Pax::getPaxID).collect(Collectors.toList());
-        List<SelectedOffer> selectedOfferList = req.getTickets().stream().map(ticketParams -> {
-            String flightId = ticketParams.getFlightId();
-            String ticketId = ticketParams.getTicketId();
 
-            CorpApiFlightListDataV2 flightData = redisUtils.get(RedisKeyConstants.getRedisFlightDataCacheKey(flightId), CorpApiFlightListDataV2.class);
-            CorpApiTicketData ticketData = redisUtils.hGet(RedisKeyConstants.getRedisTicketDataCacheKey(flightId), ticketId, CorpApiTicketData.class);
+        SelectedOffer selectedOffer = getSelectedOffer(flightData, ticketData, paxIdList);
 
-            return getSelectedOffer(flightData, ticketData, paxIdList);
-        }).collect(Collectors.toList());
-        createOrder.setSelectedOffer(selectedOfferList);
+        createOrder.setSelectedOffer(Collections.singletonList(selectedOffer));
         request.setCreateOrder(createOrder);
 
         return request;

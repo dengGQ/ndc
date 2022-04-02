@@ -78,13 +78,13 @@ public class PayloadAttributes {
 
     public PayloadAttributes() {
         this.altLangID = "CN";
-        this.correlationID = "";
+        this.correlationID = UUID.randomUUID().toString();
         this.echoTokenText = UUID.randomUUID().toString();
         this.primaryLangID = "CN";
         this.retransmissionInd = "false";
         this.seqNumber = "1";
         this.timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"));
-        this.trxID = "";
+        this.trxID = UUID.randomUUID().toString();
         this.trxStatusCode = "0";
         this.versionNumber = "";
     }

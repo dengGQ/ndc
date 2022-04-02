@@ -27,7 +27,7 @@ public class ChannelApiLogInterceptor {
     @Resource
     private ICommonService commonService;
 
-    @Pointcut("execution(public String com.ndc.channel.flight.tools.NdcApiTools.doRequest(String, String, java.util.Map<String,String>, com.ndc.channel.model.NdcAccountInfoData))")
+    @Pointcut("execution(public * com.ndc.channel.flight.tools.NdcApiTools.doRequest(..))")
     public void ndcChannelCallAspect(){}
 
     @Around("ndcChannelCallAspect()")

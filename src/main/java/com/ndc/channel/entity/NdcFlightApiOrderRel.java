@@ -5,7 +5,6 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 public class NdcFlightApiOrderRel implements Serializable {
-
     private Long relId;
 
     private String orderId;
@@ -25,6 +24,10 @@ public class NdcFlightApiOrderRel implements Serializable {
     private BigDecimal ticketPrice;
 
     private String requestId;
+
+    private String productConstraint;
+
+    private String productRights;
 
     private Date createTime;
 
@@ -110,6 +113,22 @@ public class NdcFlightApiOrderRel implements Serializable {
         this.requestId = requestId;
     }
 
+    public String getProductConstraint() {
+        return productConstraint;
+    }
+
+    public void setProductConstraint(String productConstraint) {
+        this.productConstraint = productConstraint;
+    }
+
+    public String getProductRights() {
+        return productRights;
+    }
+
+    public void setProductRights(String productRights) {
+        this.productRights = productRights;
+    }
+
     public Date getCreateTime() {
         return createTime;
     }
@@ -127,10 +146,15 @@ public class NdcFlightApiOrderRel implements Serializable {
         sb.append(", relId=").append(relId);
         sb.append(", orderId=").append(orderId);
         sb.append(", orderItemId=").append(orderItemId);
+        sb.append(", ownerCode=").append(ownerCode);
+        sb.append(", ownerTypeCode=").append(ownerTypeCode);
         sb.append(", externalOrderNumber=").append(externalOrderNumber);
         sb.append(", afterTicketUrl=").append(afterTicketUrl);
         sb.append(", totalAmount=").append(totalAmount);
         sb.append(", ticketPrice=").append(ticketPrice);
+        sb.append(", requestId=").append(requestId);
+        sb.append(", productConstraint=").append(productConstraint);
+        sb.append(", productRights=").append(productRights);
         sb.append(", createTime=").append(createTime);
         sb.append(", serialVersionUID=").append(serialVersionUID);
         sb.append("]");

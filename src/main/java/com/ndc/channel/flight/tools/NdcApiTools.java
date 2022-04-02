@@ -16,6 +16,7 @@ import com.ndc.channel.http.ChannelOKHttpService;
 import com.ndc.channel.mapper.NdcAccountInfoMapper;
 import com.ndc.channel.model.NdcAccountInfoData;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.aop.framework.AopContext;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -287,7 +288,7 @@ public class NdcApiTools {
         headers.put("Authorization", accountInfo.getAuthorization());
         headers.put("apiCode", accountInfo.getNdcApiInfo().getApiCode());
 
-        final String resp = doRequest(url, xmlParams, headers, accountInfo);
+        final String resp = ((NdcApiTools)AopContext.currentProxy()).doRequest(url, xmlParams, headers, accountInfo);
         String respLog = resp;
         if (accountInfo.getNdcApiInfo().getApiCode().equals("A0534")) {
             respLog = "内容太大隐藏";

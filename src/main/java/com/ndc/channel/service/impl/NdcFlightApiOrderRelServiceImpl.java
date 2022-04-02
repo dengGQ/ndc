@@ -4,13 +4,16 @@ import com.alibaba.fastjson.JSON;
 import com.ndc.channel.entity.NdcFlightApiOrderRel;
 import com.ndc.channel.flight.dto.createOrder.CorpApiFlightOrderCreateData;
 import com.ndc.channel.flight.dto.createOrder.FlightOrderCreateReq;
+import com.ndc.channel.flight.dto.flightSearch.CorpApiTicketData;
 import com.ndc.channel.mapper.NdcFlightApiOrderRelMapper;
 import com.ndc.channel.service.NdcFlightApiOrderRelService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.Date;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -20,7 +23,7 @@ public class NdcFlightApiOrderRelServiceImpl implements NdcFlightApiOrderRelServ
     private NdcFlightApiOrderRelMapper apiOrderRelMapper;
 
     @Override
-    public void insertEntity(FlightOrderCreateReq orderCreateReq, CorpApiFlightOrderCreateData orderCreateData) {
+    public void insertEntity(FlightOrderCreateReq orderCreateReq, CorpApiFlightOrderCreateData orderCreateData, CorpApiTicketData ticketData) {
 
         try {
             NdcFlightApiOrderRel rel = new NdcFlightApiOrderRel();
@@ -32,6 +35,11 @@ public class NdcFlightApiOrderRelServiceImpl implements NdcFlightApiOrderRelServ
             rel.setCreateTime(new Date());
             rel.setTotalAmount(orderCreateData.getSettlementMoney());
             rel.setTicketPrice(orderCreateData.getTicketPrice());
+            if (CollectionUtils.isNotEmpty(ticketData.getRightsList())) {
+                rel.setProductRights(ticketData.getRightsList().stream().collect(Collectors.joining(",")));
+            }
+
+            rel.setProductConstraint(ticketData.getProductNotice());
 
             rel.setOwnerCode(orderCreateData.getOwnerCode());
             rel.setOwnerTypeCode(orderCreateData.getOwnerTypeCode());

@@ -4,6 +4,8 @@ import com.alibaba.fastjson.JSON;
 import com.ndc.channel.ChannelApplication;
 import com.ndc.channel.flight.dto.createOrder.CorpApiFlightOrderCreateData;
 import com.ndc.channel.flight.dto.createOrder.FlightOrderCreateReq;
+import com.ndc.channel.flight.dto.flightSearch.CorpApiTicketData;
+import com.ndc.channel.redis.RedisKeyConstants;
 import com.ndc.channel.redis.RedisUtils;
 import com.ndc.channel.service.NdcFlightApiOrderRelService;
 import lombok.extern.slf4j.Slf4j;
@@ -41,7 +43,9 @@ public class MuNdcFlightApiOrderServiceImplTests {
 
         final CorpApiFlightOrderCreateData orderCreateData = JSON.parseObject(s1, CorpApiFlightOrderCreateData.class);
 
-        orderRelService.insertEntity(orderCreateReq, orderCreateData);
+        CorpApiTicketData ticketData = redisUtils.hGet(RedisKeyConstants.getRedisTicketDataCacheKey("2022-06-2808051030MU5301SHACAN"), "2022-06-2808051030MU5301SHACANY1@10168", CorpApiTicketData.class);
+
+        orderRelService.insertEntity(orderCreateReq, orderCreateData, ticketData);
     }
 
     @Test

@@ -191,15 +191,15 @@ public class NdcFlightSearchHandler {
                     ticketData.setProductName(priceClass.getName());
                     ProductRightDefinition definition = JSONObject.parseObject(priceClass.getDesc().getDescText(), ProductRightDefinition.class);
                     List<String> productRights = parseProductRights(definition);
-                    if (CollectionUtils.isEmpty(productRights) && StringUtils.isNotEmpty(ndcChannelProductConfig.getProductRights())) {
+                    /*if (CollectionUtils.isEmpty(productRights) && StringUtils.isNotEmpty(ndcChannelProductConfig.getProductRights())) {
                         productRights = Arrays.asList(ndcChannelProductConfig.getProductRights().split("[,，]"));
-                    }
+                    }*/
                     ticketData.setRightsList(productRights);
 
                     String productNotice = definition.getProductDefinition().getProductNotice();
-                    if (StringUtils.isEmpty(productNotice)) {
+                    /*if (StringUtils.isEmpty(productNotice)) {
                         productNotice = ndcChannelProductConfig.getProductConstraint();
-                    }
+                    }*/
                     ticketData.setProductNotice(productNotice);
 
                     TaxSummary taxSummary = offerItem.getPrice().getTaxSummary();
