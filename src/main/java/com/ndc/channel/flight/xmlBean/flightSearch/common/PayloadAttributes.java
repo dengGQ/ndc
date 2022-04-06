@@ -80,7 +80,7 @@ public class PayloadAttributes {
         this.retransmissionInd = "false";
         this.seqNumber = "1";
         this.timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"));
-        this.trxID = "";
+        this.trxID = UUID.randomUUID().toString();
         this.trxStatusCode = "0";
         this.versionNumber = "";
     }
