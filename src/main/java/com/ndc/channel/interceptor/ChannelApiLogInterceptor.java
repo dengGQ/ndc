@@ -99,7 +99,7 @@ public class ChannelApiLogInterceptor {
             apiLog.setParams(params);
             apiLog.setStatus(status);
             apiLog.setMethodName(methodName);
-            apiLog.setResult(result == null ? null : JSONObject.toJSONString(result));
+            apiLog.setResult((String) result);
 
             commonService.insert(apiLog);
         }catch (Exception e) {

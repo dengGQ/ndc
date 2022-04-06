@@ -60,7 +60,7 @@ public class TravelAgency {
     public TravelAgency(List<String> contactInfoRefID) {
         this.agencyID = "1462";
         this.contactInfoRefID = contactInfoRefID;
-        this.name = "天巡";
+        this.name = "杭州飞巴网络科技有限公司";
         this.typeCode = "OnlineTravelAgency";
     }
 

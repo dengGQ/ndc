@@ -6,6 +6,7 @@ import com.ndc.channel.flight.xmlBean.changeFlightSearch.request.bean.IATAOrderR
 import com.ndc.channel.flight.xmlBean.changeFlightSearch.response.bean.IATAOrderReshopRS;
 import com.ndc.channel.flight.xmlBean.createOrder.request.bean.IATAOrderCreateRQ;
 import com.ndc.channel.flight.xmlBean.createOrder.response.bean.IATAOrderViewRS;
+import com.ndc.channel.flight.xmlBean.flightSearch.common.TravelAgency;
 import com.ndc.channel.flight.xmlBean.flightSearch.request.bean.IATAAirShoppingRQ;
 import com.ndc.channel.flight.xmlBean.flightSearch.response.bean.IATAAirShoppingRS;
 import com.ndc.channel.flight.xmlBean.orderDetail.request.bean.IATAOrderRetrieveRQ;
@@ -51,6 +52,13 @@ public class NdcApiTools {
 
             NdcAccountInfoData accountInfo = accountInfoMapper.selectByNdcCode("mu_ndc");
 
+            TravelAgency travelAgency = rq.getParty().getSender().getTravelAgency();
+            travelAgency.setAgencyID(accountInfo.getAgencyID());
+            travelAgency.setIATANumber(accountInfo.getIataNumber());
+            travelAgency.setName(accountInfo.getName());
+            travelAgency.setTypeCode(accountInfo.getTypeCode());
+            travelAgency.setPseudoCityID(accountInfo.getPseudoCityID());
+
             accountInfo.setNdcApiInfo(BusinessEnum.NdcApiInfo.FLIGHT_SEARCH);
             accountInfo.setRequestId(rq.getPayloadAttributes().getEchoTokenText());
             return remote(accountInfo, rq, IATAAirShoppingRQ.class, IATAAirShoppingRS.class);
@@ -71,6 +79,13 @@ public class NdcApiTools {
         try{
 
             NdcAccountInfoData accountInfo = accountInfoMapper.selectByNdcCode("mu_ndc");
+
+            com.ndc.channel.flight.xmlBean.verifyPrice.common.TravelAgency travelAgency = rq.getParty().getSender().getTravelAgency();
+            travelAgency.setAgencyID(accountInfo.getAgencyID());
+            travelAgency.setIATANumber(accountInfo.getIataNumber());
+            travelAgency.setName(accountInfo.getName());
+            travelAgency.setTypeCode(accountInfo.getTypeCode());
+            travelAgency.setPseudoCityID(accountInfo.getPseudoCityID());
 
             accountInfo.setNdcApiInfo(BusinessEnum.NdcApiInfo.OFFER_PRICE);
             accountInfo.setRequestId(rq.getPayloadAttributes().getEchoTokenText());
@@ -94,6 +109,13 @@ public class NdcApiTools {
 
             NdcAccountInfoData accountInfo = accountInfoMapper.selectByNdcCode("mu_ndc");
 
+            com.ndc.channel.flight.xmlBean.createOrder.request.bean.TravelAgency travelAgency = rq.getParty().getSender().getTravelAgency();
+            travelAgency.setAgencyID(accountInfo.getAgencyID());
+            travelAgency.setIATANumber(accountInfo.getIataNumber());
+            travelAgency.setName(accountInfo.getName());
+            travelAgency.setTypeCode(accountInfo.getTypeCode());
+            travelAgency.setPseudoCityID(accountInfo.getPseudoCityID());
+
             accountInfo.setNdcApiInfo(BusinessEnum.NdcApiInfo.CREATE_ORDER);
             accountInfo.setRequestId(rq.getPayloadAttributes().getEchoTokenText());
             return remote(accountInfo, rq, IATAOrderCreateRQ.class, IATAOrderViewRS.class);
@@ -112,6 +134,13 @@ public class NdcApiTools {
      */
     public com.ndc.channel.flight.xmlBean.orderPay.response.bean.IATAOrderViewRS orderPay(NdcAccountInfoData accountInfo, IATAOrderChangeRQ rq) {
         try{
+
+            com.ndc.channel.flight.xmlBean.orderPay.request.bean.TravelAgency travelAgency = rq.getParty().getSender().getTravelAgency();
+            travelAgency.setAgencyID(accountInfo.getAgencyID());
+            travelAgency.setIATANumber(accountInfo.getIataNumber());
+            travelAgency.setName(accountInfo.getName());
+            travelAgency.setTypeCode(accountInfo.getTypeCode());
+            travelAgency.setPseudoCityID(accountInfo.getPseudoCityID());
 
             accountInfo.setNdcApiInfo(BusinessEnum.NdcApiInfo.ORDER_PAY);
             accountInfo.setRequestId(rq.getPayloadAttributes().getEchoTokenText());
@@ -134,6 +163,11 @@ public class NdcApiTools {
 
             NdcAccountInfoData accountInfo = accountInfoMapper.selectByNdcCode("mu_ndc");
 
+            com.ndc.channel.flight.xmlBean.orderDetail.request.bean.TravelAgency travelAgency = rq.getParty().getSender().getTravelAgency();
+            travelAgency.setAgencyID(accountInfo.getAgencyID());
+            travelAgency.setName(accountInfo.getName());
+            travelAgency.setTypeCode(accountInfo.getTypeCode());
+
             accountInfo.setNdcApiInfo(BusinessEnum.NdcApiInfo.ORDER_DETAIL);
             accountInfo.setRequestId(rq.getPayloadAttributes().getEchoTokenText());
             return remote(accountInfo, rq, IATAOrderRetrieveRQ.class, com.ndc.channel.flight.xmlBean.orderDetail.response.bean.IATAOrderViewRS.class);
@@ -154,6 +188,11 @@ public class NdcApiTools {
         try{
 
             NdcAccountInfoData accountInfo = accountInfoMapper.selectByNdcCode("mu_ndc");
+
+            final com.ndc.channel.flight.xmlBean.refundApply.request.bean.TravelAgency travelAgency = rq.getParty().getSender().getTravelAgency();
+            travelAgency.setAgencyID(accountInfo.getAgencyID());
+            travelAgency.setName(accountInfo.getName());
+            travelAgency.setTypeCode(accountInfo.getTypeCode());
 
             accountInfo.setNdcApiInfo(BusinessEnum.NdcApiInfo.REFUND_APPLY);
             accountInfo.setRequestId(rq.getPayloadAttributes().getEchoTokenText());
@@ -177,6 +216,13 @@ public class NdcApiTools {
 
             NdcAccountInfoData accountInfo = accountInfoMapper.selectByNdcCode("mu_ndc");
 
+            com.ndc.channel.flight.xmlBean.refundAmountSearch.request.bean.TravelAgency travelAgency = rq.getParty().getSender().getTravelAgency();
+            travelAgency.setAgencyID(accountInfo.getAgencyID());
+            travelAgency.setIATANumber(accountInfo.getIataNumber());
+            travelAgency.setName(accountInfo.getName());
+            travelAgency.setTypeCode(accountInfo.getTypeCode());
+            travelAgency.setPseudoCityID(accountInfo.getPseudoCityID());
+
             accountInfo.setNdcApiInfo(BusinessEnum.NdcApiInfo.REFUND_MONEY_QUERY);
             accountInfo.setRequestId(rq.getPayloadAttributes().getEchoTokenText());
             return remote(accountInfo, rq, com.ndc.channel.flight.xmlBean.refundAmountSearch.request.bean.IATAOrderChangeRQ.class, com.ndc.channel.flight.xmlBean.refundAmountSearch.response.bean.refund.IATAOrderViewRS.class);
@@ -197,6 +243,11 @@ public class NdcApiTools {
         try {
 
             NdcAccountInfoData accountInfo = accountInfoMapper.selectByNdcCode("mu_ndc");
+
+            final com.ndc.channel.flight.xmlBean.refundConfirm.request.bean.TravelAgency travelAgency = rq.getParty().getSender().getTravelAgency();
+            travelAgency.setAgencyID(accountInfo.getAgencyID());
+            travelAgency.setName(accountInfo.getName());
+            travelAgency.setTypeCode(accountInfo.getTypeCode());
 
             accountInfo.setNdcApiInfo(BusinessEnum.NdcApiInfo.REFUND_CONFIRM);
             accountInfo.setRequestId(rq.getPayloadAttributes().getEchoTokenText());
@@ -220,6 +271,13 @@ public class NdcApiTools {
 
             NdcAccountInfoData accountInfo = accountInfoMapper.selectByNdcCode("mu_ndc");
 
+            final com.ndc.channel.flight.xmlBean.refundOrderDetail.request.bean.TravelAgency travelAgency = rq.getParty().getSender().getTravelAgency();
+            travelAgency.setAgencyID(accountInfo.getAgencyID());
+            travelAgency.setIATANumber(accountInfo.getIataNumber());
+            travelAgency.setName(accountInfo.getName());
+            travelAgency.setTypeCode(accountInfo.getTypeCode());
+            travelAgency.setPseudoCityID(accountInfo.getPseudoCityID());
+
             accountInfo.setNdcApiInfo(BusinessEnum.NdcApiInfo.REFUND_ORDER_DETAIL);
             accountInfo.setRequestId(rq.getPayloadAttributes().getEchoTokenText());
             return remote(accountInfo, rq, com.ndc.channel.flight.xmlBean.refundOrderDetail.request.bean.IATAOrderRetrieveRQ.class, com.ndc.channel.flight.xmlBean.refundOrderDetail.response.bean.IATAOrderViewRS.class);
@@ -241,6 +299,13 @@ public class NdcApiTools {
 
             NdcAccountInfoData accountInfo = accountInfoMapper.selectByNdcCode("mu_ndc");
 
+            com.ndc.channel.flight.xmlBean.changeFlightSearch.request.bean.TravelAgency travelAgency = rq.getParty().getSender().getTravelAgency();
+            travelAgency.setAgencyID(accountInfo.getAgencyID());
+            travelAgency.setIATANumber(accountInfo.getIataNumber());
+            travelAgency.setName(accountInfo.getName());
+            travelAgency.setTypeCode(accountInfo.getTypeCode());
+            travelAgency.setPseudoCityID(accountInfo.getPseudoCityID());
+
             accountInfo.setNdcApiInfo(BusinessEnum.NdcApiInfo.CHANGE_FLIGHT_SEARCH);
             accountInfo.setRequestId(rq.getPayloadAttributes().getEchoTokenText());
             return remote(accountInfo, rq, IATAOrderReshopRQ.class, IATAOrderReshopRS.class);
@@ -256,6 +321,13 @@ public class NdcApiTools {
         try {
 
             NdcAccountInfoData accountInfo = accountInfoMapper.selectByNdcCode("mu_ndc");
+
+            com.ndc.channel.flight.xmlBean.changeBooking.request.bean.TravelAgency travelAgency = rq.getParty().getSender().getTravelAgency();
+            travelAgency.setAgencyID(accountInfo.getAgencyID());
+            travelAgency.setIATANumber(accountInfo.getIataNumber());
+            travelAgency.setName(accountInfo.getName());
+            travelAgency.setTypeCode(accountInfo.getTypeCode());
+            travelAgency.setPseudoCityID(accountInfo.getPseudoCityID());
 
             accountInfo.setNdcApiInfo(BusinessEnum.NdcApiInfo.CHANGE_BOOKING);
             accountInfo.setRequestId(rq.getPayloadAttributes().getEchoTokenText());

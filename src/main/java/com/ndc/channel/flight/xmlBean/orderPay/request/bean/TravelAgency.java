@@ -60,7 +60,7 @@ public class TravelAgency {
     public TravelAgency() {
         this.agencyID = "1462";
         this.iataNumber = "8332730";
-        this.name = "天巡";
+        this.name = "杭州飞巴网络科技有限公司";
         this.pseudoCityID = "HGH121";
         this.typeCode = "OnlineTravelAgency";
     }

@@ -51,7 +51,7 @@ public class TravelAgency {
 
     public TravelAgency() {
         this.agencyID = "1462";
-        this.name = "天巡";
+        this.name = "杭州飞巴网络科技有限公司";
         this.typeCode = "OnlineTravelAgency";
     }
 

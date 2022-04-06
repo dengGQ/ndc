@@ -43,13 +43,47 @@ public class NdcAccountInfoData {
         this.ndcApiInfo = ndcApiInfo;
     }
 
+    public String getAgencyID() {
+        if (jsonParams == null && params != null) {
+            jsonParams = JSONObject.parseObject(params);
+        }
+        return jsonParams.getString("agencyID");
+    }
+
+    public String getIataNumber() {
+        if (jsonParams == null && params != null) {
+            jsonParams = JSONObject.parseObject(params);
+        }
+        return jsonParams.getString("iataNumber");
+    }
+
+    public String getPseudoCityID() {
+        if (jsonParams == null && params != null) {
+            jsonParams = JSONObject.parseObject(params);
+        }
+        return jsonParams.getString("pseudoCityID");
+    }
+
+    public String getName() {
+        if (jsonParams == null && params != null) {
+            jsonParams = JSONObject.parseObject(params);
+        }
+        return jsonParams.getString("name");
+    }
+
+    public String getTypeCode() {
+        if (jsonParams == null && params != null) {
+            jsonParams = JSONObject.parseObject(params);
+        }
+        return jsonParams.getString("typeCode");
+    }
+
     public String getMerCode() {
         if (jsonParams == null && params != null) {
             jsonParams = JSONObject.parseObject(params);
         }
         return jsonParams.getString("merCode");
     }
-
 
     public String getChnlCode() {
         if (jsonParams == null && params != null) {

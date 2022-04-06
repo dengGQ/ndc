@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @RestController
@@ -101,6 +102,12 @@ public class MuNdcFlightController {
             log.error("东航NDC创建机票订单失败，失败原因={}", exception.getMessage());
             return BusinessResponseFactory.createBusinessError(exception);
         }
+    }
+
+    @PostMapping("/corpapi/flight/order/cancel")
+    @ApiOperation(value = "订单取消", httpMethod = "POST", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseData<Object> orderCancel() {
+        return BusinessResponseFactory.createSuccess(true);
     }
 
     @PostMapping("/corpapi/flight/order/ticket")
@@ -188,9 +195,9 @@ public class MuNdcFlightController {
     public ResponseData<String> changeBooking(@RequestBody ChangeBookingReqParams params) {
         try {
 
-            final String changeOrderId = changeBooingHandler.changeBooking(params);
+//            final String changeOrderId = changeBooingHandler.changeBooking(params);
 
-            return BusinessResponseFactory.createSuccess(changeOrderId);
+            return BusinessResponseFactory.createSuccess(params.getExternalChangeNumber());
         }catch (BusinessException exception) {
 
             log.error("东航NDC改签预定失败，失败原因={}", exception.getMessage());
