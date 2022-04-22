@@ -24,7 +24,7 @@ public class RefundApplyParams {
     private String refundExplain;
 
     @ApiModelProperty(value = "退票原因：1-行程变更，定错等主观原因；2-航司，机场或天气原因造成的航班延误或取消；" +
-            "3-个人健康原因；4-升舱/名错换开,若有新票号请备注; 5-其他原因", required = true)
+            "3-个人健康原因；4-升舱/名错换开,若有新票号请备注; 5-其他原因; 6-重购客票退票", required = true)
     private Byte refundReason;
 
     @ApiModelProperty(value = "退票方式：1-自愿退票；2-非自愿退票", required = true)

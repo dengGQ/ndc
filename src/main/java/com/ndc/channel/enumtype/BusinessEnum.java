@@ -68,7 +68,7 @@ public class BusinessEnum {
 	}
 
 	/**
-	 * 退票方式：1-自愿退票；2-非自愿退票,航变；3-非自愿，病退;4-非自愿,升舱或换开；5-其他
+	 * 退票方式：1-自愿退票；2-非自愿退票,航变；3-非自愿，病退;4-非自愿,升舱或换开；5-其他；6-非自愿，重购客票退票
 	 */
 	public enum RefundWay{
 		_10("10", "由于自身原因无法成行, 同意扣除退票手续费退票"),_11("11","易享退"), _21("21","由于航空公司原因, 无法成行, 申请全额退票"),
@@ -82,6 +82,10 @@ public class BusinessEnum {
 			this.label = label;
 		}
 
+		public String getCode() {
+			return code;
+		}
+
 		public static String getReasonCode(byte refundWay) {
 			if (refundWay == 1) {
 				return "10";
@@ -89,9 +93,9 @@ public class BusinessEnum {
 				return "21";
 			}else if(refundWay == 3) {
 				return "22";
-			}else if(refundWay == 4) {
+			}else if(refundWay == 6) {
 				return "23";
-			}else {
+			}else{
 				return "24";
 			}
 		}
@@ -480,6 +484,25 @@ public class BusinessEnum {
 			}).findFirst().orElseThrow(BusinessException::new);
 
 			return dateType.getMsg();
+		}
+	}
+
+	public enum RefTypeCode{
+		PAX_ID("1","旅客唯一标识"), REPEAT_TICKET_NUMBER("709", "重购客票号");
+
+		private String code;
+		private String msg;
+		RefTypeCode(String code, String msg) {
+			this.code = code;
+			this.msg = msg;
+		}
+
+		public String getCode() {
+			return code;
+		}
+
+		public String getMsg() {
+			return msg;
 		}
 	}
 }

@@ -19,6 +19,9 @@ public class RefundApplyPassengerParams {
     @ApiModelProperty(value = "乘机人证件类型", required = true)
     private String idcardType;
 
+    @ApiModelProperty(value = "重购客票票号，refundWay为6必填", required = false)
+    private String repeatTicketNumber;
+
     public Long getOrderPassengerId() {
         return orderPassengerId;
     }
@@ -57,5 +60,13 @@ public class RefundApplyPassengerParams {
 
     public void setIdcardType(String idcardType) {
         this.idcardType = idcardType;
+    }
+
+    public String getRepeatTicketNumber() {
+        return repeatTicketNumber;
+    }
+
+    public void setRepeatTicketNumber(String repeatTicketNumber) {
+        this.repeatTicketNumber = repeatTicketNumber;
     }
 }

@@ -33,6 +33,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -567,9 +568,14 @@ public class NdcFlightSearchHandler {
     }
 
     private static List<FlightStopOver> parseFlightStopOver(List<DatedOperatingLeg> stops) {
+        AtomicInteger seq = new AtomicInteger();
         return stops.stream().map(leg -> {
             FlightStopOver flightStopOver = new FlightStopOver();
+
+            flightStopOver.setStep(String.valueOf(seq.getAndIncrement()));
             flightStopOver.setStopCityCode(leg.getArrival().getIATALocationCode());
+            flightStopOver.setStopTime(leg.getOnGroundDuration());
+
             return flightStopOver;
         }).collect(Collectors.toList());
     }

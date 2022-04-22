@@ -143,37 +143,24 @@ public class NdcFlightCreateOrderHandler {
 
         CorpApiOrderPassengerParams passengerParams = req.getPassengers().get(0);
 
-        final OrderContactParams primaryContact = new OrderContactParams();
-        primaryContact.setName(primaryContactStr[0]);
-        primaryContact.setPhone(primaryContactStr[1]);
-        primaryContact.setContactType("PRIMARY");
-
-        final OrderContactParams passengerContact = new OrderContactParams();
-        passengerContact.setPhone(passengerParams.getPhone());
-        passengerContact.setName(passengerParams.getFlightPassengerName());
-        passengerContact.setContactType("PAX");
-
-        final OrderContactParams travelAgentOrderContact= new OrderContactParams();
-        travelAgentOrderContact.setName(primaryContactStr[0]);
-        travelAgentOrderContact.setPhone(primaryContactStr[1]);
-        travelAgentOrderContact.setContactType("TRAVEL_AGENCY");
-
-        return Stream.of(primaryContact, passengerContact, travelAgentOrderContact).map(contactParams -> {
+        return Stream.of("PRIMARY", "PAX", "TRAVEL_AGENCY").map(contactType->{
             final ContactInfo contactInfo = new ContactInfo();
             contactInfo.setContactInfoID(UUID.randomUUID().toString());
-            contactInfo.setContactTypeText(contactParams.getContactType());
-
-            if (contactParams.getContactType().equals("PRIMARY")) {
-                final Individual individual = new Individual();
-                individual.setSurname(contactParams.getName());
-                contactInfo.setIndividual(individual);
-            }
-
+            contactInfo.setContactTypeText(contactType);
             final Phone phone = new Phone();
-            phone.setPhoneNumber(contactParams.getPhone());
+            phone.setPhoneNumber(passengerParams.getPhone());
             phone.setCountryDialingCode("86");
             contactInfo.setPhone(phone);
 
+            if (contactType.equals("PRIMARY")) {
+                final Individual individual = new Individual();
+                individual.setSurname(passengerParams.getFlightPassengerName());
+                contactInfo.setIndividual(individual);
+            }
+
+            if (contactType.equals("TRAVEL_AGENCY")) {
+                contactInfo.getPhone().setPhoneNumber(primaryContactStr[1]);
+            }
             return contactInfo;
         }).collect(Collectors.toList());
     }

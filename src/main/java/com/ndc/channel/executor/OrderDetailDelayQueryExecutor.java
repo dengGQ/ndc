@@ -47,7 +47,11 @@ public class OrderDetailDelayQueryExecutor {
         redisUtils.zsetAddWithScore(orderStatusQueryKey, msgBody, System.currentTimeMillis() + delaySecond*1000);
 
         if (th == null || th.getState() == Thread.State.TERMINATED) {
+            // 有新任务提交，判断任务线程是否还在，不在的话重启一个工作线程
             initWorker();
+        }else if(th.getState() == Thread.State.TIMED_WAITING) {
+            // 有新任务提交，提前唤醒休眠的线程
+            th.interrupt();
         }
     }
 
