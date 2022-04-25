@@ -1,6 +1,8 @@
 package com.ndc.channel.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.ndc.channel.common.TableName;
+import com.ndc.channel.common.service.IIdGeneratorService;
 import com.ndc.channel.entity.NdcFlightApiOrderRel;
 import com.ndc.channel.flight.dto.createOrder.CorpApiFlightOrderCreateData;
 import com.ndc.channel.flight.dto.createOrder.FlightOrderCreateReq;
@@ -22,12 +24,16 @@ public class NdcFlightApiOrderRelServiceImpl implements NdcFlightApiOrderRelServ
     @Resource
     private NdcFlightApiOrderRelMapper apiOrderRelMapper;
 
+    @Resource
+    private IIdGeneratorService idGeneratorService;
+
     @Override
     public void insertEntity(FlightOrderCreateReq orderCreateReq, CorpApiFlightOrderCreateData orderCreateData, CorpApiTicketData ticketData) {
 
         try {
             NdcFlightApiOrderRel rel = new NdcFlightApiOrderRel();
 
+            rel.setRelId(idGeneratorService.getPrimaryKey(TableName.NDC_FLIGHT_API_ORDER_REL));
             rel.setOrderId(orderCreateData.getOrderNumber());
             rel.setOrderItemId(orderCreateData.getOrderItemId());
             rel.setAfterTicketUrl(orderCreateReq.getAfterTicketUrl());

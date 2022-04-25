@@ -1,6 +1,8 @@
 package com.ndc.channel.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.ndc.channel.common.TableName;
+import com.ndc.channel.common.service.IIdGeneratorService;
 import com.ndc.channel.entity.NdcFlightApiChangeOrderRel;
 import com.ndc.channel.flight.dto.changeBooking.ChangeBookingReqParams;
 import com.ndc.channel.flight.xmlBean.changeBooking.response.bean.Order;
@@ -20,11 +22,15 @@ public class NdcFlightApiChangeOrderRelServiceImpl implements NdcFlightApiChange
     @Resource
     private NdcFlightApiChangeOrderRelMapper apiChangeOrderRelMapper;
 
+    @Resource
+    private IIdGeneratorService idGeneratorService;
+
     @Override
     public void insertEntity(ChangeBookingReqParams params, String orderId, Order order, BigDecimal upgradeTotalAmount) {
         try {
             NdcFlightApiChangeOrderRel rel = new NdcFlightApiChangeOrderRel();
 
+            rel.setRelId(idGeneratorService.getPrimaryKey(TableName.NDC_FLIGHT_API_ORDER_REL));
             rel.setOrderId(orderId);
             rel.setChangeId(order.getOrderID());
             rel.setOrderItemId(order.getOrderItem().getOrderItemID());
