@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<IATA_OrderViewRS xmlns="http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderViewRS">
+    <Error>
+        <Code>308</Code>
+        <DescText>Received from data invalid</DescText>
+    </Error>
+    <Response>
+        <Order>
+            <OrderID>1020022600060016</OrderID>
+            <OwnerCode>MU</OwnerCode>
+            <OwnerTypeCode>ORA</OwnerTypeCode>
+        </Order>
+    </Response>
+    <MessageDoc>
+        <Name>NDC_FLIGHT_TICKET_REFUND_REAPPLY</Name>
+        <RefVersionNumber>18.2</RefVersionNumber>
+    </MessageDoc>
+    <PayloadAttributes>
+        <AltLangID>CN</AltLangID>
+        <CorrelationID>aab9e1d7-d3fb-45ec-b931-32c507c9ac37</CorrelationID>
+        <EchoTokenText>ndctest20200226210036</EchoTokenText>
+        <PrimaryLangID>CN</PrimaryLangID>
+        <RetransmissionInd>false</RetransmissionInd>
+        <SeqNumber>1</SeqNumber>
+        <Timestamp>2020-02-26T21:00:38.031+08:00</Timestamp>
+        <TrxID>cf159d87-292b-48aa-b054-c99d4b7bd7a7</TrxID>
+        <TrxStatusCode>5</TrxStatusCode>
+        <VersionNumber>18.2</VersionNumber>
+    </PayloadAttributes>
+</IATA_OrderViewRS>
