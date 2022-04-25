@@ -244,7 +244,11 @@ public class NdcApiTools {
             travelAgency.setTypeCode(accountInfo.getTypeCode());
             travelAgency.setPseudoCityID(accountInfo.getPseudoCityID());
 
-            accountInfo.setNdcApiInfo(BusinessEnum.NdcApiInfo.REFUND_MONEY_QUERY);
+            BusinessEnum.NdcApiInfo refundMoneyQuery = BusinessEnum.NdcApiInfo.REFUND_MONEY_QUERY;
+            if (rq.getMessageDoc().getName().equals("NDC_FLIGHT_TICKET_REFUND_RECALCFEE")) {
+                refundMoneyQuery = BusinessEnum.NdcApiInfo.REFUND_MONEY_QUERY_;
+            }
+            accountInfo.setNdcApiInfo(refundMoneyQuery);
             accountInfo.setRequestId(rq.getPayloadAttributes().getEchoTokenText());
             return remote(accountInfo, rq, com.ndc.channel.flight.xmlBean.refundAmountSearch.request.bean.IATAOrderChangeRQ.class, com.ndc.channel.flight.xmlBean.refundAmountSearch.response.bean.refund.IATAOrderViewRS.class);
         }catch (BusinessException e) {

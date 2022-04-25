@@ -43,21 +43,9 @@ public class MuNdcFlightSearchServiceImplTests {
     private NdcFlightVerifyPriceHandler verifyPriceHandler;
 
     @Resource
-    private NdcFlightCreateOrderHandler createOrderHandler;
-
-    @Resource
-    private NdcFlightOrderPayHandler orderPayHandler;
-
-    @Resource
-    private NdcFlightOrderDetailHandler orderDetailHandler;
-    @Resource
     private RedisUtils redisUtils;
     @Resource
     private OrderDetailDelayQueryExecutor queryExecutor;
-
-    @Resource
-    private NdcFlightOrderRefundHandler orderRefundHandler;
-
     @Resource
     private NdcFlightRefundOrderDetailHandler detailHandler;
 
@@ -80,87 +68,6 @@ public class MuNdcFlightSearchServiceImplTests {
         final CorpApiFlightVerifyPriceData corpApiFlightVerifyPriceData = verifyPriceHandler.verifyPrice(req);
 
         log.info("offerPrice={}", JSON.toJSONString(corpApiFlightVerifyPriceData));
-    }
-
-
-    @Test
-    public void createOrder() {
-
-        FlightOrderCreateReq flightOrderCreateReq = new FlightOrderCreateReq();
-
-        CorpApiOrderFlightTicketParams ticketParams = new CorpApiOrderFlightTicketParams();
-        ticketParams.setFlightId("2022-06-2609301200MU5153SHAPEK");
-        ticketParams.setTicketId("2022-06-2609301200MU5153SHAPEKY1@10793");
-        ticketParams.setSeatClassCode("Y");
-        ticketParams.setPrice(new BigDecimal("1630"));
-
-        flightOrderCreateReq.setTickets(Arrays.asList(ticketParams));
-
-        CorpApiOrderPassengerParams passengerParams = new CorpApiOrderPassengerParams();
-        passengerParams.setFlightPassengerName("测试");
-        passengerParams.setPhone("18611312771");
-        passengerParams.setBirthday("1994-08-20");
-        passengerParams.setIdcardCode("411302199408201314");
-        passengerParams.setIdcardType("1");
-        passengerParams.setSex("1");
-        flightOrderCreateReq.setPassengers(Arrays.asList(passengerParams));
-
-
-//        OrderContactParams contactParams = new OrderContactParams();
-//        contactParams.setName("邓国泉");
-//        contactParams.setPhone("18611312771");
-//        List<OrderContactParams> objects = new ArrayList<>();
-//        objects.add(contactParams);
-//        flightOrderCreateReq.setContacts(objects);
-
-        createOrderHandler.createOrder(flightOrderCreateReq);
-    }
-
-
-    @Test
-    public void orderPay() {
-
-        final OrderPayReqParams payReqParams = new OrderPayReqParams();
-
-        payReqParams.setOrderNumber("1022030800206114");
-        orderPayHandler.orderPay(payReqParams);
-    }
-
-
-    @Test
-    public void orderDetail() {
-
-        // 1022030800206118 已退
-        // 1022030900206462
-        // 1022031000207068
-        final NdcOrderDetailData ndcOrderDetailData = orderDetailHandler.orderDetail("1022031400207425");
-
-        System.out.println(JSON.toJSONString(ndcOrderDetailData));
-    }
-
-    @Test
-    public void refundMoneyQuery() {
-
-        RefundChangeMoneyQueryParams params = new RefundChangeMoneyQueryParams();
-
-        params.setRefundWay(Byte.valueOf("1"));
-        params.setChannelOrderNumber("1022030800206118");
-        params.setTicketNumList(Arrays.asList("7811157639813"));
-
-        RefundChangeMoneyQueryResp queryResp = orderRefundHandler.refundMoneyQuery(params);
-    }
-
-
-    @Resource
-    private NdcFlightApiOrderRelMapper orderRelMapper;
-
-    @Test
-    public void refundOrderQuery() {
-
-        final NdcRefundOrderSearchParams searchParams = new NdcRefundOrderSearchParams(000L, null);
-        final NdcOrderDetailData response = detailHandler.orderDetail(searchParams);
-
-        System.out.println(JSON.toJSONString(response));
     }
 
     @Test

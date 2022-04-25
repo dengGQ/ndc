@@ -49,6 +49,9 @@ public class MuNdcFlightController {
     private NdcFlightChangeFlightSearchHandler changeFlightSearchHandler;
     @Resource
     private NdcFlightRefundReapplyHandler refundReapplyHandler;
+    @Resource
+    private NdcFlightRefundAmountSearchHandler refundAmountSearchHandler;
+
 
     @PostMapping("/corpapi/flight/V2/search")
     @ApiOperation(value = "航班查询", notes = "航班查询", httpMethod = "POST", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -164,7 +167,7 @@ public class MuNdcFlightController {
 
         try {
 
-            final RefundChangeMoneyQueryResp resp = orderRefundHandler.refundMoneyQuery(params);
+            final RefundChangeMoneyQueryResp resp = refundAmountSearchHandler.refundMoneyQuery(params);
 
             return BusinessResponseFactory.createSuccess(resp);
         }catch (BusinessException exception) {

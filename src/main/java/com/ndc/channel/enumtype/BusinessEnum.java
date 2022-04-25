@@ -363,6 +363,7 @@ public class BusinessEnum {
 		REFUND_CONFIRM("A0541", "/ndc-flight-ticket-refund/refund/flightRefundConfirm"),
 		REFUND_ORDER_DETAIL("A0542", "/ndc-flight-ticket-refund/refund/flightRefundNote"),
 		CHANGE_FLIGHT_SEARCH("A0549", "/ndc-flight-order-reshopping/voluntary/voluntaryReshopping"),
+		REFUND_MONEY_QUERY_("A0544", "/ndc-flight-ticket-refund/refund/flightRefundRecalcfee"),//非自愿转自愿退票金额查询
 		CHANGE_BOOKING("A0550", "/ndc-flight-order-rebooking/voluntary/voluntaryOrderRebooking");
 
 
@@ -504,6 +505,25 @@ public class BusinessEnum {
 
 		public String getMsg() {
 			return msg;
+		}
+	}
+
+	public enum QueryType {
+		REFUND_MONEY_QUERY(0, "退票手续费查询"), CHANGE_MONEY_QUERY(1, "改签手续费查询"), REFUND_MONEY_QUERY_(2, "非自愿转自愿退票金额查询");
+
+		private Integer code;
+		private String label;
+		QueryType(Integer code, String label) {
+			this.code = code;
+			this.label = label;
+		}
+
+		public Integer getCode() {
+			return code;
+		}
+
+		public String getLabel() {
+			return label;
 		}
 	}
 }
