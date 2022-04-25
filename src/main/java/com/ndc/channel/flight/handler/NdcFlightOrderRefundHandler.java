@@ -419,7 +419,7 @@ public class NdcFlightOrderRefundHandler {
                 if (StringUtils.isEmpty(repeatTicketNumber)) {
                     throw new BusinessException(BusinessExceptionCode.REQUEST_PARAM_ERROR, "重购客票退票，客票号必填！");
                 }
-                bookingRefList.add(createBookingRef(orderRel.getOwnerCode(), pax.getPaxID(), BusinessEnum.BookingRefTypeCode.REPEAT_TICKET_NUMBER.getCode()));
+                bookingRefList.add(createBookingRef(orderRel.getOwnerCode(), repeatTicketNumber, BusinessEnum.BookingRefTypeCode.REPEAT_TICKET_NUMBER.getCode()));
             }
         }
 

@@ -15,11 +15,13 @@ import com.ndc.channel.flight.dto.orderPay.OrderPayReqParams;
 import com.ndc.channel.flight.dto.refund.RefundApplyParams;
 import com.ndc.channel.flight.dto.refund.RefundChangeMoneyQueryParams;
 import com.ndc.channel.flight.dto.refund.RefundChangeMoneyQueryResp;
+import com.ndc.channel.flight.dto.refund.RefundReapplyParams;
 import com.ndc.channel.flight.dto.verifyPrice.CorpApiFlightVerifyPriceData;
 import com.ndc.channel.flight.dto.verifyPrice.FeiBaApiVerifyPriceReq;
 import com.ndc.channel.flight.handler.*;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.xpath.operations.Bool;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
@@ -46,7 +48,7 @@ public class MuNdcFlightController {
     @Resource
     private NdcFlightChangeFlightSearchHandler changeFlightSearchHandler;
     @Resource
-    private NdcFlightChangeBooingHandler changeBooingHandler;
+    private NdcFlightRefundReapplyHandler refundReapplyHandler;
 
     @PostMapping("/corpapi/flight/V2/search")
     @ApiOperation(value = "航班查询", notes = "航班查询", httpMethod = "POST", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -168,6 +170,21 @@ public class MuNdcFlightController {
         }catch (BusinessException exception) {
 
             log.error("东航NDC退票申请失败，失败原因={}", exception.getMessage());
+            return BusinessResponseFactory.createBusinessError(exception);
+        }
+    }
+
+    @PostMapping("/corpapi/flight/refund/reapply")
+    @ApiOperation(value = "重新提交退票", httpMethod = "POST", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseData<Boolean> refundReapply(@RequestBody RefundReapplyParams params) {
+
+        try {
+
+            refundReapplyHandler.refundReapply(params);
+            return BusinessResponseFactory.createSuccess(true);
+        }catch (BusinessException exception) {
+
+            log.error("东航NDC重新申请退票失败，失败原因={}", exception.getMessage());
             return BusinessResponseFactory.createBusinessError(exception);
         }
     }

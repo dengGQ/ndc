@@ -61,8 +61,8 @@ public class MuNdcFlightApiOrderServiceImplTests {
     public void reapplyRefund() {
 
         RefundReapplyParams refundReapplyParams = new RefundReapplyParams();
-        refundReapplyParams.setNdcRefundRelId(13L);
-        refundReapplyParams.setRefundReason(Byte.valueOf("6"));
+        refundReapplyParams.setNdcRefundRelId(55L);
+        refundReapplyParams.setRefundReason(Byte.valueOf("3"));
         refundReapplyParams.setMemo("病退");
         refundReapplyParams.setRefundAttachmentUrl(Arrays.asList("https://www.zixi.org/static/uploads/2022/4/202204240001035537.jpg"));
 
