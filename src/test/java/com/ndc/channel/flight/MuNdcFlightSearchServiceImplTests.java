@@ -10,6 +10,7 @@ import com.ndc.channel.flight.dto.createOrder.FlightOrderCreateReq;
 import com.ndc.channel.flight.dto.flightSearch.CorpApiFlightListDataV2;
 import com.ndc.channel.flight.dto.orderDetail.NdcOrderDetailData;
 import com.ndc.channel.flight.dto.orderPay.OrderPayReqParams;
+import com.ndc.channel.flight.dto.refund.NdcRefundOrderSearchParams;
 import com.ndc.channel.flight.dto.refund.RefundChangeMoneyQueryParams;
 import com.ndc.channel.flight.dto.refund.RefundChangeMoneyQueryResp;
 import com.ndc.channel.flight.dto.verifyPrice.CorpApiFlightVerifyPriceData;
@@ -155,7 +156,9 @@ public class MuNdcFlightSearchServiceImplTests {
 
     @Test
     public void refundOrderQuery() {
-        final NdcOrderDetailData response = detailHandler.orderDetail("1022030800206118");
+
+        final NdcRefundOrderSearchParams searchParams = new NdcRefundOrderSearchParams(000L, null);
+        final NdcOrderDetailData response = detailHandler.orderDetail(searchParams);
 
         System.out.println(JSON.toJSONString(response));
     }
@@ -165,7 +168,7 @@ public class MuNdcFlightSearchServiceImplTests {
 
         final MsgBody msgBody = new MsgBody();
         msgBody.setMsgType("1");
-        msgBody.setBusinessNumber("1022031100207207");
+        msgBody.setBusinessData("1022031100207207");
         final String s = JSON.toJSONString(msgBody);
 
         queryExecutor.submitTask(s, 5);

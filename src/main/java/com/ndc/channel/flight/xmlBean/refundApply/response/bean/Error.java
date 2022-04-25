@@ -49,6 +49,12 @@ public class Error {
     @XmlElement(name = "Error", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderViewRS")
     protected Error error;
 
+    private static Error defaultError = new Error();
+
+    public static Error getDefaultError() {
+        defaultError.setDescText("东航NDC接口异常！");
+        return defaultError;
+    }
     /**
      * 获取code属性的值。
      * 

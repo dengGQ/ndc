@@ -2,9 +2,11 @@ package com.ndc.channel.flight.handler;
 
 import com.ndc.channel.flight.dto.orderDetail.NdcOrderDetailData;
 
-public interface NdcOrderDetailHandler {
+public interface NdcOrderDetailHandler<P> {
 
-    NdcOrderDetailData orderDetail(String businessId);
+    P resolveParams(Object params);
+
+    NdcOrderDetailData orderDetail(P params);
 
     Boolean checkStatusComplete(NdcOrderDetailData detailData);
 

@@ -54,19 +54,19 @@ public class OrderDetailDelayQueryExecutor {
             th.interrupt();
         }
     }
-
     public static final String ORDER_DETAIL_HANDLER_NAME_PREFIX = "orderDetailHandler";
 
     public void orderStatusProcess(String msgBody) {
 
         MsgBody mb = JSONObject.parseObject(msgBody, MsgBody.class);
         String msgType = mb.getMsgType();
-        String businessNumber = mb.getBusinessNumber();
+        Object businessData = mb.getBusinessData();
 
         NdcOrderDetailHandler detailHandler = orderDetailHandlerMap.get( ORDER_DETAIL_HANDLER_NAME_PREFIX + msgType);
 
         try {
-            NdcOrderDetailData ndcOrderDetailData = detailHandler.orderDetail(businessNumber);
+            final Object o = detailHandler.resolveParams(businessData);
+            NdcOrderDetailData ndcOrderDetailData = detailHandler.orderDetail(o);
             log.info("NDC订单明细查询结果={}", JSON.toJSONString(ndcOrderDetailData));
             if (detailHandler.checkStatusComplete(ndcOrderDetailData)) {
 
@@ -76,6 +76,7 @@ public class OrderDetailDelayQueryExecutor {
                 this.submitTask(msgBody, 60*10);
             }
         }catch (Exception e) {
+            log.error("订单详情异步查询任务执行失败", e);
             this.submitTask(msgBody, 60*10);
         }
     }

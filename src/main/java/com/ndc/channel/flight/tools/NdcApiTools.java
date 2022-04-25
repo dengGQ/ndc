@@ -201,7 +201,28 @@ public class NdcApiTools {
             throw e;
         }catch (Exception e){
             log.error("东方航空Ndc退票申请接口异常", e);
-            return null;
+            return com.ndc.channel.flight.xmlBean.refundApply.response.bean.IATAOrderViewRS.respError();
+        }
+    }
+
+    public com.ndc.channel.flight.xmlBean.refundReapply.response.bean.IATAOrderViewRS refundReapply(com.ndc.channel.flight.xmlBean.refundReapply.request.bean.IATAOrderChangeRQ rq) {
+        try{
+
+            NdcAccountInfoData accountInfo = accountInfoMapper.selectByNdcCode("mu_ndc");
+
+            final com.ndc.channel.flight.xmlBean.refundReapply.request.bean.TravelAgency travelAgency = rq.getParty().getSender().getTravelAgency();
+            travelAgency.setAgencyID(accountInfo.getAgencyID());
+            travelAgency.setName(accountInfo.getName());
+            travelAgency.setTypeCode(accountInfo.getTypeCode());
+
+            accountInfo.setNdcApiInfo(BusinessEnum.NdcApiInfo.REFUND_REAPPLY);
+            accountInfo.setRequestId(rq.getPayloadAttributes().getEchoTokenText());
+            return remote(accountInfo, rq, com.ndc.channel.flight.xmlBean.refundReapply.request.bean.IATAOrderChangeRQ.class, com.ndc.channel.flight.xmlBean.refundReapply.response.bean.IATAOrderViewRS.class);
+        }catch (BusinessException e){
+            throw e;
+        }catch (Exception e){
+            log.error("东方航空Ndc退票重新申请接口异常", e);
+            return com.ndc.channel.flight.xmlBean.refundReapply.response.bean.IATAOrderViewRS.respError();
         }
     }
 

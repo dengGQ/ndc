@@ -1,16 +1,16 @@
 package com.ndc.channel.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.ndc.channel.common.TableName;
+import com.ndc.channel.common.service.IIdGeneratorService;
 import com.ndc.channel.entity.NdcFlightApiRefundOrderRel;
 import com.ndc.channel.flight.dto.refund.RefundApplyParams;
-import com.ndc.channel.flight.dto.refund.RefundChangeMoneyQueryResp;
 import com.ndc.channel.mapper.NdcFlightApiRefundOrderRelMapper;
 import com.ndc.channel.service.NdcFlightApiRefundOrderRelService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.math.BigDecimal;
 import java.util.Date;
 
 @Slf4j
@@ -20,21 +20,29 @@ public class NdcFlightApiRefundOrderRelServiceImpl implements NdcFlightApiRefund
     @Resource
     private NdcFlightApiRefundOrderRelMapper apiRefundOrderRelMapper;
 
+    @Resource
+    private IIdGeneratorService idGeneratorService;
+
     @Override
-    public void insertEntity(RefundApplyParams params, String orderId, String refundId, String requestId) {
+    public Long insertEntity(RefundApplyParams params, String orderId, String requestId) {
+
+        NdcFlightApiRefundOrderRel rel = new NdcFlightApiRefundOrderRel();
+        Long primaryKey = idGeneratorService.getPrimaryKey(TableName.NDC_FLIGHT_API_REFUND_ORDER_REL);
 
         try {
-            NdcFlightApiRefundOrderRel rel = new NdcFlightApiRefundOrderRel();
 
+            rel.setRelId(primaryKey);
             rel.setOrderId(orderId);
-            rel.setRefundId(refundId);
             rel.setExternalRefundNumber(params.getExternalRefundNumber());
             rel.setAfterRefundTicketUrl(params.getAfterRefundTicketUrl());
             rel.setCreateTime(new Date());
             rel.setRequestId(requestId);
             apiRefundOrderRelMapper.insertSelective(rel);
         }catch (Exception e) {
-            log.error("ndc退票单订单保存失败，refundApplyParams={}, orderId={}, refundId={}", JSON.toJSONString(params), orderId, refundId);
+            log.info("ndc退票单订单保存失败，refundApplyParams={}, orderId={}", JSON.toJSONString(params), orderId);
+            log.error("ndc退票单订单保存失败", e);
         }
+
+        return primaryKey;
     }
 }

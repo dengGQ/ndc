@@ -22,6 +22,8 @@ public class OrderTicketInfo {
 
     private BigDecimal refundFee;
 
+    private String paxId;
+
     public String getPassengerName() {
         return passengerName;
     }
@@ -84,5 +86,13 @@ public class OrderTicketInfo {
 
     public void setRefundFee(BigDecimal refundFee) {
         this.refundFee = refundFee;
+    }
+
+    public String getPaxId() {
+        return paxId;
+    }
+
+    public void setPaxId(String paxId) {
+        this.paxId = paxId;
     }
 }

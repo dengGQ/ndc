@@ -10,10 +10,7 @@ import com.ndc.channel.exception.BusinessException;
 import com.ndc.channel.exception.BusinessExceptionCode;
 import com.ndc.channel.executor.OrderDetailDelayQueryExecutor;
 import com.ndc.channel.flight.dto.MsgBody;
-import com.ndc.channel.flight.dto.refund.RefundApplyParams;
-import com.ndc.channel.flight.dto.refund.RefundApplyPassengerParams;
-import com.ndc.channel.flight.dto.refund.RefundChangeMoneyQueryParams;
-import com.ndc.channel.flight.dto.refund.RefundChangeMoneyQueryResp;
+import com.ndc.channel.flight.dto.refund.*;
 import com.ndc.channel.flight.tools.NdcApiTools;
 import com.ndc.channel.flight.xmlBean.refundAmountSearch.response.bean.refund.CarrierFee;
 import com.ndc.channel.flight.xmlBean.refundApply.request.bean.IATAOrderRetrieveRQ;
@@ -29,6 +26,7 @@ import com.ndc.channel.flight.xmlBean.refundConfirm.request.bean.BinaryObject;
 import com.ndc.channel.flight.xmlBean.refundConfirm.request.bean.Media;
 import com.ndc.channel.mapper.NdcFlightApiOrderRelMapper;
 import com.ndc.channel.service.NdcFlightApiRefundOrderRelService;
+import com.ndc.channel.util.FileUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -84,18 +82,17 @@ public class NdcFlightOrderRefundHandler {
             throw new BusinessException(BusinessExceptionCode.FLIGHT_CHANNEL_ERROR, error.getError().getDescText());
         }
 
-        final com.ndc.channel.flight.xmlBean.refundConfirm.response.bean.Response refundConfirmResponse = iataOrderViewRS.getResponse();
+        // 本次退票乘客ID
+        List<String> paxIdList = request.getDataLists().getPaxList().stream().map(com.ndc.channel.flight.xmlBean.refundConfirm.request.bean.Pax::getPaxID).collect(Collectors.toList());
 
-        final com.ndc.channel.flight.xmlBean.refundConfirm.response.bean.Order order = refundConfirmResponse.getOrder();
-        final String refundId = order.getOrderID();
+        Long refundRelId = refundOrderRelService.insertEntity(params, orderRel.getOrderId(), rq.getPayloadAttributes().getEchoTokenText());
 
-        refundOrderRelService.insertEntity(params, orderRel.getOrderId(), refundId, rq.getPayloadAttributes().getEchoTokenText());
+        NdcRefundOrderSearchParams searchParams = new NdcRefundOrderSearchParams(refundRelId, paxIdList);
 
-        delayQueryExecutor.submitTask(JSON.toJSONString(new MsgBody(orderRel.getOrderId(), "2")), 60L);
+        delayQueryExecutor.submitTask(JSON.toJSONString(new MsgBody(searchParams, "2")), 60L);
 
-        return refundId;
+        return String.valueOf(refundRelId);
     }
-
     /**
      * 机票退票金额查询
      * @param params
@@ -151,7 +148,7 @@ public class NdcFlightOrderRefundHandler {
      * @param orderId
      * @return
      */
-    private Response refundApply(String orderId, List<String> ticketNumberList) {
+    public Response refundApply(String orderId, List<String> ticketNumberList) {
 
         NdcFlightApiOrderRel ndcFlightApiOrderRel = apiOrderRelMapper.selectByOrderId(orderId);
 
@@ -291,7 +288,7 @@ public class NdcFlightOrderRefundHandler {
         com.ndc.channel.flight.xmlBean.refundConfirm.request.bean.Request request = new com.ndc.channel.flight.xmlBean.refundConfirm.request.bean.Request();
 
         final com.ndc.channel.flight.xmlBean.refundConfirm.request.bean.OrderChangeParameters parameters = new com.ndc.channel.flight.xmlBean.refundConfirm.request.bean.OrderChangeParameters();
-        parameters.setReasonCode(BusinessEnum.RefundWay.getReasonCode(params.getRefundWay()));
+        parameters.setReasonCode(BusinessEnum.RefundWay.getReasonCode(params.getRefundReason()));
 
         final com.ndc.channel.flight.xmlBean.refundConfirm.request.bean.DataLists refundConfirmDataLists = createRefundConfirmDataLists(params, refundApplyResponse);
         request.setDataLists(refundConfirmDataLists);
@@ -335,23 +332,39 @@ public class NdcFlightOrderRefundHandler {
         final List<com.ndc.channel.flight.xmlBean.refundConfirm.request.bean.ContactInfo> refundConfirmContactInfoList = createRefundConfirmContactInfo(dataLists);
         refundConfirmDataLists.setContactInfoList(refundConfirmContactInfoList);
 
-        if (CollectionUtils.isNotEmpty(refundAttachmentUrl)) {
 
-            List<Media> mediaList = refundAttachmentUrl.stream().filter(s-> StringUtils.isNoneBlank(s)).map(attachUrl -> {
-                Media media = new Media();
-                media.setMediaID(UUID.randomUUID().toString());
-                media.setBinaryObject(getFileBase64Str(attachUrl));
-                media.setDescText("退票申请证明文件");
+        List<Media> mediaList = createMediaList(refundAttachmentUrl);
+        if (CollectionUtils.isNotEmpty(mediaList)) {
 
-                return media;
-            }).collect(Collectors.toList());
-
-            if (mediaList.size() != 0) {
-                refundConfirmDataLists.setMediaList(mediaList);
-            }
+            refundConfirmDataLists.setMediaList(mediaList);
         }
 
         return refundConfirmDataLists;
+    }
+
+    private static List<Media> createMediaList(List<String> refundAttachmentUrl) {
+
+        if (CollectionUtils.isNotEmpty(refundAttachmentUrl)) {
+            return Collections.EMPTY_LIST;
+        }
+
+        List<Media> mediaList = new ArrayList<>();
+
+        for (String attachUrl : refundAttachmentUrl) {
+            if (StringUtils.isEmpty(attachUrl)) {
+                continue;
+            }
+            final BinaryObject base64Str = getFileBase64Str(attachUrl);
+            if (base64Str != null) {
+                Media media = new Media();
+                media.setMediaID(UUID.randomUUID().toString());
+                media.setBinaryObject(base64Str);
+                media.setDescText("退票申请证明文件");
+
+                mediaList.add(media);
+            }
+        }
+        return mediaList;
     }
 
     private static BinaryObject getFileBase64Str(String url) {
@@ -362,7 +375,7 @@ public class NdcFlightOrderRefundHandler {
 
             InputStream inStream = connection.getInputStream();
 
-            byte[] bytes = readFileInputStream(inStream);
+            byte[] bytes = FileUtil.readFileInputStream(inStream);
 
             final String fileStr = Base64.getEncoder().encodeToString(bytes);
 
@@ -388,19 +401,6 @@ public class NdcFlightOrderRefundHandler {
         }
     }
 
-    private static byte[] readFileInputStream(InputStream inputStream) throws IOException {
-        ByteArrayOutputStream outStream= new ByteArrayOutputStream();
-        byte[] buffer = new byte[1024];
-        int len = 0;
-        while( (len=inputStream.read(buffer)) != -1){
-            outStream.write(buffer,0, len);
-
-        }
-        inputStream.close();
-
-        return outStream.toByteArray();
-    }
-
     private List<com.ndc.channel.flight.xmlBean.refundConfirm.request.bean.Pax> createRefundConfirmPaxList(DataLists dataLists, List<String> idCardListRefundPassenger) {
         final List<Pax> paxList = dataLists.getPaxList().stream().filter(pax -> {
             final IdentityDoc identityDoc = pax.getIdentityDoc();
@@ -413,13 +413,13 @@ public class NdcFlightOrderRefundHandler {
         final List<com.ndc.channel.flight.xmlBean.refundConfirm.request.bean.BookingRef> bookingRefList = new ArrayList<>();
 
         for (com.ndc.channel.flight.xmlBean.refundConfirm.request.bean.Pax pax : paxList) {
-            bookingRefList.add(createBookingRef(pax.getPaxID(), orderRel.getOwnerCode(), BusinessEnum.RefTypeCode.PAX_ID.getCode()));
+            bookingRefList.add(createBookingRef(orderRel.getOwnerCode(), pax.getPaxID(), BusinessEnum.BookingRefTypeCode.PAX_ID.getCode()));
             if (BusinessEnum.RefundWay._23.getCode().equals(refundReasonCode)) {
                 String repeatTicketNumber = repeatTicketNumberMapping.get(pax.getIdentityDoc().getIdentityDocID()).getRepeatTicketNumber();
                 if (StringUtils.isEmpty(repeatTicketNumber)) {
                     throw new BusinessException(BusinessExceptionCode.REQUEST_PARAM_ERROR, "重购客票退票，客票号必填！");
                 }
-                bookingRefList.add(createBookingRef(pax.getPaxID(), orderRel.getOwnerCode(), BusinessEnum.RefTypeCode.REPEAT_TICKET_NUMBER.getCode()));
+                bookingRefList.add(createBookingRef(orderRel.getOwnerCode(), pax.getPaxID(), BusinessEnum.BookingRefTypeCode.REPEAT_TICKET_NUMBER.getCode()));
             }
         }
 

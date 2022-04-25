@@ -31,7 +31,6 @@ public class ChannelApplication extends SpringBootServletInitializer {
             }
         };
     }
-
     public static void main(String[] args) {
         SpringApplication.run(ChannelApplication.class, args);
     }

@@ -2,9 +2,12 @@ package com.ndc.channel.flight;
 
 import com.alibaba.fastjson.JSON;
 import com.ndc.channel.ChannelApplication;
+import com.ndc.channel.common.service.IIdGeneratorService;
 import com.ndc.channel.flight.dto.createOrder.CorpApiFlightOrderCreateData;
 import com.ndc.channel.flight.dto.createOrder.FlightOrderCreateReq;
 import com.ndc.channel.flight.dto.flightSearch.CorpApiTicketData;
+import com.ndc.channel.flight.dto.refund.RefundReapplyParams;
+import com.ndc.channel.flight.handler.NdcFlightRefundReapplyHandler;
 import com.ndc.channel.redis.RedisKeyConstants;
 import com.ndc.channel.redis.RedisUtils;
 import com.ndc.channel.service.NdcFlightApiOrderRelService;
@@ -16,6 +19,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.annotation.Resource;
+import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.IntStream;
@@ -32,6 +36,9 @@ public class MuNdcFlightApiOrderServiceImplTests {
     @Resource
     RedisUtils redisUtils;
 
+    @Resource
+    IIdGeneratorService idGeneratorService;
+
     @Test
     public void insertEntity() {
 
@@ -46,6 +53,21 @@ public class MuNdcFlightApiOrderServiceImplTests {
         CorpApiTicketData ticketData = redisUtils.hGet(RedisKeyConstants.getRedisTicketDataCacheKey("2022-06-2808051030MU5301SHACAN"), "2022-06-2808051030MU5301SHACANY1@10168", CorpApiTicketData.class);
 
         orderRelService.insertEntity(orderCreateReq, orderCreateData, ticketData);
+    }
+
+    @Resource
+    private NdcFlightRefundReapplyHandler refundReapplyHandler;
+    @Test
+    public void reapplyRefund() {
+
+        RefundReapplyParams refundReapplyParams = new RefundReapplyParams();
+        refundReapplyParams.setNdcRefundRelId(13L);
+        refundReapplyParams.setRefundReason(Byte.valueOf("6"));
+        refundReapplyParams.setMemo("病退");
+        refundReapplyParams.setRefundAttachmentUrl(Arrays.asList("https://www.zixi.org/static/uploads/2022/4/202204240001035537.jpg"));
+
+        final boolean b = refundReapplyHandler.refundReapply(refundReapplyParams);
+        System.out.println("-----------");
     }
 
     @Test

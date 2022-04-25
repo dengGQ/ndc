@@ -53,6 +53,12 @@ public class IATAOrderViewRS {
     @XmlElement(name = "PaymentInfo", namespace = "http://www.iata.org/IATA/2015/00/2018.2/IATA_OrderViewRS", required = true)
     protected PaymentInfo paymentInfo;
 
+    public static final IATAOrderViewRS resp = new IATAOrderViewRS();
+
+    public static IATAOrderViewRS respError() {
+        resp.setError(Error.getDefaultError());
+        return resp;
+    }
     /**
      * 获取error属性的值。
      * 

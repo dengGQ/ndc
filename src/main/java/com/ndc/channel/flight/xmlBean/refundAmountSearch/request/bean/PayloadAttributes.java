@@ -78,7 +78,7 @@ public class PayloadAttributes {
 
     public PayloadAttributes() {
         this.altLangID = "CN";
-        this.correlationID = "";
+        this.correlationID = UUID.randomUUID().toString();;
         this.echoTokenText = UUID.randomUUID().toString();
         this.primaryLangID = "CN";
         this.retransmissionInd = "false";
@@ -86,7 +86,7 @@ public class PayloadAttributes {
         this.timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"));
         this.trxID = UUID.randomUUID().toString();
         this.trxStatusCode = "0";
-        this.versionNumber = "";
+        this.versionNumber = "18.2";
     }
 
     /**

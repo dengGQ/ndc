@@ -1,5 +1,7 @@
 package com.ndc.channel.flight.dto.orderDetail;
 
+import com.ndc.channel.flight.xmlBean.refundOrderDetail.response.bean.Response;
+
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -12,6 +14,13 @@ public class NdcOrderDetailData {
     private String orderStatus;
 
     private BigDecimal refundMoney;
+
+    /**
+     * 退票单明细原始数据
+     */
+    private Response refundDetailResponse;
+
+    private String refundId;
 
     public String getChannelOrderNumber() {
         return channelOrderNumber;
@@ -43,5 +52,21 @@ public class NdcOrderDetailData {
 
     public void setRefundMoney(BigDecimal refundMoney) {
         this.refundMoney = refundMoney;
+    }
+
+    public Response getRefundDetailResponse() {
+        return refundDetailResponse;
+    }
+
+    public void setRefundDetailResponse(Response refundDetailResponse) {
+        this.refundDetailResponse = refundDetailResponse;
+    }
+
+    public String getRefundId() {
+        return refundId;
+    }
+
+    public void setRefundId(String refundId) {
+        this.refundId = refundId;
     }
 }

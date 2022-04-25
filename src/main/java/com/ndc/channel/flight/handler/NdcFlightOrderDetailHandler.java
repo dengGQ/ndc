@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Component(value = "orderDetailHandler1")
-public class NdcFlightOrderDetailHandler implements NdcOrderDetailHandler{
+public class NdcFlightOrderDetailHandler implements NdcOrderDetailHandler<String>{
 
     @Resource
     private NdcApiTools ndcApiTools;
@@ -146,5 +146,10 @@ public class NdcFlightOrderDetailHandler implements NdcOrderDetailHandler{
         }catch (Exception e) {
             log.error("Ndc订单状态推送失败, url="+afterTicketUrl+", params="+JSON.toJSONString(noticeData), e);
         }
+    }
+
+    @Override
+    public String resolveParams(Object params) {
+        return (String) params;
     }
 }

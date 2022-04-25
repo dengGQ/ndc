@@ -359,6 +359,7 @@ public class BusinessEnum {
 		ORDER_DETAIL("A0538", "/ndc-flight-order-retrieve/flight/flightOrderRetrieve"),
 		REFUND_MONEY_QUERY("A0540", "/ndc-flight-ticket-refund/refund/flightRefundFee"),
 		REFUND_APPLY("A0539", "/ndc-flight-ticket-refund/refund/flightRefundApply"),
+		REFUND_REAPPLY("A0543", "/ndc-flight-ticket-refund/refund/flightRefundReApply"),
 		REFUND_CONFIRM("A0541", "/ndc-flight-ticket-refund/refund/flightRefundConfirm"),
 		REFUND_ORDER_DETAIL("A0542", "/ndc-flight-ticket-refund/refund/flightRefundNote"),
 		CHANGE_FLIGHT_SEARCH("A0549", "/ndc-flight-order-reshopping/voluntary/voluntaryReshopping"),
@@ -487,12 +488,12 @@ public class BusinessEnum {
 		}
 	}
 
-	public enum RefTypeCode{
-		PAX_ID("1","旅客唯一标识"), REPEAT_TICKET_NUMBER("709", "重购客票号");
+	public enum BookingRefTypeCode{
+		PAX_ID("1","旅客唯一标识"), REFUND_ORDER_ID("708", "退货单ID"), REPEAT_TICKET_NUMBER("709", "重购客票号");
 
 		private String code;
 		private String msg;
-		RefTypeCode(String code, String msg) {
+		BookingRefTypeCode(String code, String msg) {
 			this.code = code;
 			this.msg = msg;
 		}
