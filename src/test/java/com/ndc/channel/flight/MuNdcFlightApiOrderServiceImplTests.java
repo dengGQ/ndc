@@ -78,7 +78,7 @@ public class MuNdcFlightApiOrderServiceImplTests {
 
         final CorpApiFlightOrderCreateData orderCreateData = JSON.parseObject(s1, CorpApiFlightOrderCreateData.class);
 
-        CorpApiTicketData ticketData = redisUtils.hGet(RedisKeyConstants.getRedisTicketDataCacheKey("2022-06-2808051030MU5301SHACAN"), "2022-06-2808051030MU5301SHACANY1@10168", CorpApiTicketData.class);
+        CorpApiTicketData ticketData = redisUtils.hGet(RedisKeyConstants.getRedisTicketDataCacheKey("2022-08-1206451415MU2335PVGLXA"), "2022-08-1206451415MU2335PVGLXAE1@10015", CorpApiTicketData.class);
 
         orderRelService.insertEntity(orderCreateReq, orderCreateData, ticketData);
     }
