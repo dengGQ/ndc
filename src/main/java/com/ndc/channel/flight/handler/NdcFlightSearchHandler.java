@@ -481,7 +481,6 @@ public class NdcFlightSearchHandler {
                 BigDecimal penaltyAmount = new BigDecimal(penaltyPercent).divide(new BigDecimal("100"), 2, RoundingMode.HALF_UP).multiply(ticketPrice).setScale(0, BigDecimal.ROUND_HALF_UP);
                 // 退票
                 if ("Cancellation".equals(penalty.getTypeCode())) {
-
                     chargeInfo.setReturnFee(penaltyAmount);
                     parseDate(flyDate, minTime, minTimeUnit, maxTime, maxTimeUnit, chargeInfo);
 
@@ -490,7 +489,6 @@ public class NdcFlightSearchHandler {
 
                 // 改签
                 if ("Upgrade".equals(penalty.getTypeCode())){
-
                     chargeInfo.setChangeFee(penaltyAmount);
 
                     parseDate(flyDate, minTime, minTimeUnit, maxTime, maxTimeUnit, chargeInfo);
@@ -498,7 +496,9 @@ public class NdcFlightSearchHandler {
                     changePolicyParse(changePolicy, remarkText, penaltyPercent);
                 }
             }
-            tgqPointChargeInfoList.add(chargeInfo);
+            if (StringUtils.isNoneBlank(chargeInfo.getTimeText())) {
+                tgqPointChargeInfoList.add(chargeInfo);
+            }
         }
 
         policy.setChangePolicy(changePolicy.toString());
