@@ -72,7 +72,11 @@ public class NdcFlightSearchHandler {
         }
 
         String everyFlightDateKey=flightDate+depCityCode+destCityCode;
+
         final DataLists dataLists = response.getDataLists();
+
+        final String shoppingResponseID = response.getShoppingResponse().getShoppingResponseID();
+        final List<CorpApiFlightListDataV2> flightDataList = convertToCorpApiFlightDataV2(flightDate, depCityCode, destCityCode, shoppingResponseID, dataLists);
 
         // 成人票检查
         Pax pax = dataLists.getPaxList().stream()
@@ -81,46 +85,6 @@ public class NdcFlightSearchHandler {
                     log.error("NDC航班未查到成人航班, everyFlightDateKey={}", everyFlightDateKey);
                     throw new BusinessException(BusinessExceptionCode.REQUEST_PARAM_ERROR, "NDC航班未查到成人航班！");
                 });
-
-        // 出发和到达数据
-        final OriginDest originDest = dataLists.getOriginDestList().get(0);
-        final List<String> paxJourneyRefID = originDest.getPaxJourneyRefID(); // 乘客行程ID
-
-        // 乘客行程
-        final List<PaxJourney> paxJourneyList = dataLists.getPaxJourneyList().stream()
-                .filter(paxJourney -> paxJourneyRefID.contains(paxJourney.getPaxJourneyID()))
-                .collect(Collectors.toList());
-
-        // 乘客航段
-        final List<PaxSegment> paxSegmentList = dataLists.getPaxSegmentList();
-
-        // 服务定义列表
-        final List<ServiceDefinition> serviceDefinitionList = dataLists.getServiceDefinitionList();
-
-        // 行李额信息
-        List<BaggageAllowance> baggageAllowanceList = dataLists.getBaggageAllowanceList();
-        final Map<String, BaggageAllowance> baggageAllowanceMap = baggageAllowanceList.stream().collect(Collectors.toMap(BaggageAllowance::getBaggageAllowanceID, Function.identity()));
-
-        // 价格类型列表
-        final List<PriceClass> priceClassList = dataLists.getPriceClassList();
-        final Map<String, PriceClass> priceClassMap = priceClassList.stream().collect(Collectors.toMap(PriceClass::getPriceClassID, Function.identity()));
-
-        // 转换后的航班列表
-        List<CorpApiFlightListDataV2> flightDataList = new ArrayList<>();
-
-        // 遍历乘客航段和乘客行程，查找与乘客行程相匹配的航段
-        for (PaxSegment paxSegment : paxSegmentList) {
-            for (PaxJourney paxJourney : paxJourneyList) {
-
-                if (paxJourney.getPaxSegmentRefID().contains(paxSegment.getPaxSegmentID())) {
-                    CorpApiFlightListDataV2 corpApiFlightListDataV2 = flightDataConvertFromPaxSegment(originDest, paxJourney, paxSegment, flightDate, depCityCode, destCityCode);
-                    final String shoppingResponseID = response.getShoppingResponse().getShoppingResponseID();
-                    corpApiFlightListDataV2.setShoppingResponseID(shoppingResponseID);
-                    flightDataList.add(corpApiFlightListDataV2);
-                }
-            }
-        }
-
         // 报价信息
         Offer offer = response.getOffersGroup().getCarrierOffers().stream()
                 .filter(of -> of.getPtcOfferParameters().get(0).getPTCPricedCode().equals(pax.getPTC()))
@@ -132,92 +96,35 @@ public class NdcFlightSearchHandler {
         final String ownerCode = offer.getOwnerCode();
         final Map<String, String> persistenceFlightDataMap= new HashMap<>(32);
         final Map<String, Map<String, String>> persistenceTicketDataMap = new HashMap<>(32);
-        for (CorpApiFlightListDataV2 flightData : flightDataList) {
+
+        for (Iterator<CorpApiFlightListDataV2> iterator = flightDataList.iterator(); iterator.hasNext();){
+            final CorpApiFlightListDataV2 flightData = iterator.next();
 
             persistenceFlightDataMap.put(RedisKeyConstants.getRedisFlightDataCacheKey(flightData.getFlightId()), JSON.toJSONString(flightData));
 
-//            final List<CorpApiTicketData> ticketDataList = new ArrayList<>();
 
             final Map<String, CorpApiTicketData> corpApiTicketMap = new HashMap<>();//ticketDataList.stream().collect(Collectors.toMap(CorpApiTicketData::getTicketId, v -> JSON.toJSONString(v)));
             
             // 遍历报价项目
             for (OfferItem offerItem : offer.getOfferItem()) {
 
-                // 报价详细信息
-                FareDetail fareDetail = offerItem.getFareDetail().get(0);
+                CorpApiTicketData ticketData = convertToCorpApiTicketData(everyFlightDateKey, flightData, dataLists, pax, offerItem, productConfigMap);
+                if (ticketData != null) {
 
-                // 票价计算组件
-                FareComponent fareComponent = fareDetail.getFareComponent().get(0);
-                // 票价组关联航段ID
-                List<String> paxSegmentRefID = fareComponent.getPaxSegmentRefID();
-                // 票价组关联价格类型ID
-                final String priceClassRefID = fareComponent.getPriceClassRefID();
-
-                final String fareTypeCode = fareComponent.getFareTypeCode();
-
-                final PriceClass priceClass = priceClassMap.get(priceClassRefID);
-
-                NdcChannelProductConfig ndcChannelProductConfig = productConfigMap.get(priceClass.getCode());
-                if (ndcChannelProductConfig == null) {
-                    continue;
-                }
-
-                // 价格来源
-                final String pricingSystemCodeText = fareDetail.getPricingSystemCodeText();
-
-                if (paxSegmentRefID.contains(flightData.getPaxSegmentID())) {
-
-                    // 乘客与服务之间的映射
-                    Map<String, List<String>> serviceDefinitionRefIDMapping = Optional.ofNullable(offerItem.getService()).orElseGet(Arrays::asList).stream()
-                            .collect(Collectors.groupingBy(
-                                    ser -> ser.getPaxRefID() + ser.getServiceAssociations().getServiceDefinitionRef().getPaxSegmentRefID(),
-                                    Collectors.mapping(ser -> ser.getServiceAssociations().getServiceDefinitionRef().getServiceDefinitionRefID(),
-                                            Collectors.toList())));
-
-                    final List<String> serviceDefinitionIdList = serviceDefinitionRefIDMapping.get(pax.getPaxID() + flightData.getPaxSegmentID());
-                    if (CollectionUtils.isEmpty(serviceDefinitionIdList)) {
-                        continue;
-                    }
-                    List<ServiceDefinition> paxServiceDefinitionList = serviceDefinitionList.stream().filter(sd -> serviceDefinitionIdList.contains(sd.getServiceDefinitionID())).collect(Collectors.toList());
-
-                    CorpApiTicketData ticketData = ticketDataConvertFromCarrierOffer(flightData, offerItem, paxServiceDefinitionList, baggageAllowanceMap);
-                    ticketData.setPaxId(pax.getPaxID());
-                    ticketData.setPricingSystemCodeText(pricingSystemCodeText);
-                    ticketData.setPriceClassID(priceClass.getPriceClassID());
-                    ticketData.setPriceClassCode(priceClass.getCode());
-                    ticketData.setPriceClassName(priceClass.getName());
-                    ticketData.setPriceClassDesc(priceClass.getDesc().getDescText());
-                    ticketData.setFareTypeCode(fareTypeCode);
-                    ticketData.setProductCode(priceClass.getCode());
-                    ticketData.setProductName(priceClass.getName());
-                    ProductRightDefinition definition = JSONObject.parseObject(priceClass.getDesc().getDescText(), ProductRightDefinition.class);
-                    List<String> productRights = parseProductRights(definition);
-                    /*if (CollectionUtils.isEmpty(productRights) && StringUtils.isNotEmpty(ndcChannelProductConfig.getProductRights())) {
-                        productRights = Arrays.asList(ndcChannelProductConfig.getProductRights().split("[,，]"));
-                    }*/
-                    ticketData.setRightsList(productRights);
-
-                    String productNotice = definition.getProductDefinition().getProductNotice();
-                    /*if (StringUtils.isEmpty(productNotice)) {
-                        productNotice = ndcChannelProductConfig.getProductConstraint();
-                    }*/
-                    ticketData.setProductNotice(productNotice);
-
-                    TaxSummary taxSummary = offerItem.getPrice().getTaxSummary();
-                    final Map<String, Tax> taxMap = taxSummary.getTax().stream().collect(Collectors.toMap(Tax::getTaxCode, Function.identity()));
-
-                    ticketData.setBuildFee(Optional.ofNullable(taxMap.get("CN").getAmount().getValue()).orElse(BigDecimal.ZERO));
-                    ticketData.setOilFee(Optional.ofNullable(taxMap.get("YQ").getAmount().getValue()).orElse(BigDecimal.ZERO));
                     corpApiTicketMap.put(ticketData.getTicketId(), ticketData);
                 }
             }
 
+            if (corpApiTicketMap.isEmpty()) {
+                iterator.remove();
+                continue;
+            }
+
+            List<CorpApiTicketData> ticketDataList = corpApiTicketMap.values().stream().collect(Collectors.toList());
+
             flightData.setOfferId(offer.getOfferID());
             flightData.setOwnerCode(ownerCode);
             flightData.setOwnerTypeCode(ownerTypeCode);
-            flightData.setOilFee(BigDecimal.ZERO);
-            List<CorpApiTicketData> ticketDataList = corpApiTicketMap.values().stream().collect(Collectors.toList());
-
             flightData.setBuildFee(ticketDataList.get(0).getBuildFee());
             flightData.setOilFee(ticketDataList.get(0).getOilFee());
             final boolean isPresent = ticketDataList.get(0).getServiceDefinitionList().stream().anyMatch(serviceDef -> BusinessEnum.ServiceName.MEAL.name().equals(serviceDef.getName()));
@@ -232,6 +139,114 @@ public class NdcFlightSearchHandler {
         redisUtils.hPutAndExpireAt(persistenceTicketDataMap, TimeUnit.DAYS, 1);
 
         return flightDataList;
+    }
+
+    private List<CorpApiFlightListDataV2> convertToCorpApiFlightDataV2(String flightDate, String depCityCode, String destCityCode, String shoppingResponseID, DataLists dataLists) {
+        // 出发和到达数据
+        final OriginDest originDest = dataLists.getOriginDestList().get(0);
+        final List<String> paxJourneyRefID = originDest.getPaxJourneyRefID(); // 乘客行程ID
+
+        // 乘客行程
+        final List<PaxJourney> paxJourneyList = dataLists.getPaxJourneyList().stream()
+                .filter(paxJourney -> paxJourneyRefID.contains(paxJourney.getPaxJourneyID()))
+                .collect(Collectors.toList());
+
+        // 乘客航段
+        final List<PaxSegment> paxSegmentList = dataLists.getPaxSegmentList();
+        // 转换后的航班列表
+        List<CorpApiFlightListDataV2> flightDataList = new ArrayList<>();
+
+        // 遍历乘客航段和乘客行程，查找与乘客行程相匹配的航段
+        for (PaxSegment paxSegment : paxSegmentList) {
+            for (PaxJourney paxJourney : paxJourneyList) {
+
+                if (paxJourney.getPaxSegmentRefID().contains(paxSegment.getPaxSegmentID())) {
+                    CorpApiFlightListDataV2 corpApiFlightListDataV2 = flightDataConvertFromPaxSegment(originDest, paxJourney, paxSegment, flightDate, depCityCode, destCityCode);
+                    corpApiFlightListDataV2.setShoppingResponseID(shoppingResponseID);
+                    flightDataList.add(corpApiFlightListDataV2);
+                }
+            }
+        }
+
+        return flightDataList;
+    }
+
+    private CorpApiTicketData convertToCorpApiTicketData(String everyFlightDateKey, CorpApiFlightListDataV2 flightData, DataLists dataLists, Pax pax, OfferItem offerItem, Map<String, NdcChannelProductConfig> productConfigMap) {
+
+        // 服务定义列表
+        final List<ServiceDefinition> serviceDefinitionList = dataLists.getServiceDefinitionList();
+
+        // 行李额信息
+        List<BaggageAllowance> baggageAllowanceList = dataLists.getBaggageAllowanceList();
+        final Map<String, BaggageAllowance> baggageAllowanceMap = baggageAllowanceList.stream().collect(Collectors.toMap(BaggageAllowance::getBaggageAllowanceID, Function.identity()));
+
+        // 价格类型列表
+        final List<PriceClass> priceClassList = dataLists.getPriceClassList();
+        final Map<String, PriceClass> priceClassMap = priceClassList.stream().collect(Collectors.toMap(PriceClass::getPriceClassID, Function.identity()));
+
+        // 报价详细信息
+        FareDetail fareDetail = offerItem.getFareDetail().get(0);
+
+        // 票价计算组件
+        FareComponent fareComponent = fareDetail.getFareComponent().get(0);
+        // 票价组关联航段ID
+        List<String> paxSegmentRefID = fareComponent.getPaxSegmentRefID();
+        // 票价组关联价格类型ID
+        final String priceClassRefID = fareComponent.getPriceClassRefID();
+
+        final String fareTypeCode = fareComponent.getFareTypeCode();
+
+        final PriceClass priceClass = priceClassMap.get(priceClassRefID);
+
+        NdcChannelProductConfig ndcChannelProductConfig = productConfigMap.get(priceClass.getCode());
+        if (ndcChannelProductConfig == null || !paxSegmentRefID.contains(flightData.getPaxSegmentID())) {
+            log.error("价格类型与产品匹配失败或未找到与当前航段关联的票价组, everyFlightDateKey={}, PaxSegmentID={}", everyFlightDateKey, flightData.getPaxSegmentID());
+            return null;
+        }
+
+        // 乘客与服务之间的映射
+        Map<String, List<String>> serviceDefinitionRefIDMapping = Optional.ofNullable(offerItem.getService()).orElseGet(Arrays::asList).stream()
+                .collect(Collectors.groupingBy(
+                        ser -> ser.getPaxRefID() + ser.getServiceAssociations().getServiceDefinitionRef().getPaxSegmentRefID(),
+                        Collectors.mapping(ser -> ser.getServiceAssociations().getServiceDefinitionRef().getServiceDefinitionRefID(),
+                                Collectors.toList())));
+
+        final List<String> serviceDefinitionIdList = serviceDefinitionRefIDMapping.get(pax.getPaxID() + flightData.getPaxSegmentID());
+        if (CollectionUtils.isEmpty(serviceDefinitionIdList)) {
+            log.error("服务定义为空, everyFlightDateKey={}, paxSegmentID={}, PaxID={}", everyFlightDateKey, flightData.getPaxSegmentID(), pax.getPaxID());
+            return null;
+        }
+
+        // 价格来源
+        final String pricingSystemCodeText = fareDetail.getPricingSystemCodeText();
+
+        List<ServiceDefinition> paxServiceDefinitionList = serviceDefinitionList.stream().filter(sd -> serviceDefinitionIdList.contains(sd.getServiceDefinitionID())).collect(Collectors.toList());
+
+        CorpApiTicketData ticketData = ticketDataConvertFromCarrierOffer(flightData, offerItem, paxServiceDefinitionList, baggageAllowanceMap);
+        ticketData.setPaxId(pax.getPaxID());
+        ticketData.setPricingSystemCodeText(pricingSystemCodeText);
+        ticketData.setPriceClassID(priceClass.getPriceClassID());
+        ticketData.setPriceClassCode(priceClass.getCode());
+        ticketData.setPriceClassName(priceClass.getName());
+        ticketData.setPriceClassDesc(priceClass.getDesc().getDescText());
+        ticketData.setFareTypeCode(fareTypeCode);
+        ticketData.setProductCode(priceClass.getCode());
+        ticketData.setProductName(priceClass.getName());
+        ProductRightDefinition definition = JSONObject.parseObject(priceClass.getDesc().getDescText(), ProductRightDefinition.class);
+        List<String> productRights = parseProductRights(definition);
+
+        ticketData.setRightsList(productRights);
+
+        String productNotice = definition.getProductDefinition().getProductNotice();
+
+        ticketData.setProductNotice(productNotice);
+
+        TaxSummary taxSummary = offerItem.getPrice().getTaxSummary();
+        final Map<String, Tax> taxMap = taxSummary.getTax().stream().collect(Collectors.toMap(Tax::getTaxCode, Function.identity()));
+
+        ticketData.setBuildFee(Optional.ofNullable(taxMap.get("CN").getAmount().getValue()).orElse(BigDecimal.ZERO));
+        ticketData.setOilFee(Optional.ofNullable(taxMap.get("YQ").getAmount().getValue()).orElse(BigDecimal.ZERO));
+        return ticketData;
     }
 
     private List<String> parseProductRights(ProductRightDefinition definition) {
