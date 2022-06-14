@@ -9,6 +9,25 @@ import java.util.*;
 
 public class BusinessEnum {
 
+	public enum PaymentStatusCode{
+		UNKNOWN("支付状态未知"),//	1分钟后可以重新发起支付，直到获取到其他支付状态。
+		CLOSED("支付完成"),//支付完成，等待出票
+		FAILED("支付失败"),//支付失败，订单支付时间没有失效的情况下可以重新发起支付。
+		PENDING("支付处理中"),//1分钟后可以重新发起支付。
+		ACCEPTED("已接收支付请求"),//对接渠道将H5页面现实给旅客，旅客在该页面发起支付操作【BSP Cash支付】；对接渠道唤醒SDK支付【微信、支付宝、银联APP】，旅客通过对应的APP进行支付。
+		PARTIAL_CLOSED("部分成功");//部分成功，订单支付时间没有失效的情况下可以重新发起支付。针对部分成功的扣款东航会差退处理。
+
+		private String statusDesc;
+
+		PaymentStatusCode(String statusDesc) {
+			this.statusDesc = statusDesc;
+		}
+
+		public static List<String> getAllRetryRequiredStatus() {
+			return Arrays.asList(UNKNOWN.name(), FAILED.name(), PENDING.name(), PARTIAL_CLOSED.name());
+		}
+	}
+
 	public enum RefundAuditingStatus{
 		REFUND_EXCEPTION("109", "退票异常"),
 		REJECT_FIRST("2011", "一审拒绝"),
