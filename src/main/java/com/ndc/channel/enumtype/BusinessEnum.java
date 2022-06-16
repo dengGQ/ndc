@@ -373,14 +373,14 @@ public class BusinessEnum {
 
 		FLIGHT_SEARCH("A0534", "/ndc-shopping-common/shopping/basicShopping"),
 		OFFER_PRICE("A0535", "/ndc-flight-offer-price/price/flightOfferPrice"),
-		CREATE_ORDER("A0536", "/ndc-flight-order-create/flight/flightOrderCreate"),
-		ORDER_PAY("A0537", "/ndc-flight-order-payment/flight/flightOrderPayment"),
-		ORDER_DETAIL("A0538", "/ndc-flight-order-retrieve/flight/flightOrderRetrieve"),
+		CREATE_ORDER("A0533", "/ndc-flight-order-create/flight/flightOrderCreate"),
+		ORDER_PAY("A0536", "/ndc-flight-order-payment/flight/flightOrderPayment"),
+		ORDER_DETAIL("A0537", "/ndc-flight-order-retrieve/flight/flightOrderRetrieve"),
 		REFUND_MONEY_QUERY("A0540", "/ndc-flight-ticket-refund/refund/flightRefundFee"),
-		REFUND_APPLY("A0539", "/ndc-flight-ticket-refund/refund/flightRefundApply"),
+		REFUND_APPLY("A0538", "/ndc-flight-ticket-refund/refund/flightRefundApply"),
 		REFUND_REAPPLY("A0543", "/ndc-flight-ticket-refund/refund/flightRefundReApply"),
-		REFUND_CONFIRM("A0541", "/ndc-flight-ticket-refund/refund/flightRefundConfirm"),
-		REFUND_ORDER_DETAIL("A0542", "/ndc-flight-ticket-refund/refund/flightRefundNote"),
+		REFUND_CONFIRM("A0540", "/ndc-flight-ticket-refund/refund/flightRefundConfirm"),
+		REFUND_ORDER_DETAIL("A0541", "/ndc-flight-ticket-refund/refund/flightRefundNote"),
 		CHANGE_FLIGHT_SEARCH("A0549", "/ndc-flight-order-reshopping/voluntary/voluntaryReshopping"),
 		REFUND_MONEY_QUERY_("A0544", "/ndc-flight-ticket-refund/refund/flightRefundRecalcfee"),//非自愿转自愿退票金额查询
 		CHANGE_BOOKING("A0550", "/ndc-flight-order-rebooking/voluntary/voluntaryOrderRebooking");
