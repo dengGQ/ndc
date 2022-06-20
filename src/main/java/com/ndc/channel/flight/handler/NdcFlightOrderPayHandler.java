@@ -54,7 +54,8 @@ public class NdcFlightOrderPayHandler {
         int loopNum = 0;
         do{
 
-            if (loopNum > 0) {
+            //重试5次
+            if (loopNum > 5) {
                 try {
                     // 一分钟后重试
                     Thread.sleep(60*1000);
