@@ -476,7 +476,7 @@ public class NdcFlightSearchHandler {
 
             RemarkText remarkText = JSONObject.parseObject(remark.getRemarkText(), RemarkText.class);
             final String useFlag = remarkText.getUseFlag(); // 0使用前 1使用后
-            if (useFlag.equals("1")){
+            if ("1".equals(useFlag)){
                 continue;
             }
 
