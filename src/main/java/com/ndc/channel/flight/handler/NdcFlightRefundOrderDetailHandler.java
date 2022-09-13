@@ -123,7 +123,7 @@ public class NdcFlightRefundOrderDetailHandler implements NdcOrderDetailHandler<
 
     @Override
     public Boolean checkStatusComplete(NdcOrderDetailData detailData) {
-        return BusinessEnum.RefundAuditingStatus.allCompleteStatus().contains(detailData.getTicketInfoList().get(0).getRefundAuditingStatus());
+        return BusinessEnum.RefundAuditingStatus.getEndStatus().contains(detailData.getTicketInfoList().get(0).getRefundAuditingStatus());
     }
 
     @Override
@@ -137,9 +137,17 @@ public class NdcFlightRefundOrderDetailHandler implements NdcOrderDetailHandler<
 
         try{
 
-            if (BusinessEnum.RefundAuditingStatus.REFUND_SUCCESS.getCode().equals(refundAuditingStatus)
-                    || BusinessEnum.RefundAuditingStatus.REFUND_COMPLETE.getCode().equals(refundAuditingStatus)) {
+            /*if (BusinessEnum.RefundAuditingStatus.getTicketRefundFail().contains(refundAuditingStatus)) {
 
+                noticeData.setIsSuccess(false);
+                noticeData.setMessage(BusinessEnum.RefundAuditingStatus.getLabelByName(refundAuditingStatus));
+            }else */
+            if(BusinessEnum.RefundAuditingStatus.getTicketRefundedStatus().contains(refundAuditingStatus)) {
+                // 票已退 款未退
+                noticeData.setIsSuccess(false);
+                noticeData.setMessage("一审拒绝");
+            }else if (BusinessEnum.RefundAuditingStatus.getCompleteStatus().contains(refundAuditingStatus)){
+                // 退款成功
                 List<FlightOrderPassengerData> passengerDataList = ndcOrderDetailData.getTicketInfoList().stream().map(ticketInfo -> {
                     FlightOrderPassengerData passengerData = new FlightOrderPassengerData();
 
@@ -156,9 +164,6 @@ public class NdcFlightRefundOrderDetailHandler implements NdcOrderDetailHandler<
                 noticeData.setRefundNumber(refundOrderRel.getRefundId());
                 noticeData.setPassengerDatas(passengerDataList);
                 noticeData.setIsSuccess(true);
-            }else {
-                noticeData.setIsSuccess(false);
-                noticeData.setMessage(BusinessEnum.RefundAuditingStatus.getLabelByName(refundAuditingStatus));
             }
 
             okHttpService.doPost(refundOrderRel.getAfterRefundTicketUrl(), JSON.toJSONString(noticeData));

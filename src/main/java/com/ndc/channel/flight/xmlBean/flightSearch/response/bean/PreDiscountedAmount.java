@@ -7,6 +7,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.XmlValue;
+import java.math.BigDecimal;
 
 
 /**
@@ -34,31 +35,15 @@ import javax.xml.bind.annotation.XmlValue;
 public class PreDiscountedAmount {
 
     @XmlValue
-    protected String value;
+    protected BigDecimal value;
     @XmlAttribute(name = "CurCode")
     protected String curCode;
 
-    /**
-     * 获取value属性的值。
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getValue() {
+    public BigDecimal getValue() {
         return value;
     }
 
-    /**
-     * 设置value属性的值。
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setValue(String value) {
+    public void setValue(BigDecimal value) {
         this.value = value;
     }
 

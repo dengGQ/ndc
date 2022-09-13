@@ -382,7 +382,7 @@ public class NdcFlightSearchHandler {
         ticketData.setPurchasePrice(ticketData.getTicketPrice());
         ticketData.setTicketId(FlightKeyUtils.getTicketId(flightData.getFlightId(), ticketData.getProductType(), ticketData.getSeatClassCode(), offerItemID));
         if (discount != null) {
-            ticketData.setFdPrice(discount.getDiscountAmount().getValue());
+            ticketData.setFdPrice(discount.getPreDiscountedAmount().getValue());
         }else {
             ticketData.setFdPrice(ticketData.getTicketPrice());
         }

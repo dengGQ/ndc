@@ -53,9 +53,38 @@ public class BusinessEnum {
 			return label;
 		}
 
-		public static List<String> allCompleteStatus(){
-			return Arrays.asList(REFUND_SUCCESS.getCode(), REFUND_COMPLETE.getCode(), REFUND_EXCEPTION.getCode(), REJECT_FIRST.getCode(), EXCEPTION.getCode(), DEL.getCode());
+		/**
+		 * 中止状态
+		 * @return
+		 */
+		public static List<String> getEndStatus(){
+			return Arrays.asList(REFUND_SUCCESS.getCode(), REFUND_EXCEPTION.getCode(), REJECT_FIRST.getCode(), EXCEPTION.getCode());
 		}
+
+		/**
+		 * 完成状态
+		 * @return
+		 */
+		public static List<String> getCompleteStatus() {
+			return Arrays.asList(REFUND_SUCCESS.getCode());
+		}
+
+		/**
+		 * 票已退未退款: 一审拒
+		 * @return
+		 */
+		public static List<String> getTicketRefundedStatus() {
+			return Arrays.asList(REJECT_FIRST.getCode());
+		}
+
+		/**
+		 * 异常
+		 * @return
+		 */
+		public static List<String> getTicketRefundFail() {
+			return Arrays.asList(REFUND_EXCEPTION.getCode(), EXCEPTION.getCode());
+		}
+
 
 		public static String getLabelByName(String code) {
 			return Arrays.stream(RefundAuditingStatus.values()).filter(s->s.getCode().equals(code)).findFirst().orElse(UN_KNOW).getLabel();
