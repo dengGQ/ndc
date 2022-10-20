@@ -32,6 +32,7 @@ import com.ndc.channel.flight.xmlBean.verifyPrice.request.bean.PriceClassList;
 import com.ndc.channel.flight.xmlBean.verifyPrice.response.bean.*;
 import com.ndc.channel.redis.RedisKeyConstants;
 import com.ndc.channel.redis.RedisUtils;
+import com.ndc.channel.util.FlightKeyUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -67,8 +68,8 @@ public class NdcFlightVerifyPriceHandler {
     public CorpApiFlightVerifyPriceData verifyPrice(FeiBaApiVerifyPriceReq verifyPriceParams) {
 
         final FeibaApiVerificationParams params = verifyPriceParams.getPriceVerificationParams();
-        final String flightId = params.getFlightId();
         final String ticketId = params.getTicketId();
+        final String flightId = FlightKeyUtils.getFlightIdByTicketId(ticketId);
 
         final String redisFlightDataCacheKey = RedisKeyConstants.getRedisFlightDataCacheKey(flightId);
         CorpApiFlightListDataV2 flightData = redisUtils.get(redisFlightDataCacheKey, CorpApiFlightListDataV2.class);

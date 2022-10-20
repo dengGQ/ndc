@@ -1,44 +1,13 @@
 package com.ndc.channel.util;
 
-import com.ndc.channel.model.FlightIdInfo;
-import com.ndc.channel.model.TicketIdInfo;
-import org.apache.commons.lang3.StringUtils;
+import com.ndc.channel.exception.BusinessException;
+import com.ndc.channel.exception.BusinessExceptionCode;
 
 public class FlightKeyUtils {
 
-    // 2021-08-2708001015MU5102PEKSHA
-    public static FlightIdInfo processFlightId(String flightId) {
-        FlightIdInfo flightIdInfo = new FlightIdInfo();
+    public static final String SEP = "|";
+    public static final String SEP_REG = "\\|";
 
-        flightIdInfo.setFlightId(flightId);
-        flightIdInfo.setFlightNumber(flightId.substring(18, 24));
-        flightIdInfo.setAirlineCode(flightIdInfo.getFlightNumber().substring(0, 2));
-        flightIdInfo.setFlightDate(flightId.substring(0, 10));
-        flightIdInfo.setDepartureTime(flightId.substring(10, 14));
-        flightIdInfo.setDestinationTime(flightId.substring(14, 18));
-        flightIdInfo.setDepartureAirportCode(flightId.substring(24, 27));
-        flightIdInfo.setDestinationAirportCode(flightId.substring(27));
-
-        return flightIdInfo;
-    }
-
-    /**
-     *
-     * @param flightId {@link #getFlightId(String, String, String, String, String, String)}
-     * @param ticketId {@link #getTicketId(Long, String, String, String)}
-     * @return
-     */
-    public static TicketIdInfo processTicketId(String flightId, String ticketId) {
-        TicketIdInfo ticketIdInfo = new TicketIdInfo();
-
-        ticketIdInfo.setChannelId(Long.valueOf(ticketId.split("-")[0]));
-        ticketIdInfo.setProductType(ticketId.substring(ticketId.length()-1));
-
-        String str = ticketId.split(flightId)[1];
-        ticketIdInfo.setSeatClassCode(str.substring(0, str.length()-1));
-
-        return ticketIdInfo;
-    }
 
     /**
      * 生成flightId
@@ -51,10 +20,24 @@ public class FlightKeyUtils {
      * @param toAirport    到达机场
      * @return
      */
+    @Deprecated
     public static String getFlightId(String flightDate, String depTime, String arrTime, String flightNumber,
                                      String fromAirport, String toAirport) {
         return new StringBuffer().append(flightDate).append(depTime).append(arrTime).append(flightNumber)
                 .append(fromAirport).append(toAirport).toString();
+    }
+    // 968d9364-bd83-4fc2-a532-a680a9971cfa@MF8123
+    public static String getFlightId(String shopingResponseId, String flightNumber) {
+        return new StringBuffer(shopingResponseId).append(SEP).append(flightNumber).toString();
+    }
+    public static String getFlightIdByTicketId(String ticketId) {
+        try{
+
+            return ticketId.split(SEP_REG)[0];
+        }catch (Exception e) {
+
+            throw new BusinessException(BusinessExceptionCode.REQUEST_PARAM_ERROR, "机票ID格式错误!");
+        }
     }
 
     /**
@@ -64,7 +47,13 @@ public class FlightKeyUtils {
      * @param seatClassCode 舱位代码
      * @return
      */
+    @Deprecated
     public static String getTicketId(String flightId, String productType, String seatClassCode, String offerItem) {
         return new StringBuffer().append(flightId).append(seatClassCode).append(productType).append("@").append(offerItem).toString();
+    }
+
+    // 968d9364-bd83-4fc2-a532-a680a9971cfa|MF8123|S
+    public static String getTicketId(String flightId, String seatClassCode) {
+        return new StringBuffer(flightId).append(SEP).append(seatClassCode).toString();
     }
 }

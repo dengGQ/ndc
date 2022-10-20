@@ -113,9 +113,7 @@ public class NdcFlightChangeFlightSearchHandler {
             for (PaxJourney paxJourney : paxJourneyList) {
 
                 if (paxJourney.getPaxSegmentRefID().contains(paxSegment.getPaxSegmentID())) {
-                    CorpApiFlightListDataV2 corpApiFlightListDataV2 = flightDataConvertFromPaxSegment(originDest, paxJourney, paxSegment, flightDate, depCityCode, destCityCode);
-
-                    corpApiFlightListDataV2.setShoppingResponseID(shoppingResponse.getShoppingResponseID());
+                    CorpApiFlightListDataV2 corpApiFlightListDataV2 = flightDataConvertFromPaxSegment(shoppingResponse.getShoppingResponseID(), originDest, paxJourney, paxSegment, flightDate, depCityCode, destCityCode);
                     flightDataList.add(corpApiFlightListDataV2);
                 }
             }
@@ -209,9 +207,10 @@ public class NdcFlightChangeFlightSearchHandler {
         return flightDataList;
     }
 
-    private CorpApiFlightListDataV2 flightDataConvertFromPaxSegment(OriginDest originDest, PaxJourney paxJourney, PaxSegment paxSegment, String flightDate, String depCityCode, String destCityCode) {
+    private CorpApiFlightListDataV2 flightDataConvertFromPaxSegment(String shoppingResponseID, OriginDest originDest, PaxJourney paxJourney, PaxSegment paxSegment, String flightDate, String depCityCode, String destCityCode) {
 
         CorpApiFlightListDataV2 corpApiFlight = new CorpApiFlightListDataV2();
+        corpApiFlight.setShoppingResponseID(shoppingResponseID);
 
         // 渠道信息
         corpApiFlight.setOriginDestID(originDest.getOriginDestID());
@@ -284,7 +283,8 @@ public class NdcFlightChangeFlightSearchHandler {
         corpApiFlight.setMainFlightNumber(operationCarrierFlightNumber);
         corpApiFlight.setMainAirlineShortName("东方航空");
 
-        corpApiFlight.setFlightId(FlightKeyUtils.getFlightId(flightDate, departureTime, arriveTime, flightNumber, corpApiFlight.getDepartureAirportCode(), corpApiFlight.getDestinationAirportCode()));
+//        corpApiFlight.setFlightId(FlightKeyUtils.getFlightId(flightDate, departureTime, arriveTime, flightNumber, corpApiFlight.getDepartureAirportCode(), corpApiFlight.getDestinationAirportCode()));
+        corpApiFlight.setFlightId(FlightKeyUtils.getFlightId(shoppingResponseID, flightNumber));
         return corpApiFlight;
     }
 
@@ -326,7 +326,7 @@ public class NdcFlightChangeFlightSearchHandler {
         ticketData.setTicketPrice(new BigDecimal(baseAmount.getValue()));
         ticketData.setPrice(ticketData.getTicketPrice());
         ticketData.setPurchasePrice(ticketData.getTicketPrice());
-        ticketData.setTicketId(FlightKeyUtils.getTicketId(flightData.getFlightId(), ticketData.getProductType(), ticketData.getSeatClassCode(), offerItemID));
+        ticketData.setTicketId(FlightKeyUtils.getTicketId(flightData.getFlightId(), ticketData.getSeatClassCode()));
 
         ticketData.setOfferItemId(offerItemID);
 

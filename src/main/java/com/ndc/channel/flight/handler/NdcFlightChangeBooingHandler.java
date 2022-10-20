@@ -18,6 +18,7 @@ import com.ndc.channel.mapper.NdcFlightApiOrderRelMapper;
 import com.ndc.channel.redis.RedisKeyConstants;
 import com.ndc.channel.redis.RedisUtils;
 import com.ndc.channel.service.NdcFlightApiChangeOrderRelService;
+import com.ndc.channel.util.FlightKeyUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -43,11 +44,14 @@ public class NdcFlightChangeBooingHandler {
 
     public String changeBooking(ChangeBookingReqParams params) {
 
+        final String ticketId = params.getTicketId();
+        final String flightId = FlightKeyUtils.getFlightIdByTicketId(ticketId);
+
         final NdcFlightApiOrderRel orderRel = orderRelMapper.selectByOrderId(params.getOrderNumber());
 
-        CorpApiFlightListDataV2 flightData = redisUtils.get(RedisKeyConstants.getRedisFlightChangeDataCacheKey(params.getFlightId()), CorpApiFlightListDataV2.class);
+        CorpApiFlightListDataV2 flightData = redisUtils.get(RedisKeyConstants.getRedisFlightChangeDataCacheKey(flightId), CorpApiFlightListDataV2.class);
 
-        CorpApiTicketData ticketData = redisUtils.hGet(RedisKeyConstants.getRedisTicketChangeDataCacheKey(params.getFlightId()), params.getTicketId(), CorpApiTicketData.class);
+        CorpApiTicketData ticketData = redisUtils.hGet(RedisKeyConstants.getRedisTicketChangeDataCacheKey(flightId), ticketId, CorpApiTicketData.class);
 
         final IATAOrderViewRS viewRS = ndcApiTools.changeBooking(createIATAOrderChangeRQ(orderRel, params, flightData, ticketData));
 

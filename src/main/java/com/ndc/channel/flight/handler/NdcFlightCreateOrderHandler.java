@@ -19,6 +19,7 @@ import com.ndc.channel.mapper.NdcFlightApiOrderRelMapper;
 import com.ndc.channel.redis.RedisKeyConstants;
 import com.ndc.channel.redis.RedisUtils;
 import com.ndc.channel.service.NdcFlightApiOrderRelService;
+import com.ndc.channel.util.FlightKeyUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -56,8 +57,8 @@ public class NdcFlightCreateOrderHandler {
         CorpApiFlightOrderCreateData orderCreateData = new CorpApiFlightOrderCreateData();
 
         final CorpApiOrderFlightTicketParams ticketParams = orderCreateReq.getTickets().get(0);
-        final String flightId = ticketParams.getFlightId();
         final String ticketId = ticketParams.getTicketId();
+        final String flightId = FlightKeyUtils.getFlightIdByTicketId(ticketId);
 
         CorpApiFlightListDataV2 flightData = redisUtils.get(RedisKeyConstants.getRedisFlightDataCacheKey(flightId), CorpApiFlightListDataV2.class);
         CorpApiTicketData ticketData = redisUtils.hGet(RedisKeyConstants.getRedisTicketDataCacheKey(flightId), ticketId, CorpApiTicketData.class);
