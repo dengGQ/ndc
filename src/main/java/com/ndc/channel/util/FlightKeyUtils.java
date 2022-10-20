@@ -5,8 +5,9 @@ import com.ndc.channel.exception.BusinessExceptionCode;
 
 public class FlightKeyUtils {
 
-    public static final String SEP = "|";
-    public static final String SEP_REG = "\\|";
+    public static final String SEP = "@";
+    public static final String SEP_TICKET_ID = "|";
+    public static final String SEP_TICKET_ID_REG = "\\|";
 
 
     /**
@@ -33,7 +34,7 @@ public class FlightKeyUtils {
     public static String getFlightIdByTicketId(String ticketId) {
         try{
 
-            return ticketId.split(SEP_REG)[0];
+            return ticketId.split(SEP_TICKET_ID_REG)[0];
         }catch (Exception e) {
 
             throw new BusinessException(BusinessExceptionCode.REQUEST_PARAM_ERROR, "机票ID格式错误!");
@@ -52,8 +53,8 @@ public class FlightKeyUtils {
         return new StringBuffer().append(flightId).append(seatClassCode).append(productType).append("@").append(offerItem).toString();
     }
 
-    // 968d9364-bd83-4fc2-a532-a680a9971cfa|MF8123|S
-    public static String getTicketId(String flightId, String seatClassCode) {
-        return new StringBuffer(flightId).append(SEP).append(seatClassCode).toString();
+    // 968d9364-bd83-4fc2-a532-a680a9971cfa@MF8123|S@54313
+    public static String getTicketId(String flightId, String seatClassCode, String offerItem) {
+        return new StringBuffer(flightId).append(SEP_TICKET_ID).append(seatClassCode).append(offerItem).toString();
     }
 }
